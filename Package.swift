@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "UILibrary",
+    name: "ios-ui-library",
     defaultLocalization: "en",
     platforms: [
       .iOS(.v17),

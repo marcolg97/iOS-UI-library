@@ -9,37 +9,53 @@ import SwiftUI
 
 import PopupView
 
+// Internal constants used to control popup vertical padding. Keeps magic numbers in one place.
+private enum Constants {
+    static let tabBarPadding: CGFloat = 60
+    static let defaultPadding: CGFloat = 20
+}
+
 /// A view modifier that adds an offline banner and a dismissable popup to any view.
 /// - Parameters:
 ///   - showOfflineBanner: Binding controlling the offline banner visibility.
 ///   - popupContent: The view to display as the popup.
 ///   - offlineBannerBackground: The background color for the offline banner.
+/// ViewModifier that displays a top status bar and a bottom popup when the app is offline.
+///
+/// - Layer: Organism
+/// - Responsibility: Present an app-wide visual indicator (top status bar) and a transient
+///   bottom popup for offline / critical status. Styling is injected via
+///   `BackgroundStatusBarStyle` and `Popup` content.
+/// - Usage: Apply to any root view to surface offline UI consistently across screens.
+@MainActor
 public struct StatusBarAndPopupModifier<PopupContent: View>: ViewModifier {
-    /// Global offline state — controls visibility of both the status bar and popup.
+    /// Generic boolean that controls visibility of the top status bar and bottom popup.
+    /// Use `hasToShow` when the modifier should represent a generic app‑wide state (offline,
+    /// maintenance, restricted access, etc.). Kept generic for reusability across use cases.
     @Binding public var hasToShow: Bool
 
     private let popupContent: PopupContent
-    private let hasTabbar: Bool
+    private let hasTabBar: Bool
     private let backgroundStatusBarStyle: BackgroundStatusBarStyle
 
     @State private var showPopup: Bool = false
 
     /// Creates a `StatusBarAndPopupModifier`.
     /// - Parameters:
-    ///   - isOffline: Binding controlling whether the offline UI is shown.
+    ///   - hasToShow: Binding controlling whether the top status bar / popup is shown.
     ///   - backgroundStatusBarStyle: Visual style for the top status bar.
-    ///   - hasTabbar: Whether the host view contains a tab bar (affects popup padding).
+    ///   - hasTabBar: Whether the host view contains a tab bar (affects popup padding).
     ///   - popupContent: Builder for the popup content.
     public init(
-        isOffline: Binding<Bool>,
+        hasToShow: Binding<Bool>,
         backgroundStatusBarStyle: BackgroundStatusBarStyle,
-        hasTabbar: Bool,
+        hasTabBar: Bool,
         @ViewBuilder popupContent: () -> PopupContent
     ) {
-        self._hasToShow = isOffline
+        self._hasToShow = hasToShow
         self.popupContent = popupContent()
-        self.showPopup = isOffline.wrappedValue
-        self.hasTabbar = hasTabbar
+        self.showPopup = hasToShow.wrappedValue
+        self.hasTabBar = hasTabBar
         self.backgroundStatusBarStyle = backgroundStatusBarStyle
     }
 
@@ -53,7 +69,7 @@ public struct StatusBarAndPopupModifier<PopupContent: View>: ViewModifier {
                 popupContent
             } customize: {
                 $0
-                    .type(.floater(verticalPadding: hasTabbar ? 60 : 20))
+                    .type(.floater(verticalPadding: hasTabBar ? Constants.tabBarPadding : Constants.defaultPadding))
                     .position(.bottom)
                     .animation(.spring())
             }
@@ -75,27 +91,27 @@ public struct StatusBarAndPopupModifier<PopupContent: View>: ViewModifier {
 ///
 /// Example:
 /// ```swift
-/// .bannerAndPopup(isOffline: $isOffline, backgroundStatusBarStyle: .warning, hasTabbar: true) {
+/// .bannerAndPopup(hasToShow: $hasToShow, backgroundStatusBarStyle: .warning, hasTabBar: true) {
 ///     Popup(...)
 /// }
 /// ```
 public extension View {
     /// Adds a top status bar and a dismissable popup for offline state.
     /// - Parameters:
-    ///   - isOffline: Binding controlling visibility of the offline UI.
+    ///   - hasToShow: Binding controlling visibility of the top status bar / popup.
     ///   - backgroundStatusBarStyle: Style used for the top status bar.
-    ///   - hasTabbar: Whether the host view contains a tab bar.
+    ///   - hasTabBar: Whether the host view contains a tab bar.
     ///   - popupContent: Builder for the popup content.
     func bannerAndPopup<PopupContent: View>(
-        isOffline: Binding<Bool>,
+        hasToShow: Binding<Bool>,
         backgroundStatusBarStyle: BackgroundStatusBarStyle,
-        hasTabbar: Bool,
+        hasTabBar: Bool,
         @ViewBuilder popupContent: () -> PopupContent
     ) -> some View {
         self.modifier(StatusBarAndPopupModifier(
-            isOffline: isOffline,
+            hasToShow: hasToShow,
             backgroundStatusBarStyle: backgroundStatusBarStyle,
-            hasTabbar: hasTabbar,
+            hasTabBar: hasTabBar,
             popupContent: popupContent
         ))
     }
@@ -108,20 +124,20 @@ struct BannerAndPopupTestView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                NavigationLink("Push detail") {
+                NavigationLink(.pushDetail) {
                     DetailView2()
                 }
 
-                Button(isOffline ? "Go Online" : "Go Offline") {
+                Button(isOffline ? .goOnline : .goOffline) {
                     isOffline.toggle()
                 }
             }
-            .navigationTitle("Home")
+            .navigationTitle(.home)
         }
         .bannerAndPopup(
-            isOffline: $isOffline,
+            hasToShow: $isOffline,
             backgroundStatusBarStyle: .warning,
-            hasTabbar: false
+            hasTabBar: false
         ) {
             Popup(icon: "wifi.slash", message: "This is the message", style: .warning)
         }
@@ -131,9 +147,9 @@ struct BannerAndPopupTestView: View {
 struct DetailView2: View {
     var body: some View {
         VStack {
-            Text("Detail screen")
+            Text(.detailScreen)
         }
-        .navigationTitle("Detail")
+        .navigationTitle(.detail)
     }
 }
 
@@ -156,26 +172,26 @@ struct BannerAndPopupWithTabBarPreview: View {
         TabView(selection: $selectedTab) {
             NavigationStack {
                 VStack(spacing: 24) {
-                    Text("Tab 1")
-                    Button(isOffline ? "Go Online" : "Go Offline") {
+                    Text(.tab1)
+                    Button(isOffline ? .goOnline : .goOffline) {
                         isOffline.toggle()
                     }
                 }
-                .navigationTitle("Tab 1")
+                .navigationTitle(.tab1)
             }
             .tabItem {
-                Label("Home", systemImage: "house")
+                Label(.home, systemImage: "house")
             }.tag(0)
 
-            Text("Tab 2")
+            Text(.tab2)
                 .tabItem {
-                    Label("Other", systemImage: "star")
+                    Label(.other, systemImage: "star")
                 }.tag(1)
         }
         .bannerAndPopup(
-            isOffline: $isOffline,
+            hasToShow: $isOffline,
             backgroundStatusBarStyle: .warning,
-            hasTabbar: false
+            hasTabBar: false
         ) {
             Popup(icon: "wifi.slash", message: "This is the message", style: .warning)
         }
@@ -188,17 +204,17 @@ struct BannerAndPopupNoTabBarPreview: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                Text("No Tab Bar")
-                Button(isOffline ? "Go Online" : "Go Offline") {
+                Text(.noTabBar)
+                Button(isOffline ? .goOnline : .goOffline) {
                     isOffline.toggle()
                 }
             }
-            .navigationTitle("No Tab Bar")
+            .navigationTitle(.noTabBar)
         }
         .bannerAndPopup(
-            isOffline: $isOffline,
+            hasToShow: $isOffline,
             backgroundStatusBarStyle: .warning,
-            hasTabbar: false
+            hasTabBar: false
         ) {
             Popup(icon: "wifi.slash", message: "This is the message", style: .warning)
         }

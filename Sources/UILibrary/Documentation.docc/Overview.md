@@ -22,7 +22,7 @@ Component reference is authored in-source using SwiftDoc comments and surfaced b
 - `Popup` — `Popup(icon: String, message: String, style: PopupStyle = .neutral)`
 - `PopupStyle` — `PopupStyle(iconColor:textColor:backgroundColor:)` (presets: `.warning`, `.error`, `.success`, `.neutral`)
 - `BackgroundStatusBarStyle` — `BackgroundStatusBarStyle(backgroundColor: Color, height: CGFloat)` (preset: `.warning`)
-- Modifiers: `backgroundStatusBar(isVisible:style:)`, `bannerAndPopup(isOffline:backgroundStatusBarStyle:hasTabbar:popupContent:)`
+- Modifiers: `backgroundStatusBar(isVisible:style:)`, `bannerAndPopup(hasToShow:backgroundStatusBarStyle:hasTabBar:popupContent:)`
 
 How to preview locally
 

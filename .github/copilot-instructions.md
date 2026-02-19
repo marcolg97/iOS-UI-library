@@ -13,6 +13,7 @@ UILibrary is a SwiftUI component library built for multi-app reuse, white-labeli
   - `Atoms/`, `Molecules/`, `Organisms/`, `Modifiers/`, `Extensions/`, `Layout/`, `Utilities/`
   - Each component in its own folder: e.g. `Organisms/OfflinePopup/OfflinePopup.swift`, `OfflinePopupStyle.swift`
 - **Docs:** Document component APIs in‑source using SwiftDoc/DocC; do not add per‑component Markdown files under `Docs/Components/`.
+
 ## Theming & Integration
 
 - **No brand tokens:** UILibrary never contains brand or semantic tokens. All theming is provided by the app or a design system module.

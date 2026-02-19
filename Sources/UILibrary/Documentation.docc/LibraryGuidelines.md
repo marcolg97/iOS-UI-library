@@ -8,13 +8,13 @@ Define clear architectural rules for building a reusable, scalable, production�
 
 Goals:
 
-* Strong separation of concerns
-* Brand‑agnostic components
-* High composability
-* Atomic Design driven structure
-* Style injection instead of hardcoded values
-* Predictable folder organization
-* AI and human contributor alignment
+- Strong separation of concerns
+- Brand‑agnostic components
+- High composability
+- Atomic Design driven structure
+- Style injection instead of hardcoded values
+- Predictable folder organization
+- AI and human contributor alignment
 
 ---
 
@@ -24,25 +24,25 @@ Goals:
 
 The UI Library:
 
-* Does NOT contain brand colors
-* Does NOT contain semantic palettes
-* Does NOT contain app-specific business logic
-* Does NOT depend on any App module
+- Does NOT contain brand colors
+- Does NOT contain semantic palettes
+- Does NOT contain app-specific business logic
+- Does NOT depend on any App module
 
 The UI Library exposes:
 
-* Views
-* Styles
-* Configuration structs
-* ViewModifiers
-* Layout primitives
+- Views
+- Styles
+- Configuration structs
+- ViewModifiers
+- Layout primitives
 
 The App (or Design System module) provides:
 
-* Semantic palette
-* Typography system
-* Spacing tokens
-* Concrete Style factories
+- Semantic palette
+- Typography system
+- Spacing tokens
+- Concrete Style factories
 
 Dependency direction:
 
@@ -62,17 +62,17 @@ Smallest UI units. No composition of complex business rules.
 
 Examples:
 
-* PrimaryText
-* IconView
-* DividerLine
-* AvatarImage
-* Spacing
+- PrimaryText
+- IconView
+- DividerLine
+- AvatarImage
+- Spacing
 
 Rules:
 
-* Stateless
-* Highly reusable
-* Accept style/config objects
+- Stateless
+- Highly reusable
+- Accept style/config objects
 
 ---
 
@@ -82,15 +82,15 @@ Composition of atoms.
 
 Examples:
 
-* LabeledIcon
-* TextFieldWithTitle
-* BadgeWithIcon
+- LabeledIcon
+- TextFieldWithTitle
+- BadgeWithIcon
 
 Rules:
 
-* Still reusable across domains
-* No feature logic
-* No navigation
+- Still reusable across domains
+- No feature logic
+- No navigation
 
 ---
 
@@ -100,15 +100,15 @@ Complex UI sections.
 
 Examples:
 
-* OfflinePopup
-* LoginForm
-* ProductCard
+- OfflinePopup
+- LoginForm
+- ProductCard
 
 Rules:
 
-* Built using atoms + molecules
-* Accept Style object
-* No business logic
+- Built using atoms + molecules
+- Accept Style object
+- No business logic
 
 ---
 
@@ -144,10 +144,10 @@ Component(textColor: Color?, backgroundColor: Color?, cornerRadius: CGFloat?)
 
 A Style struct defines:
 
-* Colors
-* Typography
-* Spacing
-* Shape
+- Colors
+- Typography
+- Spacing
+- Shape
 
 It does NOT fetch palette.
 
@@ -173,9 +173,9 @@ Two valid approaches:
 
 Pros:
 
-* Clear dependency
-* Easy testing
-* Explicit
+- Clear dependency
+- Easy testing
+- Explicit
 
 Use for most components.
 
@@ -183,9 +183,9 @@ Use for most components.
 
 Useful when:
 
-* You want automatic theme propagation
-* You want global override capability
-* You want subtree-based theme overrides
+- You want automatic theme propagation
+- You want global override capability
+- You want subtree-based theme overrides
 
 Use sparingly.
 
@@ -212,9 +212,9 @@ Component(style: factory.offlinePopupStyle())
 
 This keeps the UI Library pure while still enabling:
 
-* Runtime theme switching
-* White‑label support
-* Per-feature theme customization
+- Runtime theme switching
+- White‑label support
+- Per-feature theme customization
 
 Environment injection is optional convenience, not a requirement for theming.
 
@@ -289,10 +289,10 @@ Organisms/OfflinePopup/
 
 Contains only:
 
-* OfflinePopup.swift
-* OfflinePopupStyle.swift
-* OfflinePopupConfiguration.swift
-* OfflinePopup+Preview.swift (optional)
+- OfflinePopup.swift
+- OfflinePopupStyle.swift
+- OfflinePopupConfiguration.swift
+- OfflinePopup+Preview.swift (optional)
 
 Never mix unrelated components in same folder.
 
@@ -302,9 +302,9 @@ Never mix unrelated components in same folder.
 
 Use ViewModifier when:
 
-* Styling is reusable
-* Behavior is reusable
-* Multiple components need it
+- Styling is reusable
+- Behavior is reusable
+- Multiple components need it
 
 Do NOT put ViewModifiers inside component file unless private.
 
@@ -318,9 +318,9 @@ Modifiers/
 
 Only create extensions for:
 
-* View helpers
-* Safe Color helpers
-* Reusable computed properties
+- View helpers
+- Safe Color helpers
+- Reusable computed properties
 
 Never put business logic in extensions.
 
@@ -328,9 +328,9 @@ Never put business logic in extensions.
 
 # Naming Conventions
 
-* Use semantic names
-* Avoid “Custom”, “My”, “Base”
-* Avoid UI references to brand
+- Use semantic names
+- Avoid “Custom”, “My”, “Base”
+- Avoid UI references to brand
 
 Correct:
 
@@ -349,13 +349,13 @@ AppPrimaryBlueButton
 
 When AI generates components:
 
-* Must follow Atomic Design layer
-* Must generate Style struct
-* Must avoid hardcoded colors
-* Must avoid business logic
-* Must not introduce dependencies to App module
-* Must keep initializer minimal
-* Must avoid optional styling parameters
+- Must follow Atomic Design layer
+- Must generate Style struct
+- Must avoid hardcoded colors
+- Must avoid business logic
+- Must not introduce dependencies to App module
+- Must keep initializer minimal
+- Must avoid optional styling parameters
 
 ---
 
@@ -363,24 +363,24 @@ When AI generates components:
 
 When developers add components:
 
-* Respect folder structure
-* Extract style
-* Keep views small
-* Compose instead of nesting deeply
-* Do not add semantic palette here
-* Add preview for validation
+- Respect folder structure
+- Extract style
+- Keep views small
+- Compose instead of nesting deeply
+- Do not add semantic palette here
+- Add preview for validation
 
 ---
 
 # What Never Goes Into UI Library
 
-* Networking
-* Feature logic
-* ViewModels tied to feature
-* Analytics
-* Navigation logic
-* Brand palette
-* App theme
+- Networking
+- Feature logic
+- ViewModels tied to feature
+- Analytics
+- Navigation logic
+- Brand palette
+- App theme
 
 ---
 
@@ -402,31 +402,31 @@ All public APIs must include structured documentation comments.
 
 Each public type must document:
 
-* Responsibility
-* Usage context
-* Layer (Atom, Molecule, Organism)
+- Responsibility
+- Usage context
+- Layer (Atom, Molecule, Organism)
 
 Each public function must document:
 
-* Purpose
-* Parameters
-* Return value
-* Failure conditions (if any)
+- Purpose
+- Parameters
+- Return value
+- Failure conditions (if any)
 
 Example:
 
 /// Displays a transient offline notification banner.
 /// - Parameters:
-///   - icon: System image name.
-///   - message: Message displayed to the user.
-///   - style: Visual style configuration.
+/// - icon: System image name.
+/// - message: Message displayed to the user.
+/// - style: Visual style configuration.
 /// - Note: Organism component. No business logic allowed.
 
 Avoid:
 
-* Redundant comments
-* Obvious descriptions
-* Implementation details in public docs
+- Redundant comments
+- Obvious descriptions
+- Implementation details in public docs
 
 ---
 
@@ -472,10 +472,10 @@ All component documentation must be authored in‑source using SwiftDoc/DocC com
 
 Required per-component documentation (in‑source):
 
-* Responsibility and layer (Atom / Molecule / Organism)
-* Public API documentation (parameters, usage, failure modes)
-* Style contract description (if the component exposes a Style struct)
-* Short usage example and preview notes
+- Responsibility and layer (Atom / Molecule / Organism)
+- Public API documentation (parameters, usage, failure modes)
+- Style contract description (if the component exposes a Style struct)
+- Short usage example and preview notes
 
 Do NOT create separate Markdown files under `Documentation.docc/Components/` for component API reference — prefer in‑source DocC comments. If a repository still contains legacy component Markdown files, mark them as deprecated and migrate examples into in‑source SwiftDoc comments.
 
@@ -495,10 +495,10 @@ Steps:
 
 This provides:
 
-* Searchable API docs
-* Symbol graphs
-* Tutorials
-* Visual hierarchy
+- Searchable API docs
+- Symbol graphs
+- Tutorials
+- Visual hierarchy
 
 ---
 
@@ -506,9 +506,9 @@ This provides:
 
 Follow Semantic Versioning:
 
-* MAJOR: Breaking API change
-* MINOR: New backward-compatible feature
-* PATCH: Bug fixes
+- MAJOR: Breaking API change
+- MINOR: New backward-compatible feature
+- PATCH: Bug fixes
 
 Never introduce breaking changes silently.
 
@@ -518,19 +518,18 @@ Document all changes in CHANGELOG.md.
 
 # Long Term Scalability Strategy
 
-* Keep atoms extremely stable
-* Evolve molecules carefully
-* Allow organisms to be replaced
-* Keep Style structs backward compatible
-* Avoid breaking public APIs
+- Keep atoms extremely stable
+- Evolve molecules carefully
+- Allow organisms to be replaced
+- Keep Style structs backward compatible
+- Avoid breaking public APIs
 
 ---
 
 This structure ensures:
 
-* Multi‑brand support
-* White label readiness
-* Testability
-* Maintainability
-* Predictable scaling across apps
-
+- Multi‑brand support
+- White label readiness
+- Testability
+- Maintainability
+- Predictable scaling across apps

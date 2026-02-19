@@ -15,7 +15,7 @@ struct MockTest {
         // ensure modifiers are available
         let _ = Text("x")
             .backgroundStatusBar(isVisible: true, style: BackgroundStatusBarStyle.warning)
-            .bannerAndPopup(isOffline: Binding.constant(true), backgroundStatusBarStyle: BackgroundStatusBarStyle.warning, hasTabbar: false) {
+            .bannerAndPopup(hasToShow: Binding.constant(true), backgroundStatusBarStyle: BackgroundStatusBarStyle.warning, hasTabBar: false) {
                 Popup(icon: "wifi.slash", message: "m", style: PopupStyle.warning)
             }
     }
@@ -32,7 +32,7 @@ struct MockTest {
     @Test func statusBarAndPopupModifier_binding_passthrough() throws {
         var offline = true
         let binding = Binding(get: { offline }, set: { offline = $0 })
-        let modifier = StatusBarAndPopupModifier(isOffline: binding, backgroundStatusBarStyle: .warning, hasTabbar: false) {
+        let modifier = StatusBarAndPopupModifier(hasToShow: binding, backgroundStatusBarStyle: .warning, hasTabBar: false) {
             Popup(icon: "wifi.slash", message: "m", style: PopupStyle.warning)
         }
         
@@ -45,7 +45,7 @@ struct MockTest {
         // compile-time smoke: text, icon-only, custom content
         _ = ActionButton("Primary", style: .primary) {}
         _ = ActionButton(systemName: "trash", style: .destructive) {}
-        _ = ActionButton(isEnabled: true, style: .primary) { HStack { Image(systemName: "plus"); Text("Add") } } action: { }
+        _ = ActionButton(isEnabled: true, style: .primary, action: {}, label:  { HStack { Image(systemName: "plus"); Text("Add") } })
 
         // style sanity checks
         let cyan = ActionButtonStyle.primaryCyan
@@ -59,5 +59,25 @@ struct MockTest {
         XCTAssertEqual(circle.minTapTarget, CGSize(width: 44, height: 44))
         XCTAssertNotNil(circle.borderColor)
         XCTAssertGreaterThanOrEqual(circle.cornerRadius, circle.minTapTarget.height / 2)
+    }
+
+    @Test func progressBar_api_compile_and_style_checks() throws {
+        // compile-time smoke: determinate, indeterminate and segmented
+        _ = ProgressBar(value: 0.5, style: .neutral)
+        _ = ProgressBar(style: .accent)
+        _ = ProgressBar(currentStep: 1, totalSteps: 3)
+
+        // style presets
+        let neutral = ProgressBarStyle.neutral
+        XCTAssertEqual(neutral.height, 6)
+        XCTAssertEqual(neutral.cornerRadius, 3)
+
+        let accent = ProgressBarStyle.accent
+        XCTAssertEqual(accent.progressColor, .accentColor)
+    }
+
+    @Test func progressBar_style_presets_areDistinct() throws {
+        XCTAssertEqual(ProgressBarStyle.neutral, ProgressBarStyle())
+        XCTAssertNotEqual(ProgressBarStyle.neutral, ProgressBarStyle(progressColor: .red))
     }
 }

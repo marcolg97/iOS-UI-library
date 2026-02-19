@@ -12,8 +12,7 @@ UILibrary is a SwiftUI component library built for multi-app reuse, white-labeli
 - **Folder Structure:**
   - `Atoms/`, `Molecules/`, `Organisms/`, `Modifiers/`, `Extensions/`, `Layout/`, `Utilities/`
   - Each component in its own folder: e.g. `Organisms/OfflinePopup/OfflinePopup.swift`, `OfflinePopupStyle.swift`
-- **Docs:** Every component must have a corresponding markdown file in `Docs/Components/`.
-
+- **Docs:** Document component APIs in‑source using SwiftDoc/DocC; do not add per‑component Markdown files under `Docs/Components/`.
 ## Theming & Integration
 
 - **No brand tokens:** UILibrary never contains brand or semantic tokens. All theming is provided by the app or a design system module.
@@ -27,7 +26,7 @@ UILibrary is a SwiftUI component library built for multi-app reuse, white-labeli
 - **Test:** Tests are in `Tests/UILibraryTests/`. Run via Xcode or `swift test`.
 - **Add/Update Component:**
   1. Add or update code in the correct Atomic layer folder.
-  2. Update or create the corresponding doc in `Docs/Components/`.
+  2. Update the component's SwiftDoc comments in‑source so DocC generates up‑to‑date API pages (add conceptual articles to `Sources/UILibrary/Documentation.docc/` only when needed).
   3. Update the component list in `README.md`.
   4. Update `CHANGELOG.md` following Semantic Versioning.
   5. Ensure previews compile and cover new variants.
@@ -69,7 +68,7 @@ Maintain strict separation for scalable, reusable, and brand-independent UI.
 Before considering any change (feature, fix, refactor, breaking change) as complete, always check:
 
 - [ ] Code updated in the correct folder (Atoms/Molecules/Organisms/…)
-- [ ] Documentation updated/created in `Docs/Components/`
+- [ ] Documentation updated in‑source (SwiftDoc/DocC)
 - [ ] Component list updated in `README.md`
 - [ ] `CHANGELOG.md` updated following SemVer
 - [ ] Previews compile and cover new variants

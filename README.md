@@ -113,24 +113,13 @@ Maintain an updated list of public components.
 - **BackgroundStatusBarView** – Top overlay bar for app-wide status (e.g. offline, warning). Modifier: `.backgroundStatusBar(isVisible: Bool, style: BackgroundStatusBarStyle)`
 - **StatusBarAndPopupModifier** – Adds both a status bar and a dismissable popup to any view for critical states. Modifier: `.bannerAndPopup(isOffline: Binding<Bool>, backgroundStatusBarStyle: BackgroundStatusBarStyle, hasTabbar: Bool, popupContent: () -> PopupContent)`
 
-This list must always reflect the current public API. Each Organism has a dedicated documentation file in `Docs/Components/`.
+This list must always reflect the current public API. Component API reference must be authored in‑source using SwiftDoc/DocC (see "Documentation Structure" below).
 
 ---
 
 # Documentation Structure
 
-Repository must contain:
-
-```
-Docs/
-├── Architecture.md
-├── Theming.md
-└── Components/
-    ├── OfflinePopup.md
-    └── ...
-```
-
-Every component must have a corresponding `.md` file inside `Docs/Components/`.
+All public API documentation must be authored in‑source using SwiftDoc/DocC comments. Use `Sources/UILibrary/Documentation.docc/` only for high‑level conceptual articles (guides, theming, architecture). Avoid creating per‑component Markdown files to prevent documentation drift.
 
 How to preview the DocC catalog locally
 
@@ -140,7 +129,7 @@ How to preview the DocC catalog locally
 
 Notes
 
-- Keep `Sources/Docs/Documentation.docc/` as the single source for generated documentation used by DocC. Avoid maintaining duplicate Markdown outside this catalog to prevent drift.
+- Keep the in‑source SwiftDoc comments as the single source of truth for component API docs; use `Documentation.docc/` for tutorials and conceptual articles only.
 
 ---
 

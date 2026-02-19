@@ -466,27 +466,18 @@ UILibrary
 
 ---
 
-## Per Component Documentation
+## Per-component documentation (DocC in‑source)
 
-Each component should have:
+All component documentation must be authored in‑source using SwiftDoc/DocC comments. This ensures API docs, symbol graphs and rendered DocC pages remain the single source of truth and prevents drift between code and external Markdown files.
 
-* Description
-* Layer classification
-* Style explanation
-* Usage example
-* Preview image (optional)
+Required per-component documentation (in‑source):
 
-Example structure inside Docs/Components:
+* Responsibility and layer (Atom / Molecule / Organism)
+* Public API documentation (parameters, usage, failure modes)
+* Style contract description (if the component exposes a Style struct)
+* Short usage example and preview notes
 
-OfflinePopup.md
-
-Contents:
-
-* Overview
-* Public API
-* Style Contract
-* Usage
-* Do / Don’t
+Do NOT create separate Markdown files under `Documentation.docc/Components/` for component API reference — prefer in‑source DocC comments. If a repository still contains legacy component Markdown files, mark them as deprecated and migrate examples into in‑source SwiftDoc comments.
 
 ---
 

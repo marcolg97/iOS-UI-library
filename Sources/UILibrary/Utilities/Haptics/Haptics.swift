@@ -8,7 +8,10 @@
 import Foundation
 #if os(macOS)
 import AppKit
+#else
+import UIKit
 #endif
+
 
 /// Cross-platform haptics helper.
 /// - iOS: maps to `UIImpactFeedbackGenerator` / `UINotificationFeedbackGenerator`.

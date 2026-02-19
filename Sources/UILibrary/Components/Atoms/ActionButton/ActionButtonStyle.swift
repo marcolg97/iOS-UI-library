@@ -21,9 +21,11 @@ public struct ActionButtonStyle: Equatable, Sendable {
     public let shadowColor: Color
     public let shadowRadius: CGFloat
     public let shadowYOffset: CGFloat
-    public let fullWidth: Bool
+    /// Default maximum width for the button. `nil` means intrinsic/content width; use `.infinity` to expand.
+    public let defaultMaxWidth: CGFloat?
 
     /// Creates an `ActionButtonStyle`.
+    /// - Parameter defaultMaxWidth: Optional default `maxWidth` applied to the button. If `nil` the button sizes to its content.
     public init(
         backgroundColor: Color = .accentColor,
         foregroundColor: Color = .white,
@@ -39,7 +41,7 @@ public struct ActionButtonStyle: Equatable, Sendable {
         shadowColor: Color = Color.black.opacity(0.12),
         shadowRadius: CGFloat = 6,
         shadowYOffset: CGFloat = 4,
-        fullWidth: Bool = true
+        defaultMaxWidth: CGFloat? = .infinity
     ) {
         self.backgroundColor = backgroundColor
         self.foregroundColor = foregroundColor
@@ -55,6 +57,6 @@ public struct ActionButtonStyle: Equatable, Sendable {
         self.shadowColor = shadowColor
         self.shadowRadius = shadowRadius
         self.shadowYOffset = shadowYOffset
-        self.fullWidth = fullWidth
+        self.defaultMaxWidth = defaultMaxWidth
     }
 }

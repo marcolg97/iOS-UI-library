@@ -20,7 +20,7 @@ Components
 Component reference is authored in-source using SwiftDoc comments and surfaced by DocC as symbol pages. Key public symbols:
 
 - `Card` — `Card(style: CardStyle = .neutral, @ViewBuilder bodyContent: () -> BodyContent)` (style: `CardStyle` — presets: `.neutral`, `.surface`)
-- `GhostButton` — `GhostButton(text: LocalizedStringResource, systemName: String? = nil, style: GhostButtonStyle = .neutral, action: () -> Void)` (style: `GhostButtonStyle` — presets: `.neutral`, `.emphasized`)
+- `ActionButton` — `ActionButton(_: LocalizedStringResource, style: ActionButtonStyle = .primary, action: () -> Void)` (style: `ActionButtonStyle` — presets: `.primary`, `.secondary`, `.destructive`, `.ghost`, `.primaryCyan`, `.iconCircle`)
 - `LabelImage` — `LabelImage(style: LabelImageStyle = .neutral, label: () -> LabelContent, icon: () -> IconContent)` (style: `LabelImageStyle` — presets: `.neutral`, `.compact`)
 - `Popup` — `Popup(icon: String, message: String, style: PopupStyle = .neutral)`
 - `PopupStyle` — `PopupStyle(iconColor:textColor:backgroundColor:)` (presets: `.warning`, `.error`, `.success`, `.neutral`)

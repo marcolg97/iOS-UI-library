@@ -40,4 +40,24 @@ struct MockTest {
         offline = false
         XCTAssertFalse(modifier.hasToShow)
     }
+
+    @Test func actionButton_api_compile_and_style_checks() throws {
+        // compile-time smoke: text, icon-only, custom content
+        _ = ActionButton("Primary", style: .primary) {}
+        _ = ActionButton(systemName: "trash", style: .destructive) {}
+        _ = ActionButton(isEnabled: true, style: .primary) { HStack { Image(systemName: "plus"); Text("Add") } } action: { }
+
+        // style sanity checks
+        let cyan = ActionButtonStyle.primaryCyan
+        XCTAssertEqual(cyan.cornerRadius, 16)
+        XCTAssertEqual(cyan.shadowRadius, 10)
+        XCTAssertEqual(cyan.defaultMaxWidth, .infinity)
+
+        // circular icon button style
+        let circle = ActionButtonStyle.iconCircle
+        XCTAssertEqual(circle.defaultMaxWidth, 44)
+        XCTAssertEqual(circle.minTapTarget, CGSize(width: 44, height: 44))
+        XCTAssertNotNil(circle.borderColor)
+        XCTAssertGreaterThanOrEqual(circle.cornerRadius, circle.minTapTarget.height / 2)
+    }
 }

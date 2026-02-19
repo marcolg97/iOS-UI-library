@@ -12,7 +12,7 @@ public extension ActionButtonStyle {
         disabledForegroundColor: Color.primary.opacity(0.5),
         borderColor: Color.accentColor.opacity(0.12),
         shadowColor: .clear,
-        fullWidth: true
+        defaultMaxWidth: .infinity
     )
 
     /// Destructive — strong red emphasis for destructive actions.
@@ -21,7 +21,8 @@ public extension ActionButtonStyle {
         foregroundColor: .white,
         disabledBackgroundColor: Color.red.opacity(0.3),
         disabledForegroundColor: Color.primary.opacity(0.6),
-        shadowColor: Color.red.opacity(0.12)
+        shadowColor: Color.red.opacity(0.12),
+        defaultMaxWidth: .infinity
     )
 
     /// Ghost/tertiary — no background or shadow, just tappable text (useful for footers).
@@ -31,7 +32,7 @@ public extension ActionButtonStyle {
         disabledBackgroundColor: .clear,
         disabledForegroundColor: Color.accentColor.opacity(0.5),
         shadowColor: .clear,
-        fullWidth: false
+        defaultMaxWidth: nil
     )
 
     /// Primary (cyan) — reproduces the look of `PrimaryActionButton` used in app screens.
@@ -47,6 +48,23 @@ public extension ActionButtonStyle {
         shadowColor: Color.cyan.opacity(0.3),
         shadowRadius: 10,
         shadowYOffset: 5,
-        fullWidth: true
+        defaultMaxWidth: .infinity
+    )
+
+    /// Circular icon button with an outlined border. Use for toolbar/compact icon actions.
+    static let iconCircle = ActionButtonStyle(
+        backgroundColor: Color.gray.opacity(0.1),
+        foregroundColor: .accentColor,
+        disabledBackgroundColor: .clear,
+        disabledForegroundColor: Color.accentColor.opacity(0.5),
+        borderColor: Color.primary.opacity(0.12),
+        disabledBorderColor: Color.primary.opacity(0.06),
+        font: .body,
+        cornerRadius: 999,                  // fully rounded
+        verticalPadding: 8,
+        horizontalPadding: 10,
+        minTapTarget: CGSize(width: 44, height: 44),
+        shadowColor: .clear,
+        defaultMaxWidth: 44
     )
 } 

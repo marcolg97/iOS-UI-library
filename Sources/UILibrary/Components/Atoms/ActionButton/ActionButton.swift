@@ -2,71 +2,84 @@ import SwiftUI
 
 /// A reusable, style-driven action button supporting primary / secondary / destructive / ghost presets.
 ///
-/// - Responsibility: single source of truth for primary tappable actions used across the app.
+/// - Responsibility: single source of truth for tappable actions used across the app.
 /// - Style: visual appearance is injected via `ActionButtonStyle`.
+///
+/// ## Features
+/// - Style-driven (immutable `ActionButtonStyle`)
+/// - Size variants (`.compact`, `.regular`, `.large`)
+/// - Content-based initializer for custom labels
+/// - Icon-only convenience initializer
+/// - Accessibility-aware (configurable `accessibilityTrait`)
 ///
 /// ## Usage
 /// ```swift
+/// // Simple text button
 /// ActionButton("Continue", style: .primary) { submit() }
-/// ActionButton("Delete", isEnabled: isReady, style: .destructive) { delete() }
-/// ActionButton("Add more", style: .secondary) { add() }
+///
+/// // Icon-only
+/// ActionButton(systemName: "trash", style: .destructive) { delete() }
+///
+/// // Custom label (content initializer)
+/// ActionButton(isEnabled: true, style: .primary) {
+///     HStack { Image(systemName: "plus"); Text("Add") }
+/// } action: { add() }
 /// ```
-public struct ActionButton: View {
+public struct ActionButton<Label: View>: View {
     /// Size variants for `ActionButton`.
     public enum Size: Equatable {
         case compact, regular, large
     }
 
-    public let title: LocalizedStringResource
-    public let systemName: String?
+    private let label: Label
     public let isEnabled: Bool
     public let size: Size
+
+    // Accessibility trait (default: button)
+    private let accessibilityTrait: AccessibilityTraits
+
     private let style: ActionButtonStyle
     private let action: () -> Void
 
-    /// Creates an `ActionButton`.
-    /// - Parameters:
-    ///   - title: Localized title (string literal supported).
-    ///   - systemName: Optional SF Symbol name shown to the leading edge of the label.
-    ///   - isEnabled: Enable / disable the button (default: `true`).
-    ///   - size: Visual size variant — `.regular` by default.
-    ///   - style: Visual style (default: `.primary`).
-    ///   - action: Tap action.
+    /// Primary generic initializer — action param comes before the label so call-sites
+    /// that use two trailing closures keep the same ordering as before.
     public init(
-        _ title: LocalizedStringResource,
-        systemName: String? = nil,
         isEnabled: Bool = true,
         size: Size = .regular,
         style: ActionButtonStyle = .primary,
-        action: @escaping () -> Void
+        accessibilityTrait: AccessibilityTraits = .isButton,
+        action: @escaping () -> Void,
+        @ViewBuilder label: () -> Label
     ) {
-        self.title = title
-        self.systemName = systemName
+        self.label = label()
         self.isEnabled = isEnabled
         self.size = size
+        self.accessibilityTrait = accessibilityTrait
         self.style = style
         self.action = action
     }
 
     public var body: some View {
         Button(action: action) {
-            HStack(spacing: 10) {
-                if let systemName, !systemName.isEmpty {
-                    Image(systemName: systemName)
+            Group {
+                if let w = fixedWidth {
+                    label
                         .font(fontForSize)
                         .foregroundColor(currentForeground)
+                        .padding(.vertical, verticalPaddingForSize)
+                        .padding(.horizontal, style.horizontalPadding)
+                        .contentShape(Rectangle())
+                        .frame(minWidth: w, maxWidth: w, minHeight: style.minTapTarget.height)
+                } else {
+                    label
+                        .font(fontForSize)
+                        .foregroundColor(currentForeground)
+                        .padding(.vertical, verticalPaddingForSize)
+                        .padding(.horizontal, style.horizontalPadding)
+                        .contentShape(Rectangle())
+                        .frame(maxWidth: style.defaultMaxWidth, minHeight: style.minTapTarget.height)
                 }
-
-                Text(title)
-                    .font(fontForSize)
-                    .foregroundColor(currentForeground)
-                    .lineLimit(1)
-                    .frame(maxWidth: style.fullWidth ? .infinity : nil, alignment: .center)
             }
-            .padding(.vertical, verticalPaddingForSize)
-            .padding(.horizontal, style.horizontalPadding)
-            .contentShape(Rectangle())
-            .frame(minWidth: style.fullWidth ? 0 : nil, minHeight: style.minTapTarget.height)
             .background(backgroundView)
             .overlay(borderOverlay)
             .cornerRadius(style.cornerRadius)
@@ -74,7 +87,7 @@ public struct ActionButton: View {
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
-        .accessibilityAddTraits(.isButton)
+        .accessibilityAddTraits(accessibilityTrait)
     }
 
     private var currentForeground: Color { isEnabled ? style.foregroundColor : style.disabledForegroundColor }
@@ -100,6 +113,12 @@ public struct ActionButton: View {
         }
     }
 
+    /// Fixed width to apply when `defaultMaxWidth` is a finite value.
+    private var fixedWidth: CGFloat? {
+        guard let w = style.defaultMaxWidth, w.isFinite else { return nil }
+        return w
+    }
+
     @ViewBuilder
     private var backgroundView: some View {
         RoundedRectangle(cornerRadius: style.cornerRadius).fill(currentBackground)
@@ -113,6 +132,36 @@ public struct ActionButton: View {
                 .stroke(strokeColor, lineWidth: 1)
         } else {
             EmptyView()
+        }
+    }
+}
+
+extension ActionButton {
+    /// Convenience initializer for simple text labels (`Label == Text`).
+    public init(
+        _ title: LocalizedStringResource,
+        isEnabled: Bool = true,
+        size: Size = .regular,
+        style: ActionButtonStyle = .primary,
+        accessibilityTrait: AccessibilityTraits = .isButton,
+        action: @escaping () -> Void
+    ) where Label == Text {
+        self.init(isEnabled: isEnabled, size: size, style: style, accessibilityTrait: accessibilityTrait, action: action) {
+            Text(title)
+        }
+    }
+
+    /// Convenience initializer for icon-only buttons (`Label == Image`).
+    public init(
+        systemName: String,
+        isEnabled: Bool = true,
+        size: Size = .regular,
+        style: ActionButtonStyle = .primary,
+        accessibilityTrait: AccessibilityTraits = .isButton,
+        action: @escaping () -> Void
+    ) where Label == Image {
+        self.init(isEnabled: isEnabled, size: size, style: style, accessibilityTrait: accessibilityTrait, action: action) {
+            Image(systemName: systemName)
         }
     }
 }
@@ -183,6 +232,19 @@ public struct ActionButton: View {
                 HStack(spacing: 12) {
                     ActionButton("Primary", size: .regular, style: .primary) {}
                     ActionButton("Secondary", size: .regular, style: .secondary) {}
+                }
+                .frame(maxWidth: 320)
+            }
+
+            Group {
+                Text("Custom / icon-only examples").font(.caption).foregroundColor(.gray)
+                VStack(spacing: 12) {
+                    ActionButton(systemName: "heart.fill", style: .ghost) {}
+                    ActionButton(systemName: "trash", style: .destructive) {}
+                    ActionButton(systemName: "star", style: .iconCircle) {}
+                    ActionButton(isEnabled: true, style: .primary, action: { }) {
+                        HStack { Image(systemName: "plus"); Text("Add item") }
+                    }
                 }
                 .frame(maxWidth: 320)
             }

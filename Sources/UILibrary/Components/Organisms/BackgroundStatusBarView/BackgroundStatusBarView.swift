@@ -103,7 +103,7 @@ struct DetailView: View {
 
 // MARK: - Preview
 
-#Preview {
+#Preview("Offline banner — interactive") {
     OfflineBannerTestView()
 }
 #endif

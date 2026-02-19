@@ -101,7 +101,8 @@ Maintain an updated list of public components.
 
 ## Atoms
 
-// (No public Atoms implemented yet)
+- `ActionButton` — centralized, style-driven button with size variants, icon-only and custom-content initializers. Use `ActionButtonStyle` presets (`.primary`, `.secondary`, `.destructive`, `.ghost`, `.primaryCyan`, `.iconCircle`).
+
 
 ## Molecules
 

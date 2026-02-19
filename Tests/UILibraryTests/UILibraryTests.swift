@@ -71,6 +71,8 @@ struct MockTest {
         let neutral = ProgressBarStyle.neutral
         XCTAssertEqual(neutral.height, 6)
         XCTAssertEqual(neutral.cornerRadius, 3)
+        // default indeterminate animation duration should be slow for smoother preview
+        XCTAssertEqual(neutral.indeterminateAnimationDuration, 14.0)
 
         let accent = ProgressBarStyle.accent
         XCTAssertEqual(accent.progressColor, .accentColor)

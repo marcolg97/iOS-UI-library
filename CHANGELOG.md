@@ -12,6 +12,7 @@
 - Made `backgroundStatusBar` and `bannerAndPopup` modifier APIs public and documented them.
 - Translated preview strings and documentation comments to English.
 - Removed redundant `public` modifiers inside `public extension`s to eliminate compiler warnings.
+- `ProgressBar`: default indeterminate animation duration set to 14s for a smoother, slower preview animation.
 
 ### Fixed
 - Documentation/parameter-name mismatches and missing initializer docs.

@@ -10,7 +10,7 @@ import SwiftUI
 ///
 /// Usage:
 /// ```swift
-/// ProgressBar(value: 0.6, style: .neutral)        // determinate
+/// ProgressBar(value: 0.6, style: .neutral)        // determinate — callers may animate changes with `withAnimation` or rely on implicit animations
 /// ProgressBar(style: .neutral)                   // indeterminate
 /// ProgressBar(currentStep: 2, totalSteps: 4)     // segmented (onboarding)
 /// ```
@@ -19,9 +19,9 @@ public struct ProgressBar: View {
     private let currentStep: Int?
     private let totalSteps: Int?
     private let style: ProgressBarStyle
-
+    
     @State private var indeterminateOffset: CGFloat = -0.6
-
+    
     /// Determinate or indeterminate initializer. When `value` is `nil` the component shows an indeterminate animation.
     public init(value: Double? = nil, style: ProgressBarStyle = .neutral) {
         self.value = value
@@ -29,7 +29,7 @@ public struct ProgressBar: View {
         self.totalSteps = nil
         self.style = style
     }
-
+    
     /// Segmented/step-based initializer used by onboarding flows.
     /// - Parameters:
     ///   - currentStep: 1-based current step index.
@@ -41,7 +41,7 @@ public struct ProgressBar: View {
         self.totalSteps = max(1, totalSteps)
         self.style = style
     }
-
+    
     public var body: some View {
         if let current = currentStep, let total = totalSteps {
             segmentedBody(current: current, total: total)
@@ -49,7 +49,7 @@ public struct ProgressBar: View {
             determinateOrIndeterminateBody()
         }
     }
-
+    
     @ViewBuilder
     private func determinateOrIndeterminateBody() -> some View {
         GeometryReader { geo in
@@ -57,12 +57,14 @@ public struct ProgressBar: View {
                 Capsule()
                     .fill(style.trackColor)
                     .frame(height: style.height)
-
+                
                 if let v = value {
+                    // determinate — do not force an internal animation so callers can control timing with
+                    // `withAnimation(...)` or rely on SwiftUI implicit animations. This avoids overriding
+                    // parent-provided animations (e.g. preview animations with custom duration).
                     Capsule()
                         .fill(style.progressColor)
                         .frame(width: max(0, min(1, v)) * geo.size.width, height: style.height)
-                        .animation(.linear, value: v)
                 } else {
                     Capsule()
                         .fill(style.progressColor.opacity(0.9))
@@ -81,7 +83,7 @@ public struct ProgressBar: View {
         }
         .frame(height: style.height)
     }
-
+    
     @ViewBuilder
     private func segmentedBody(current: Int, total: Int) -> some View {
         HStack(spacing: style.segmentSpacing) {
@@ -89,11 +91,10 @@ public struct ProgressBar: View {
                 Capsule()
                     .fill(segmentFillColor(for: step, current: current))
                     .frame(width: step == current ? style.segmentActiveWidth : style.segmentInactiveWidth, height: style.height)
-                    .animation(.spring(), value: current)
             }
-
+            
             Spacer()
-
+            
             Text("Step \(current)/\(total)")
                 .font(.caption)
                 .fontWeight(.semibold)
@@ -104,7 +105,7 @@ public struct ProgressBar: View {
         .accessibilityLabel(Text("Progress"))
         .accessibilityValue(Text("Step \(current) of \(total)"))
     }
-
+    
     private func segmentFillColor(for step: Int, current: Int) -> Color {
         if step <= current {
             return style.segmentActiveColor ?? style.progressColor
@@ -112,7 +113,7 @@ public struct ProgressBar: View {
             return style.segmentInactiveColor ?? style.trackColor
         }
     }
-
+    
     private var accessibilityValue: Text {
         if let v = value {
             return Text(String(format: "%.0f%%", v * 100))
@@ -124,18 +125,19 @@ public struct ProgressBar: View {
 
 #Preview("ProgressBar · Determinate / Indeterminate / Segmented") {
     VStack(spacing: 16) {
-        ProgressBar(value: 0.25)
+        ProgressBar(value: 0.25, style: .init(progressColor: .green, height: 20))
             .frame(height: 6)
+        
         ProgressBar(value: 0.5, style: .accent)
             .frame(height: 8)
-
+        
         Text("Indeterminate")
             .font(.caption)
             .foregroundColor(.gray)
         ProgressBar(style: .accent)
             .frame(height: 6)
             .frame(maxWidth: 300)
-
+        
         Text("Segmented (onboarding style)")
             .font(.caption)
             .foregroundColor(.gray)
@@ -143,4 +145,16 @@ public struct ProgressBar: View {
             .frame(maxWidth: 360)
     }
     .padding()
+}
+
+#Preview("ProgressView Animation") {
+    @Previewable @State var value: Double = 0
+    
+    ProgressBar(value: value, style: .init(progressColor: .green, height: 20))
+        .frame(height: 6)
+        .onAppear {
+            withAnimation(.linear(duration: 14)) {
+                value = 1
+            }
+        }
 }

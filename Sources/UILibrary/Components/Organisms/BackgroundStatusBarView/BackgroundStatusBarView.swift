@@ -75,7 +75,7 @@ struct OfflineBannerTestView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                NavigationLink(.pushDetail) {
+                NavigationLink("Push detail") {
                     DetailView()
                 }
 
@@ -83,7 +83,7 @@ struct OfflineBannerTestView: View {
                     isOffline.toggle()
                 }
             }
-            .navigationTitle(.home)
+            .navigationTitle("Home")
         }
         .backgroundStatusBar(
             isVisible: isOffline,
@@ -95,9 +95,9 @@ struct OfflineBannerTestView: View {
 struct DetailView: View {
     var body: some View {
         VStack {
-            Text(.detailScreen)
+            Text("Detail screen")
         }
-        .navigationTitle(.detail)
+        .navigationTitle("Detail")
     }
 }
 

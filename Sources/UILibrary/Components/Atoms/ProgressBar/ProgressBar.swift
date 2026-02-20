@@ -124,10 +124,11 @@ public struct ProgressBar: View {
     
     @ViewBuilder
     private func segmentedBody(current: Int, total: Int) -> some View {
-        HStack(spacing: style.segmentSpacing) {
-            ForEach(1...total, id: \.self) { step in
+        let cfg = style.segmentedConfig
+        HStack(spacing: cfg.spacing) {
+            ForEach(Array(1...total), id: \.self) { step in
                 let isActive = step <= current
-                let width = step == current ? style.segmentActiveWidth : style.segmentInactiveWidth
+                let width = step == current ? cfg.activeWidth : cfg.inactiveWidth
 
                 if isActive, let start = style.progressGradientStartColor, let end = style.progressGradientEndColor {
                     Capsule()
@@ -143,7 +144,7 @@ public struct ProgressBar: View {
                     if isActive {
                         // active segment (non-gradient) — solid fill with gloss + glow when available
                         Capsule()
-                            .fill(style.segmentActiveColor ?? style.progressColor)
+                            .fill(style.progressColor)
                             .frame(width: width, height: style.height)
                         .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
                         .overlay(
@@ -177,9 +178,9 @@ public struct ProgressBar: View {
     
     private func segmentFillColor(for step: Int, current: Int) -> Color {
         if step <= current {
-            return style.segmentActiveColor ?? style.progressColor
+            return style.progressColor
         } else {
-            return style.segmentInactiveColor ?? style.trackColor
+            return style.trackColor
         }
     }
     
@@ -194,8 +195,7 @@ public struct ProgressBar: View {
 
 #Preview("ProgressBar · Determinate / Indeterminate / Segmented") {
     VStack(spacing: 16) {
-        ProgressBar(value: 0.25, style: .init(progressColor: .green, height: 20))
-            .frame(height: 6)
+        
         
         ProgressBar(value: 0.5, style: .accent)
             .frame(height: 8)
@@ -210,23 +210,37 @@ public struct ProgressBar: View {
         Text("Segmented (onboarding style)")
             .font(.caption)
             .foregroundColor(.gray)
+        
         ProgressBar(currentStep: 2, totalSteps: 4, style: .neutral)
+            .frame(maxWidth: 360)
+        
+        ProgressBar(currentStep: 2, totalSteps: 4, style: .threeD)
             .frame(maxWidth: 360)
 
         Text("3D / Glossy")
             .font(.caption)
             .foregroundColor(.gray)
+        
         ProgressBar(value: 0.65, style: .threeD)
             .frame(height: 10)
             .frame(maxWidth: 360)
+        
+        ProgressBar(
+            value: 0.25,
+            style: .quizStyle
+        )
+        .frame(height: 6)
     }
     .padding()
 }
 
 #Preview("ProgressView Animation") {
-    @Previewable @State var value: Double = 0
+    @Previewable @State var value: Double = 0.05
     
-    ProgressBar(value: value, style: .init(progressColor: .green, height: 20))
+    ProgressBar(
+        value: value,
+        style: .quizStyle
+    )
 
     Button {
         value += 0.1

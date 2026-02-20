@@ -4,6 +4,11 @@
 
 UILibrary is a SwiftUI component library built for multi-app reuse, white-labeling, and long-term scalability. It enforces strict separation of concerns, Atomic Design, and brand-agnosticism. All theming and brand tokens are injected from the consuming app or design system.
 
+IMPORTANT!! Always ask before commit
+
+HOW TO BUILD: swift build --build-system swiftbuild  
+HOW TO TEST: swift test --build-system swiftbuild
+
 ## Architecture & Structure
 
 - **Atomic Design:** Components are organized as Atoms (primitives), Molecules (compositions), and Organisms (complex UIs).

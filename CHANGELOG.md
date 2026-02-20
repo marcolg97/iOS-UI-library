@@ -3,20 +3,25 @@
 ## [Unreleased] - 2026-02-18
 
 ### Added
+
 - Standardized SwiftDoc for public APIs: `Popup`, `PopupStyle`, `BackgroundStatusBarStyle` and public modifiers (`backgroundStatusBar`, `bannerAndPopup`).
 - `ActionButton` atom (style-driven, size variants, icon-only and custom label initializers) + `ActionButtonStyle` presets including `.primaryCyan` and `.iconCircle`.
 - `ProgressBar` atom (determinate, indeterminate and segmented/step variants) + `ProgressBarStyle` and presets (includes new `.threeD` glossy preset).
+- Refactored `ProgressBarStyle` to a more coherent structure with separate `Layout`, `Fill`, `Presentation`, `Track`, and `Metrics` types; added detailed SwiftDoc comments and convenience helpers. Updated progress bar implementation and presets to require the new style exclusively.
 - Unit tests for `PopupStyle`, `BackgroundStatusBarStyle`, and `StatusBarAndPopupModifier` (compile/smoke + behavior).
 
 ### Changed
+
 - Made `backgroundStatusBar` and `bannerAndPopup` modifier APIs public and documented them.
 - Translated preview strings and documentation comments to English.
 - Removed redundant `public` modifiers inside `public extension`s to eliminate compiler warnings.
 - `ProgressBar`: default indeterminate animation duration set to 14s for a smoother, slower preview animation.
 
 ### Fixed
+
 - Documentation/parameter-name mismatches and missing initializer docs.
 
 ### Notes
+
 - No breaking API changes introduced in this set of edits.
 - Tests and build verified locally.

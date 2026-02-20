@@ -1,81 +1,186 @@
 import SwiftUI
 
-/// Style contract for `ProgressBar`.
+/// Visual tokens describing **how** a ``ProgressBar`` should render. The style is
+/// completely agnostic to any business logic – it simply declares colors, sizes,
+/// and effects. Callers obtain or construct a style (often from one of the presets)
+/// and pass it down to the view.
 ///
-/// Responsibility: visual tokens for `ProgressBar` (track color, progress color, height and corner radius).
-/// Styles are immutable and brand‑agnostic — apps should provide concrete tokens via style factories.
+/// Styles are immutable and `Equatable` so they can be compared in tests or reused
+/// across multiple components without duplication.
 public struct ProgressBarStyle: Equatable, Sendable {
-    public let trackColor: Color
-    public let progressColor: Color
-    public let height: CGFloat
-    public let cornerRadius: CGFloat
-    /// Duration used by indeterminate animation (in seconds). Presentational only.
-    public let indeterminateAnimationDuration: Double
 
-    // --- Step/segment presentation tokens (used by onboarding-style segmented variant)
-    public let segmentActiveColor: Color?
-    public let segmentInactiveColor: Color?
-    public let segmentActiveWidth: CGFloat
-    public let segmentInactiveWidth: CGFloat
-    public let segmentSpacing: CGFloat
+    /// Horizontal layout of the bar. See ``Layout``.
+    public let layout: Layout
 
-    // Presentation-specific tokens (no nullable 3D tokens at the top level)
-    public enum Presentation: Equatable, Sendable {
+    /// Fill information (solid color or gradient).
+    public let fill: Fill
+
+    /// Additional presentation decorations (flat vs 3‑D).
+    public let presentation: Presentation
+
+    /// Track (background) color.
+    public let track: Track
+
+    /// Size and timing metrics.
+    public let metrics: Metrics
+
+    /// Creates a new style. Every argument has a default so the plain
+    /// ``init()`` expression yields a neutral, continuous bar using the accent
+    /// color for progress and a light gray track.
+    public init(
+        layout: Layout,
+        fill: Fill,
+        presentation: Presentation,
+        track: Track,
+        metrics: Metrics
+    ) {
+        self.layout = layout
+        self.fill = fill
+        self.presentation = presentation
+        self.track = track
+        self.metrics = metrics
+    }
+}
+
+// MARK: - Nested types
+
+public extension ProgressBarStyle {
+
+    /// Determines whether the bar fills continuously or in discrete segments/steps.
+    enum Layout: Equatable, Sendable {
+        /// Standard continuous bar where progress is represented by a single
+        /// growing capsule.
+        case continuous
+
+        /// Segmented/step style used for onboarding flows or multi‑step processes.
+        case segmented(Segmented)
+
+        /// Configuration for the segmented layout.
+        public struct Segmented: Equatable, Sendable {
+            public let activeWidth: CGFloat
+            public let inactiveWidth: CGFloat
+            public let spacing: CGFloat
+
+            public init(
+                activeWidth: CGFloat,
+                inactiveWidth: CGFloat,
+                spacing: CGFloat
+            ) {
+                self.activeWidth = activeWidth
+                self.inactiveWidth = inactiveWidth
+                self.spacing = spacing
+            }
+        }
+    }
+}
+
+public extension ProgressBarStyle {
+
+    /// Describes how the progressing portion of the bar should be painted.
+    enum Fill: Equatable, Sendable {
+        /// A simple solid color.
+        case solid(Color)
+
+        /// A gradient (horizontal, leading→trailing).
+        case gradient(Gradient)
+    }
+}
+
+public extension ProgressBarStyle {
+
+    /// Track appearance tokens.
+    struct Track: Equatable, Sendable {
+        public let color: Color
+
+        public init(color: Color) {
+            self.color = color
+        }
+    }
+}
+
+public extension ProgressBarStyle {
+
+    /// Additional visual presentation options layered on top of the fill.
+    enum Presentation: Equatable, Sendable {
+        /// No extra decorations – flat rendering.
+        case flat
+
+        /// Gloss, glow and shadow to simulate depth.
+        case threeD(ThreeD)
+
+        /// Tokens used by the 3‑D presentation.
         public struct ThreeD: Equatable, Sendable {
             public let glowColor: Color
             public let highlightColor: Color
             public let shadowRadius: CGFloat
-
-            public init(glowColor: Color, highlightColor: Color, shadowRadius: CGFloat) {
+            
+            public init(
+                glowColor: Color,
+                highlightColor: Color,
+                shadowRadius: CGFloat
+            ) {
                 self.glowColor = glowColor
                 self.highlightColor = highlightColor
                 self.shadowRadius = shadowRadius
             }
         }
+    }
+}
 
-        case flat
-        case threeD(ThreeD)
+public extension ProgressBarStyle {
+
+    /// Size and timing metrics.
+    struct Metrics: Equatable, Sendable {
+        public let height: CGFloat
+        public let cornerRadius: CGFloat
+        public let indeterminateDuration: Double
+
+        public init(
+            height: CGFloat,
+            cornerRadius: CGFloat,
+            indeterminateDuration: Double
+        ) {
+            self.height = height
+            self.cornerRadius = cornerRadius
+            self.indeterminateDuration = indeterminateDuration
+        }
+    }
+}
+
+// MARK: - Convenience accessors
+
+public extension ProgressBarStyle {
+    var trackColor: Color { track.color }
+
+    var progressColor: Color {
+        switch fill {
+        case let .solid(c): return c
+        case let .gradient(g):
+            return g.stops.first?.color ?? .accentColor
+        }
     }
 
-    /// The presentation mode for the progress's visual treatment.
-    public let presentation: Presentation
-
-    public init(
-        trackColor: Color = Color.primary.opacity(0.12),
-        progressColor: Color = .accentColor,
-        height: CGFloat = 6,
-        cornerRadius: CGFloat = 3,
-        indeterminateAnimationDuration: Double = 14.0,
-        // step/segment defaults - keep optional colors to fall back to existing tokens when nil
-        segmentActiveColor: Color? = nil,
-        segmentInactiveColor: Color? = nil,
-        segmentActiveWidth: CGFloat = 50,
-        segmentInactiveWidth: CGFloat = 25,
-        segmentSpacing: CGFloat = 4,
-        // optional gradient fill tokens (kept nullable to preserve flexibility)
-        progressGradientStartColor: Color? = nil,
-        progressGradientEndColor: Color? = nil,
-        // presentation: choose .flat or .threeD(...) to enable 3D-only tokens
-        presentation: Presentation = .flat
-    ) {
-        self.trackColor = trackColor
-        self.progressColor = progressColor
-        self.height = height
-        self.cornerRadius = cornerRadius
-        self.indeterminateAnimationDuration = indeterminateAnimationDuration
-        self.segmentActiveColor = segmentActiveColor
-        self.segmentInactiveColor = segmentInactiveColor
-        self.segmentActiveWidth = segmentActiveWidth
-        self.segmentInactiveWidth = segmentInactiveWidth
-        self.segmentSpacing = segmentSpacing
-        self.progressGradientStartColor = progressGradientStartColor
-        self.progressGradientEndColor = progressGradientEndColor
-        self.presentation = presentation
+    var progressGradientStartColor: Color? {
+        guard case let .gradient(g) = fill else { return nil }
+        return g.stops.first?.color
     }
 
-    /// Convenience accessor for the 3D configuration (nil when presentation == .flat).
-    public var threeDConfig: Presentation.ThreeD? {
+    var progressGradientEndColor: Color? {
+        guard case let .gradient(g) = fill else { return nil }
+        return g.stops.last?.color
+    }
+
+    var threeDConfig: Presentation.ThreeD? {
         if case let .threeD(cfg) = presentation { return cfg }
         return nil
     }
+
+    var segmentedConfig: Layout.Segmented {
+        if case let .segmented(cfg) = layout { return cfg }
+        return .default
+    }
+
+    var height: CGFloat { metrics.height }
+    var cornerRadius: CGFloat { metrics.cornerRadius }
+    var indeterminateAnimationDuration: Double { metrics.indeterminateDuration }
 }

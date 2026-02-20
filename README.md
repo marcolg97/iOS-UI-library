@@ -101,7 +101,8 @@ Maintain an updated list of public components.
 
 ## Atoms
 
-- `ActionButton` — centralized, style-driven button with size variants, icon-only and custom-content initializers. Use `ActionButtonStyle` presets (`.primary`, `.secondary`, `.destructive`, `.ghost`, `.primaryCyan`, `.iconCircle`).- `ProgressBar` — style-driven progress indicator supporting determinate, indeterminate and segmented (step) presentations. Use `ProgressBarStyle` to customize appearance (includes `.threeD` glossy/gradient preset).
+- `ActionButton` — centralized, style-driven button with size variants, icon-only and custom-content initializers. Use `ActionButtonStyle` presets (`.primary`, `.secondary`, `.destructive`, `.ghost`, `.primaryCyan`, `.iconCircle`).
+- `ProgressBar` — style-driven progress indicator supporting determinate, indeterminate and segmented (step) presentations. Build a custom look by composing tokens from `ProgressBarStyle` (layout, fill, presentation, track, metrics); built‑in presets include `.neutral`, `.accent` and `.threeD`.
 
 ## Molecules
 

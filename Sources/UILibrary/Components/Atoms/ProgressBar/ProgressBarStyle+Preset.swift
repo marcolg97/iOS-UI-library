@@ -17,8 +17,6 @@ public extension ProgressBarStyle {
         // no gradient for threeD preset — we use solid fill + overlays for gloss and glow
         progressGradientStartColor: nil,
         progressGradientEndColor: nil,
-        progressGlowColor: Color(red: 0.00, green: 0.78, blue: 0.92).opacity(0.28),
-        progressHighlightColor: Color.white.opacity(0.28),
-        progressShadowRadius: 6
+        presentation: .threeD(.init(glowColor: Color(red: 0.00, green: 0.78, blue: 0.92).opacity(0.28), highlightColor: Color.white.opacity(0.28), shadowRadius: 6))
     )
 }

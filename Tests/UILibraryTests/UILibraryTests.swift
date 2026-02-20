@@ -81,9 +81,10 @@ struct MockTest {
         let threeD = ProgressBarStyle.threeD
         XCTAssertNil(threeD.progressGradientStartColor)
         XCTAssertNil(threeD.progressGradientEndColor)
-        XCTAssertNotNil(threeD.progressGlowColor)
-        XCTAssertNotNil(threeD.progressHighlightColor)
-        XCTAssertGreaterThan(threeD.progressShadowRadius, 0)
+        guard case let .threeD(cfg) = threeD.presentation else { XCTFail("expected threeD presentation"); return }
+        XCTAssertEqual(cfg.shadowRadius, 6)
+        XCTAssertEqual(cfg.glowColor, Color(red: 0.00, green: 0.78, blue: 0.92).opacity(0.28))
+        XCTAssertEqual(cfg.highlightColor, Color.white.opacity(0.28))
     }
 
     @Test func progressBar_style_presets_areDistinct() throws {

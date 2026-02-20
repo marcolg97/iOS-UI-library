@@ -19,36 +19,44 @@ public struct ProgressBarStyle: Equatable, Sendable {
     public let segmentInactiveWidth: CGFloat
     public let segmentSpacing: CGFloat
 
-    // --- 3D / material presentation tokens (opt-in)
-    /// Optional gradient start color for progress fill — when provided the progress uses a left→right gradient.
-    public let progressGradientStartColor: Color?
-    /// Optional gradient end color for progress fill.
-    public let progressGradientEndColor: Color?
-    /// Subtle glow color applied behind the progress capsule to create a raised/neon effect.
-    public let progressGlowColor: Color?
-    /// Highlight color used to simulate gloss on top of the filled portion.
-    public let progressHighlightColor: Color?
-    /// Additional shadow radius applied to the filled capsule when 3D tokens are present.
-    public let progressShadowRadius: CGFloat
+    // Presentation-specific tokens (no nullable 3D tokens at the top level)
+    public enum Presentation: Equatable, Sendable {
+        public struct ThreeD: Equatable, Sendable {
+            public let glowColor: Color
+            public let highlightColor: Color
+            public let shadowRadius: CGFloat
+
+            public init(glowColor: Color, highlightColor: Color, shadowRadius: CGFloat) {
+                self.glowColor = glowColor
+                self.highlightColor = highlightColor
+                self.shadowRadius = shadowRadius
+            }
+        }
+
+        case flat
+        case threeD(ThreeD)
+    }
+
+    /// The presentation mode for the progress's visual treatment.
+    public let presentation: Presentation
 
     public init(
         trackColor: Color = Color.primary.opacity(0.12),
         progressColor: Color = .accentColor,
         height: CGFloat = 6,
         cornerRadius: CGFloat = 3,
-        indeterminateAnimationDuration: Double = 1.2,
+        indeterminateAnimationDuration: Double = 14.0,
         // step/segment defaults - keep optional colors to fall back to existing tokens when nil
         segmentActiveColor: Color? = nil,
         segmentInactiveColor: Color? = nil,
         segmentActiveWidth: CGFloat = 50,
         segmentInactiveWidth: CGFloat = 25,
         segmentSpacing: CGFloat = 4,
-        // 3D defaults (nil = disabled)
+        // optional gradient fill tokens (kept nullable to preserve flexibility)
         progressGradientStartColor: Color? = nil,
         progressGradientEndColor: Color? = nil,
-        progressGlowColor: Color? = nil,
-        progressHighlightColor: Color? = nil,
-        progressShadowRadius: CGFloat = 0
+        // presentation: choose .flat or .threeD(...) to enable 3D-only tokens
+        presentation: Presentation = .flat
     ) {
         self.trackColor = trackColor
         self.progressColor = progressColor
@@ -62,8 +70,12 @@ public struct ProgressBarStyle: Equatable, Sendable {
         self.segmentSpacing = segmentSpacing
         self.progressGradientStartColor = progressGradientStartColor
         self.progressGradientEndColor = progressGradientEndColor
-        self.progressGlowColor = progressGlowColor
-        self.progressHighlightColor = progressHighlightColor
-        self.progressShadowRadius = progressShadowRadius
+        self.presentation = presentation
+    }
+
+    /// Convenience accessor for the 3D configuration (nil when presentation == .flat).
+    public var threeDConfig: Presentation.ThreeD? {
+        if case let .threeD(cfg) = presentation { return cfg }
+        return nil
     }
 }

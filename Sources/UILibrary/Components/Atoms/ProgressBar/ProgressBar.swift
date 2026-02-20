@@ -66,25 +66,25 @@ public struct ProgressBar: View {
                         Capsule()
                             .fill(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
                             .frame(width: width, height: style.height)
-                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                            .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
                             .overlay(
                                 Capsule()
-                                    .fill(LinearGradient(colors: [style.progressHighlightColor ?? Color.white.opacity(0), Color.white.opacity(0)], startPoint: .top, endPoint: .bottom))
-                                    .opacity(style.progressHighlightColor != nil ? 0.6 : 0)
+                                    .fill(style.threeDConfig?.highlightColor ?? Color.white.opacity(0))
+                                    .opacity(style.threeDConfig != nil ? 0.6 : 0)
                             )
                     } else {
                         // solid-fill path — support 3D tokens (glow + highlight) when present
                         Capsule()
                             .fill(style.progressColor)
                             .frame(width: width, height: style.height)
-                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                            .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
                             .overlay(
-                                // top gloss/highlight (smaller capsule) — not a gradient, just a subtle solid highlight
+                                // top gloss/highlight (smaller capsule) — solid highlight when threeD is configured
                                 Capsule()
-                                    .fill(style.progressHighlightColor ?? Color.white.opacity(0))
+                                    .fill(style.threeDConfig?.highlightColor ?? Color.white.opacity(0))
                                     .frame(height: max(1, style.height * 0.45))
                                     .offset(y: -style.height * 0.20)
-                                    .opacity(style.progressHighlightColor != nil ? 0.85 : 0)
+                                    .opacity(style.threeDConfig != nil ? 0.85 : 0)
                                     .blendMode(.screen)
                             )
                     }
@@ -93,7 +93,7 @@ public struct ProgressBar: View {
                         Capsule()
                             .fill(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
                             .frame(width: geo.size.width * 0.6, height: style.height)
-                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                            .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
                             .offset(x: geo.size.width * indeterminateOffset)
                             .onAppear {
                                 withAnimation(.linear(duration: style.indeterminateAnimationDuration).repeatForever(autoreverses: false)) {
@@ -105,7 +105,7 @@ public struct ProgressBar: View {
                         Capsule()
                             .fill(style.progressColor.opacity(0.9))
                             .frame(width: geo.size.width * 0.6, height: style.height)
-                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                            .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
                             .offset(x: geo.size.width * indeterminateOffset)
                             .onAppear {
                                 withAnimation(.linear(duration: style.indeterminateAnimationDuration).repeatForever(autoreverses: false)) {
@@ -133,11 +133,11 @@ public struct ProgressBar: View {
                     Capsule()
                         .fill(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
                         .frame(width: width, height: style.height)
-                        .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                        .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
                         .overlay(
                             Capsule()
-                                .fill(LinearGradient(colors: [style.progressHighlightColor ?? Color.white.opacity(0), Color.white.opacity(0)], startPoint: .top, endPoint: .bottom))
-                                .opacity(style.progressHighlightColor != nil ? 0.6 : 0)
+                                .fill(style.threeDConfig?.highlightColor ?? Color.white.opacity(0))
+                                .opacity(style.threeDConfig != nil ? 0.6 : 0)
                         )
                 } else {
                     if isActive {
@@ -145,13 +145,13 @@ public struct ProgressBar: View {
                         Capsule()
                             .fill(style.segmentActiveColor ?? style.progressColor)
                             .frame(width: width, height: style.height)
-                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
-                            .overlay(
+                        .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
+                        .overlay(
                                 Capsule()
-                                    .fill(style.progressHighlightColor ?? Color.white.opacity(0))
+                                    .fill(style.threeDConfig?.highlightColor ?? Color.white.opacity(0))
                                     .frame(height: max(1, style.height * 0.45))
                                     .offset(y: -style.height * 0.20)
-                                    .opacity(style.progressHighlightColor != nil ? 0.8 : 0)
+                                    .opacity(style.threeDConfig != nil ? 0.85 : 0)
                                     .blendMode(.screen)
                             )
                     } else {

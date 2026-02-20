@@ -28,6 +28,8 @@ HOW TO TEST: swift test --build-system swiftbuild
 
 ## Developer Workflows
 
+- **Branch first:** before you start working, create a new feature branch off `main` (e.g. `feat/atoms/avatar-image`).
+- **Push often:** commit locally and push your branch to the remote repository so it can be reviewed.
 - **Build:** Standard SwiftPM/Xcode build. No custom scripts required.
 - **Test:** Tests are in `Tests/UILibraryTests/`. Run via Xcode or `swift test`.
 - **Add/Update Component:**
@@ -37,6 +39,8 @@ HOW TO TEST: swift test --build-system swiftbuild
   4. Update `CHANGELOG.md` following Semantic Versioning.
   5. Ensure previews compile and cover new variants.
   6. For breaking changes, bump MAJOR version and document migration.
+  7. Run the checklist at the bottom of this file before considering the work done.
+  8. Open a pull request from your branch to `main` with a descriptive title and summary of what you changed and why.
 
 ## Project Conventions
 

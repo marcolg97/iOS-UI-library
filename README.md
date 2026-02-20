@@ -103,6 +103,7 @@ Maintain an updated list of public components.
 
 - `ActionButton` — centralized, style-driven button with size variants, icon-only and custom-content initializers. Use `ActionButtonStyle` presets (`.primary`, `.secondary`, `.destructive`, `.ghost`, `.primaryCyan`, `.iconCircle`).
 - `AvatarImage` — circular avatar that shows either a supplied image or the first letter of a name when no image is provided. Appearance is controlled via `AvatarImageStyle` with presets such as `.default`, `.small`, `.large` and `bordered(_:)`.
+- `Badge` — small, style-driven status label for displaying status, count, or tag-like information. Use `BadgeStyle` presets (`.default`, `.neutral`, `.accent`, `.success`, `.warning`, `.error`, `.outlined(_:)`).
 - `ProgressBar` — style-driven progress indicator supporting determinate, indeterminate and segmented (step) presentations. Build a custom look by composing tokens from `ProgressBarStyle` (layout, fill, presentation, track, metrics); built‑in presets include `.neutral`, `.accent` and `.threeD`.
 
 ## Molecules

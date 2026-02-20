@@ -1,7 +1,12 @@
 # Journal
 
-## 2026-02-20 — Banner molecule for contextual messages
+## 2026-02-20 — Badge atom
+- Created `Badge` atom with `BadgeStyle` contract for small status labels and tags.
+- Supports customizable colors, typography, padding, corner radius, and optional borders.
+- Added `.default` preset and comprehensive previews showing different Badge variants.
+- Updated `README.md` and `CHANGELOG.md`.
 
+Rationale: provide a reusable, brand-agnostic Badge primitive for displaying status indicators, counts, and tag-like information across apps. The style contract enables apps to inject their own design tokens while maintaining separation of concerns.
 - Added `Banner` molecule supporting informational messages with optional actions.
 - Created `BannerStyle` contract with presets (`.info()`, `.warning()`, `.success()`, `.error()`).
 - Component supports optional subtitle and custom action content via ViewBuilder.
@@ -20,7 +25,6 @@ Rationale: Banners provide a flexible, style-driven way to display contextual fe
 Rationale: extracted onboarding-specific progress UI into a reusable, style-driven atom to remove duplication and follow UILibrary's style-injection and Atomic Design rules.
 
 ## 2026-02-20 — AvatarImage atom
-
 - Created `AvatarImage` atom with optional `image` and name-based initial fallback.
 - Added `AvatarImageStyle` contract, presets (`.default`, `.small`, `.large`, `.bordered`), and comprehensive previews.
 - Updated tests with compile-time smoke and style assertions.

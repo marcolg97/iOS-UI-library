@@ -108,7 +108,7 @@ Maintain an updated list of public components.
 
 ## Molecules
 
-// (No public Molecules implemented yet)
+- **Banner** – Contextual banner for displaying informational messages with optional actions. Supports info, warning, success, and error styles. API: `Banner(title: String, subtitle: String? = nil, style: BannerStyle = .info(), actionContent: () -> ActionContent)`
 
 ## Organisms
 

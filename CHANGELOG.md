@@ -1,9 +1,10 @@
 # Changelog
 
-## [Unreleased] - 2026-02-18
+## [Unreleased] - 2026-02-20
 
 ### Added
 
+- `Banner` molecule (contextual banner for informational messages with optional actions) + `BannerStyle` and presets (`.info()`, `.warning()`, `.success()`, `.error()`).
 - Standardized SwiftDoc for public APIs: `Popup`, `PopupStyle`, `BackgroundStatusBarStyle` and public modifiers (`backgroundStatusBar`, `bannerAndPopup`).
 - `ActionButton` atom (style-driven, size variants, icon-only and custom label initializers) + `ActionButtonStyle` presets including `.primaryCyan` and `.iconCircle`.
 - `AvatarImage` atom (circular avatars showing either an image or the first letter of a name) with fallback-initial logic, plus `AvatarImageStyle` and presets (`.default`, `.small`, `.large`, `.bordered`).

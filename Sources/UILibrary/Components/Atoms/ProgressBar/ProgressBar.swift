@@ -168,7 +168,7 @@ public struct ProgressBar: View {
             Text("Step \(current)/\(total)")
                 .font(.caption)
                 .fontWeight(.semibold)
-                .foregroundColor(.primary.opacity(0.6))
+                .foregroundColor(cfg.textColor)
         }
         .frame(height: max(style.height, 20))
         .accessibilityElement(children: .combine)

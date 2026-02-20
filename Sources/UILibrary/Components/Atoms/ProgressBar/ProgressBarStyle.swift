@@ -60,15 +60,18 @@ public extension ProgressBarStyle {
             public let activeWidth: CGFloat
             public let inactiveWidth: CGFloat
             public let spacing: CGFloat
+            public let textColor: Color?
 
             public init(
                 activeWidth: CGFloat,
                 inactiveWidth: CGFloat,
-                spacing: CGFloat
+                spacing: CGFloat,
+                textColor: Color
             ) {
                 self.activeWidth = activeWidth
                 self.inactiveWidth = inactiveWidth
                 self.spacing = spacing
+                self.textColor = textColor
             }
         }
     }

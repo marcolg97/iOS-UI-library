@@ -66,7 +66,8 @@ public extension ProgressBarStyle.Layout.Segmented {
     static let `default` = ProgressBarStyle.Layout.Segmented(
         activeWidth: 50,
         inactiveWidth: 25,
-        spacing: 4
+        spacing: 4,
+        textColor: .primary.opacity(0.6)
     )
 }
 

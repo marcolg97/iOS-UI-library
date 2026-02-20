@@ -33,6 +33,15 @@ public struct BadgeStyle: Equatable, Sendable {
     
     /// Border width. Only applied when `borderColor` is non-nil.
     public let borderWidth: CGFloat
+    
+    /// Shadow color for 3D effects. When `nil`, no shadow is applied.
+    public let shadowColor: Color?
+    
+    /// Shadow radius for 3D effects.
+    public let shadowRadius: CGFloat
+    
+    /// Shadow offset for 3D effects.
+    public let shadowOffset: CGSize
 
     /// Creates a new `BadgeStyle`.
     ///
@@ -45,6 +54,9 @@ public struct BadgeStyle: Equatable, Sendable {
     ///   - cornerRadius: Corner radius of background (default: 8pt).
     ///   - borderColor: Optional border color (nil = no border).
     ///   - borderWidth: Border width (default: 0).
+    ///   - shadowColor: Optional shadow color for 3D effects (nil = no shadow).
+    ///   - shadowRadius: Shadow blur radius (default: 0).
+    ///   - shadowOffset: Shadow offset (default: .zero).
     public init(
         backgroundColor: Color = Color.primary.opacity(0.12),
         foregroundColor: Color = Color.primary,
@@ -53,7 +65,10 @@ public struct BadgeStyle: Equatable, Sendable {
         horizontalPadding: CGFloat = 8,
         cornerRadius: CGFloat = 8,
         borderColor: Color? = nil,
-        borderWidth: CGFloat = 0
+        borderWidth: CGFloat = 0,
+        shadowColor: Color? = nil,
+        shadowRadius: CGFloat = 0,
+        shadowOffset: CGSize = .zero
     ) {
         self.backgroundColor = backgroundColor
         self.foregroundColor = foregroundColor
@@ -63,6 +78,9 @@ public struct BadgeStyle: Equatable, Sendable {
         self.cornerRadius = cornerRadius
         self.borderColor = borderColor
         self.borderWidth = borderWidth
+        self.shadowColor = shadowColor
+        self.shadowRadius = shadowRadius
+        self.shadowOffset = shadowOffset
     }
 }
 

@@ -59,22 +59,47 @@ public struct ProgressBar: View {
                     .frame(height: style.height)
                 
                 if let v = value {
-                    // determinate — do not force an internal animation so callers can control timing with
-                    // `withAnimation(...)` or rely on SwiftUI implicit animations. This avoids overriding
-                    // parent-provided animations (e.g. preview animations with custom duration).
-                    Capsule()
-                        .fill(style.progressColor)
-                        .frame(width: max(0, min(1, v)) * geo.size.width, height: style.height)
+                    // determinate — choose gradient fill when 3D tokens are present, otherwise solid color.
+                    let width = max(0, min(1, v)) * geo.size.width
+
+                    if let start = style.progressGradientStartColor, let end = style.progressGradientEndColor {
+                        Capsule()
+                            .fill(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: width, height: style.height)
+                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                            .overlay(
+                                Capsule()
+                                    .fill(LinearGradient(colors: [style.progressHighlightColor ?? Color.white.opacity(0), Color.white.opacity(0)], startPoint: .top, endPoint: .bottom))
+                                    .opacity(style.progressHighlightColor != nil ? 0.6 : 0)
+                            )
+                    } else {
+                        Capsule()
+                            .fill(style.progressColor)
+                            .frame(width: width, height: style.height)
+                    }
                 } else {
-                    Capsule()
-                        .fill(style.progressColor.opacity(0.9))
-                        .frame(width: geo.size.width * 0.6, height: style.height)
-                        .offset(x: geo.size.width * indeterminateOffset)
-                        .onAppear {
-                            withAnimation(.linear(duration: style.indeterminateAnimationDuration).repeatForever(autoreverses: false)) {
-                                indeterminateOffset = 1.1
+                    if let start = style.progressGradientStartColor, let end = style.progressGradientEndColor {
+                        Capsule()
+                            .fill(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: geo.size.width * 0.6, height: style.height)
+                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                            .offset(x: geo.size.width * indeterminateOffset)
+                            .onAppear {
+                                withAnimation(.linear(duration: style.indeterminateAnimationDuration).repeatForever(autoreverses: false)) {
+                                    indeterminateOffset = 1.1
+                                }
                             }
-                        }
+                    } else {
+                        Capsule()
+                            .fill(style.progressColor.opacity(0.9))
+                            .frame(width: geo.size.width * 0.6, height: style.height)
+                            .offset(x: geo.size.width * indeterminateOffset)
+                            .onAppear {
+                                withAnimation(.linear(duration: style.indeterminateAnimationDuration).repeatForever(autoreverses: false)) {
+                                    indeterminateOffset = 1.1
+                                }
+                            }
+                    }
                 }
             }
             .frame(height: style.height)
@@ -88,9 +113,24 @@ public struct ProgressBar: View {
     private func segmentedBody(current: Int, total: Int) -> some View {
         HStack(spacing: style.segmentSpacing) {
             ForEach(1...total, id: \.self) { step in
-                Capsule()
-                    .fill(segmentFillColor(for: step, current: current))
-                    .frame(width: step == current ? style.segmentActiveWidth : style.segmentInactiveWidth, height: style.height)
+                let isActive = step <= current
+                let width = step == current ? style.segmentActiveWidth : style.segmentInactiveWidth
+
+                if isActive, let start = style.progressGradientStartColor, let end = style.progressGradientEndColor {
+                    Capsule()
+                        .fill(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
+                        .frame(width: width, height: style.height)
+                        .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                        .overlay(
+                            Capsule()
+                                .fill(LinearGradient(colors: [style.progressHighlightColor ?? Color.white.opacity(0), Color.white.opacity(0)], startPoint: .top, endPoint: .bottom))
+                                .opacity(style.progressHighlightColor != nil ? 0.6 : 0)
+                        )
+                } else {
+                    Capsule()
+                        .fill(segmentFillColor(for: step, current: current))
+                        .frame(width: width, height: style.height)
+                }
             }
             
             Spacer()
@@ -143,6 +183,13 @@ public struct ProgressBar: View {
             .foregroundColor(.gray)
         ProgressBar(currentStep: 2, totalSteps: 4, style: .neutral)
             .frame(maxWidth: 360)
+
+        Text("3D / Glossy")
+            .font(.caption)
+            .foregroundColor(.gray)
+        ProgressBar(value: 0.65, style: .threeD)
+            .frame(height: 10)
+            .frame(maxWidth: 360)
     }
     .padding()
 }
@@ -151,10 +198,10 @@ public struct ProgressBar: View {
     @Previewable @State var value: Double = 0
     
     ProgressBar(value: value, style: .init(progressColor: .green, height: 20))
-        .frame(height: 6)
-        .onAppear {
-            withAnimation(.linear(duration: 14)) {
-                value = 1
-            }
-        }
+
+    Button {
+        value += 0.1
+    } label: {
+        Text("Go next")
+    }
 }

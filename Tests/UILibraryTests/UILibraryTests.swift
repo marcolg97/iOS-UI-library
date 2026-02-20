@@ -76,6 +76,13 @@ struct MockTest {
 
         let accent = ProgressBarStyle.accent
         XCTAssertEqual(accent.progressColor, .accentColor)
+
+        // 3D preset sanity checks
+        let threeD = ProgressBarStyle.threeD
+        XCTAssertNotNil(threeD.progressGradientStartColor)
+        XCTAssertNotNil(threeD.progressGradientEndColor)
+        XCTAssertNotNil(threeD.progressGlowColor)
+        XCTAssertGreaterThan(threeD.progressShadowRadius, 0)
     }
 
     @Test func progressBar_style_presets_areDistinct() throws {

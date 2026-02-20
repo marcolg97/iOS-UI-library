@@ -77,11 +77,12 @@ struct MockTest {
         let accent = ProgressBarStyle.accent
         XCTAssertEqual(accent.progressColor, .accentColor)
 
-        // 3D preset sanity checks
+        // 3D preset sanity checks — solid-fill (no gradient) with gloss + glow
         let threeD = ProgressBarStyle.threeD
-        XCTAssertNotNil(threeD.progressGradientStartColor)
-        XCTAssertNotNil(threeD.progressGradientEndColor)
+        XCTAssertNil(threeD.progressGradientStartColor)
+        XCTAssertNil(threeD.progressGradientEndColor)
         XCTAssertNotNil(threeD.progressGlowColor)
+        XCTAssertNotNil(threeD.progressHighlightColor)
         XCTAssertGreaterThan(threeD.progressShadowRadius, 0)
     }
 

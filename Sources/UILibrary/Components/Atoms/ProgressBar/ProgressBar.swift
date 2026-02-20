@@ -73,9 +73,20 @@ public struct ProgressBar: View {
                                     .opacity(style.progressHighlightColor != nil ? 0.6 : 0)
                             )
                     } else {
+                        // solid-fill path — support 3D tokens (glow + highlight) when present
                         Capsule()
                             .fill(style.progressColor)
                             .frame(width: width, height: style.height)
+                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                            .overlay(
+                                // top gloss/highlight (smaller capsule) — not a gradient, just a subtle solid highlight
+                                Capsule()
+                                    .fill(style.progressHighlightColor ?? Color.white.opacity(0))
+                                    .frame(height: max(1, style.height * 0.45))
+                                    .offset(y: -style.height * 0.20)
+                                    .opacity(style.progressHighlightColor != nil ? 0.85 : 0)
+                                    .blendMode(.screen)
+                            )
                     }
                 } else {
                     if let start = style.progressGradientStartColor, let end = style.progressGradientEndColor {
@@ -90,9 +101,11 @@ public struct ProgressBar: View {
                                 }
                             }
                     } else {
+                        // indeterminate solid-fill path — apply glow when available
                         Capsule()
                             .fill(style.progressColor.opacity(0.9))
                             .frame(width: geo.size.width * 0.6, height: style.height)
+                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
                             .offset(x: geo.size.width * indeterminateOffset)
                             .onAppear {
                                 withAnimation(.linear(duration: style.indeterminateAnimationDuration).repeatForever(autoreverses: false)) {
@@ -127,9 +140,25 @@ public struct ProgressBar: View {
                                 .opacity(style.progressHighlightColor != nil ? 0.6 : 0)
                         )
                 } else {
-                    Capsule()
-                        .fill(segmentFillColor(for: step, current: current))
-                        .frame(width: width, height: style.height)
+                    if isActive {
+                        // active segment (non-gradient) — solid fill with gloss + glow when available
+                        Capsule()
+                            .fill(style.segmentActiveColor ?? style.progressColor)
+                            .frame(width: width, height: style.height)
+                            .shadow(color: style.progressGlowColor ?? .clear, radius: style.progressShadowRadius, x: 0, y: 0)
+                            .overlay(
+                                Capsule()
+                                    .fill(style.progressHighlightColor ?? Color.white.opacity(0))
+                                    .frame(height: max(1, style.height * 0.45))
+                                    .offset(y: -style.height * 0.20)
+                                    .opacity(style.progressHighlightColor != nil ? 0.8 : 0)
+                                    .blendMode(.screen)
+                            )
+                    } else {
+                        Capsule()
+                            .fill(segmentFillColor(for: step, current: current))
+                            .frame(width: width, height: style.height)
+                    }
                 }
             }
             

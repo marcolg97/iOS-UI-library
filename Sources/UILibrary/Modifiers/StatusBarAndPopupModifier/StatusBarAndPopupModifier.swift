@@ -128,7 +128,7 @@ struct BannerAndPopupTestView: View {
                     DetailView2()
                 }
                 
-                Button(isOffline ? .goOnline : .goOffline) {
+                Button(isOffline ? "Go online" : "Go offline") {
                     isOffline.toggle()
                 }
             }
@@ -171,7 +171,7 @@ struct BannerAndPopupWithTabBarPreview: View {
             NavigationStack {
                 VStack(spacing: 24) {
                     Text("Tab 1")
-                    Button(isOffline ? .goOnline : .goOffline) {
+                    Button(isOffline ? "Go online" : "Go offline") {
                         isOffline.toggle()
                     }
                 }
@@ -182,7 +182,7 @@ struct BannerAndPopupWithTabBarPreview: View {
                 
                 Text("Tab 2")
                     .tabItem {
-                        Label(.other, systemImage: "star")
+                        Label("Other", systemImage: "star")
                     }.tag(1)
             }
             .bannerAndPopup(
@@ -202,12 +202,12 @@ struct BannerAndPopupNoTabBarPreview: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                Text(.noTabBar)
-                Button(isOffline ? .goOnline : .goOffline) {
+                Text("No tab bar")
+                Button(isOffline ? "Go online" : "Go offline") {
                     isOffline.toggle()
                 }
             }
-            .navigationTitle(.noTabBar)
+            .navigationTitle("No tab bar")
         }
         .bannerAndPopup(
             hasToShow: $isOffline,

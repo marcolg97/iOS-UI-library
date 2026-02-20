@@ -79,7 +79,7 @@ struct OfflineBannerTestView: View {
                     DetailView()
                 }
 
-                Button(isOffline ? .goOnline : .goOffline) {
+                Button(isOffline ? "Go online" : "Go offline") {
                     isOffline.toggle()
                 }
             }

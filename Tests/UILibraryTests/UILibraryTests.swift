@@ -77,7 +77,33 @@ struct MockTest {
     }
 
     @Test func progressBar_style_presets_areDistinct() throws {
-        XCTAssertEqual(ProgressBarStyle.neutral, ProgressBarStyle())
-        XCTAssertNotEqual(ProgressBarStyle.neutral, ProgressBarStyle(progressColor: .red))
+        // verify that two distinct style instances are not equal
+        let neutral = ProgressBarStyle.neutral
+        let redVariant = ProgressBarStyle(
+            layout: neutral.layout,
+            fill: .solid(.red),
+            presentation: neutral.presentation,
+            track: neutral.track,
+            metrics: neutral.metrics
+        )
+        XCTAssertNotEqual(neutral, redVariant)
+    }
+
+    @Test func avatarImage_api_compile_and_style_checks() throws {
+        // compile-time smoke: name-only and image + name variants
+        _ = AvatarImage(name: "Alice")
+        _ = AvatarImage(name: "Bob", image: Image(systemName: "person"))
+
+        // style sanity checks
+        let `default` = AvatarImageStyle.default
+        XCTAssertEqual(`default`.size, 40)
+        XCTAssertEqual(`default`.textColor, .white)
+
+        let small = AvatarImageStyle.small
+        XCTAssertLessThan(small.size, `default`.size)
+
+        let bordered = AvatarImageStyle.bordered(.red)
+        XCTAssertEqual(bordered.borderColor, .red)
+        XCTAssertEqual(bordered.borderWidth, 2)
     }
 }

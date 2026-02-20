@@ -59,4 +59,24 @@ public struct ActionButtonStyle: Equatable, Sendable {
         self.shadowYOffset = shadowYOffset
         self.defaultMaxWidth = defaultMaxWidth
     }
+    
+    func removePadding() -> Self {
+        .init(
+            backgroundColor: backgroundColor,
+            foregroundColor: foregroundColor,
+            disabledBackgroundColor: disabledBackgroundColor,
+            disabledForegroundColor: disabledForegroundColor,
+            borderColor: borderColor,
+            disabledBorderColor: disabledBorderColor,
+            font: font,
+            cornerRadius: cornerRadius,
+            verticalPadding: 0,
+            horizontalPadding: 0,
+            minTapTarget: minTapTarget,
+            shadowColor: shadowColor,
+            shadowRadius: shadowRadius,
+            shadowYOffset: shadowYOffset,
+            defaultMaxWidth: defaultMaxWidth
+        )
+    }
 }

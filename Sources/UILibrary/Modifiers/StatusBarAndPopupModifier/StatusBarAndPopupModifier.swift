@@ -33,13 +33,13 @@ public struct StatusBarAndPopupModifier<PopupContent: View>: ViewModifier {
     /// Use `hasToShow` when the modifier should represent a generic app‑wide state (offline,
     /// maintenance, restricted access, etc.). Kept generic for reusability across use cases.
     @Binding public var hasToShow: Bool
-
+    
     private let popupContent: PopupContent
     private let hasTabBar: Bool
     private let backgroundStatusBarStyle: BackgroundStatusBarStyle
-
+    
     @State private var showPopup: Bool = false
-
+    
     /// Creates a `StatusBarAndPopupModifier`.
     /// - Parameters:
     ///   - hasToShow: Binding controlling whether the top status bar / popup is shown.
@@ -58,7 +58,7 @@ public struct StatusBarAndPopupModifier<PopupContent: View>: ViewModifier {
         self.hasTabBar = hasTabBar
         self.backgroundStatusBarStyle = backgroundStatusBarStyle
     }
-
+    
     public func body(content: Content) -> some View {
         content
             .backgroundStatusBar(
@@ -120,19 +120,19 @@ public extension View {
 #if DEBUG
 struct BannerAndPopupTestView: View {
     @State private var isOffline = true
-
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                NavigationLink(.pushDetail) {
+                NavigationLink("Push detail") {
                     DetailView2()
                 }
-
+                
                 Button(isOffline ? .goOnline : .goOffline) {
                     isOffline.toggle()
                 }
             }
-            .navigationTitle(.home)
+            .navigationTitle("Home")
         }
         .bannerAndPopup(
             hasToShow: $isOffline,
@@ -147,9 +147,9 @@ struct BannerAndPopupTestView: View {
 struct DetailView2: View {
     var body: some View {
         VStack {
-            Text(.detailScreen)
+            Text("Detail screen")
         }
-        .navigationTitle(.detail)
+        .navigationTitle("Detail")
     }
 }
 
@@ -158,49 +158,47 @@ struct DetailView2: View {
 #Preview {
     BannerAndPopupTestView()
 }
-#endif
 
 
 // MARK: - Preview con TabBar e senza
 
-#if DEBUG
 struct BannerAndPopupWithTabBarPreview: View {
     @State private var isOffline = true
     @State private var selectedTab = 0
-
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
                 VStack(spacing: 24) {
-                    Text(.tab1)
+                    Text("Tab 1")
                     Button(isOffline ? .goOnline : .goOffline) {
                         isOffline.toggle()
                     }
                 }
-                .navigationTitle(.tab1)
+                .navigationTitle("Tab 1")
             }
             .tabItem {
-                Label(.home, systemImage: "house")
-            }.tag(0)
-
-            Text(.tab2)
-                .tabItem {
-                    Label(.other, systemImage: "star")
-                }.tag(1)
-        }
-        .bannerAndPopup(
-            hasToShow: $isOffline,
-            backgroundStatusBarStyle: .warning,
-            hasTabBar: false
-        ) {
-            Popup(icon: "wifi.slash", message: "This is the message", style: .warning)
+                Label("Home", systemImage: "house")
+                
+                Text("Tab 2")
+                    .tabItem {
+                        Label(.other, systemImage: "star")
+                    }.tag(1)
+            }
+            .bannerAndPopup(
+                hasToShow: $isOffline,
+                backgroundStatusBarStyle: .warning,
+                hasTabBar: false
+            ) {
+                Popup(icon: "wifi.slash", message: "This is the message", style: .warning)
+            }
         }
     }
 }
 
 struct BannerAndPopupNoTabBarPreview: View {
     @State private var isOffline = true
-
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {

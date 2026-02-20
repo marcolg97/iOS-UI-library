@@ -21,9 +21,9 @@ public enum Theme: String, CaseIterable, Identifiable, Sendable {
     /// Display name for the theme (English fallback).
     public var displayName: LocalizedStringResource {
         switch self {
-        case .light: LocalizedStringResource.light
-        case .dark: LocalizedStringResource.dark
-        case .system: LocalizedStringResource.system
+        case .light: LocalizedStringResource("Light")
+        case .dark: LocalizedStringResource("Dark")
+        case .system: LocalizedStringResource("System")
         }
     }
     

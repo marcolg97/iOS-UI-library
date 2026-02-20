@@ -15,7 +15,7 @@ struct MockTest {
         // ensure modifiers are available
         let _ = Text("x")
             .backgroundStatusBar(isVisible: true, style: BackgroundStatusBarStyle.warning)
-            .bannerAndPopup(isOffline: Binding.constant(true), backgroundStatusBarStyle: BackgroundStatusBarStyle.warning, hasTabbar: false) {
+            .bannerAndPopup(hasToShow: Binding.constant(true), backgroundStatusBarStyle: BackgroundStatusBarStyle.warning, hasTabBar: false) {
                 Popup(icon: "wifi.slash", message: "m", style: PopupStyle.warning)
             }
     }
@@ -32,7 +32,7 @@ struct MockTest {
     @Test func statusBarAndPopupModifier_binding_passthrough() throws {
         var offline = true
         let binding = Binding(get: { offline }, set: { offline = $0 })
-        let modifier = StatusBarAndPopupModifier(isOffline: binding, backgroundStatusBarStyle: .warning, hasTabbar: false) {
+        let modifier = StatusBarAndPopupModifier(hasToShow: binding, backgroundStatusBarStyle: .warning, hasTabBar: false) {
             Popup(icon: "wifi.slash", message: "m", style: PopupStyle.warning)
         }
         
@@ -45,7 +45,7 @@ struct MockTest {
         // compile-time smoke: text, icon-only, custom content
         _ = ActionButton("Primary", style: .primary) {}
         _ = ActionButton(systemName: "trash", style: .destructive) {}
-        _ = ActionButton(isEnabled: true, style: .primary) { HStack { Image(systemName: "plus"); Text("Add") } } action: { }
+        _ = ActionButton(isEnabled: true, style: .primary, action: {}, label:  { HStack { Image(systemName: "plus"); Text("Add") } })
 
         // style sanity checks
         let cyan = ActionButtonStyle.primaryCyan
@@ -59,5 +59,54 @@ struct MockTest {
         XCTAssertEqual(circle.minTapTarget, CGSize(width: 44, height: 44))
         XCTAssertNotNil(circle.borderColor)
         XCTAssertGreaterThanOrEqual(circle.cornerRadius, circle.minTapTarget.height / 2)
+    }
+
+    @Test func progressBar_api_compile_and_style_checks() throws {
+        // compile-time smoke: determinate, indeterminate and segmented
+        _ = ProgressBar(value: 0.5, style: .neutral)
+        _ = ProgressBar(style: .accent)
+        _ = ProgressBar(currentStep: 1, totalSteps: 3)
+
+        // style presets
+        let neutral = ProgressBarStyle.neutral
+        XCTAssertEqual(neutral.height, 6)
+        XCTAssertEqual(neutral.cornerRadius, 3)
+        // default indeterminate animation duration should be slow for smoother preview
+        XCTAssertEqual(neutral.indeterminateAnimationDuration, 14.0)
+        // default layout should be continuous
+        XCTAssertEqual(neutral.layout, .continuous)
+        // default segmented config (fallback) should match legacy defaults
+        XCTAssertEqual(neutral.segmentedConfig.activeWidth, 50)
+        XCTAssertEqual(neutral.segmentedConfig.inactiveWidth, 25)
+        XCTAssertEqual(neutral.segmentedConfig.spacing, 4)
+
+        let accent = ProgressBarStyle.accent
+        XCTAssertEqual(accent.progressColor, .accentColor)
+
+        // 3D preset sanity checks — solid-fill (no gradient) with gloss + glow
+        let threeD = ProgressBarStyle.threeD
+        XCTAssertNil(threeD.progressGradientStartColor)
+        XCTAssertNil(threeD.progressGradientEndColor)
+        guard case let .threeD(cfg) = threeD.presentation else { XCTFail("expected threeD presentation"); return }
+        XCTAssertEqual(cfg.shadowRadius, 6)
+        XCTAssertEqual(cfg.glowColor, Color(red: 0.00, green: 0.78, blue: 0.92).opacity(0.28))
+        XCTAssertEqual(cfg.highlightColor, Color.white.opacity(0.28))
+
+        // quiz style is derived from threeD but increases the height
+        let quiz = ProgressBarStyle.quizStyle
+        XCTAssertNotEqual(quiz, threeD)
+        XCTAssertEqual(quiz.track.color, threeD.track.color) // same base track
+        XCTAssertGreaterThan(quiz.height, threeD.height)
+    }
+
+    @Test func progressBar_style_presets_areDistinct() throws {
+        // each preset should have a distinct appearance
+        XCTAssertNotEqual(ProgressBarStyle.neutral, ProgressBarStyle.accent)
+        XCTAssertNotEqual(ProgressBarStyle.neutral, ProgressBarStyle.threeD)
+        XCTAssertNotEqual(ProgressBarStyle.accent, ProgressBarStyle.threeD)
+
+        // quizStyle is just a variant of threeD with a taller bar
+        XCTAssertNotEqual(ProgressBarStyle.quizStyle, ProgressBarStyle.threeD)
+        XCTAssertGreaterThan(ProgressBarStyle.quizStyle.height, ProgressBarStyle.threeD.height)
     }
 }

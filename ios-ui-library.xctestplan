@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "40565AE2-D1A1-4D76-A11F-442503E90810",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "UILibraryTests",
+        "name" : "UILibraryTests"
+      }
+    }
+  ],
+  "version" : 1
+}

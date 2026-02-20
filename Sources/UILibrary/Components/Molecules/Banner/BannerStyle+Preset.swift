@@ -68,4 +68,76 @@ public extension BannerStyle {
             customIcon: customIcon ?? "xmark.circle.fill"
         )
     }
+    
+    /// Creates a 3D-style info banner with elevated appearance and shadow.
+    /// - Parameters:
+    ///   - customIcon: Optional custom icon (default: "info.circle.fill").
+    /// - Returns: A `BannerStyle` configured for 3D info messages.
+    static func threeDimensionalInfo(customIcon: String? = nil) -> BannerStyle {
+        BannerStyle(
+            backgroundColor: Color.blue,
+            iconColor: .white,
+            titleColor: .white,
+            subtitleColor: .white.opacity(0.9),
+            actionColor: .white,
+            customIcon: customIcon ?? "info.circle.fill",
+            shadowColor: Color.blue.opacity(0.4),
+            shadowRadius: 8,
+            shadowOffset: CGSize(width: 0, height: 4)
+        )
+    }
+    
+    /// Creates a 3D-style warning banner with elevated appearance and shadow.
+    /// - Parameters:
+    ///   - customIcon: Optional custom icon (default: "exclamationmark.triangle.fill").
+    /// - Returns: A `BannerStyle` configured for 3D warning messages.
+    static func threeDimensionalWarning(customIcon: String? = nil) -> BannerStyle {
+        BannerStyle(
+            backgroundColor: Color.orange,
+            iconColor: .white,
+            titleColor: .white,
+            subtitleColor: .white.opacity(0.9),
+            actionColor: .white,
+            customIcon: customIcon ?? "exclamationmark.triangle.fill",
+            shadowColor: Color.orange.opacity(0.4),
+            shadowRadius: 8,
+            shadowOffset: CGSize(width: 0, height: 4)
+        )
+    }
+    
+    /// Creates a 3D-style success banner with elevated appearance and shadow.
+    /// - Parameters:
+    ///   - customIcon: Optional custom icon (default: "checkmark.circle.fill").
+    /// - Returns: A `BannerStyle` configured for 3D success messages.
+    static func threeDimensionalSuccess(customIcon: String? = nil) -> BannerStyle {
+        BannerStyle(
+            backgroundColor: Color.green,
+            iconColor: .white,
+            titleColor: .white,
+            subtitleColor: .white.opacity(0.9),
+            actionColor: .white,
+            customIcon: customIcon ?? "checkmark.circle.fill",
+            shadowColor: Color.green.opacity(0.4),
+            shadowRadius: 8,
+            shadowOffset: CGSize(width: 0, height: 4)
+        )
+    }
+    
+    /// Creates a 3D-style error banner with elevated appearance and shadow.
+    /// - Parameters:
+    ///   - customIcon: Optional custom icon (default: "xmark.circle.fill").
+    /// - Returns: A `BannerStyle` configured for 3D error messages.
+    static func threeDimensionalError(customIcon: String? = nil) -> BannerStyle {
+        BannerStyle(
+            backgroundColor: Color.red,
+            iconColor: .white,
+            titleColor: .white,
+            subtitleColor: .white.opacity(0.9),
+            actionColor: .white,
+            customIcon: customIcon ?? "xmark.circle.fill",
+            shadowColor: Color.red.opacity(0.4),
+            shadowRadius: 8,
+            shadowOffset: CGSize(width: 0, height: 4)
+        )
+    }
 }

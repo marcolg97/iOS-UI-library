@@ -45,6 +45,15 @@ public struct BannerStyle: Equatable, Sendable {
     /// Vertical spacing between title and subtitle.
     public let verticalSpacing: CGFloat
     
+    /// Shadow color for 3D effects. When `nil`, no shadow is applied.
+    public let shadowColor: Color?
+    
+    /// Shadow radius for 3D effects.
+    public let shadowRadius: CGFloat
+    
+    /// Shadow offset for 3D effects.
+    public let shadowOffset: CGSize
+    
     /// Creates a `BannerStyle`.
     /// - Parameters:
     ///   - backgroundColor: Background color of the banner.
@@ -58,6 +67,9 @@ public struct BannerStyle: Equatable, Sendable {
     ///   - iconSize: Size of the icon (default: 20).
     ///   - spacing: Horizontal spacing between icon and content (default: 12).
     ///   - verticalSpacing: Vertical spacing between title and subtitle (default: 4).
+    ///   - shadowColor: Optional shadow color for 3D effects (nil = no shadow).
+    ///   - shadowRadius: Shadow blur radius (default: 0).
+    ///   - shadowOffset: Shadow offset (default: .zero).
     public init(
         backgroundColor: Color,
         iconColor: Color,
@@ -69,7 +81,10 @@ public struct BannerStyle: Equatable, Sendable {
         padding: CGFloat = 16,
         iconSize: CGFloat = 20,
         spacing: CGFloat = 12,
-        verticalSpacing: CGFloat = 4
+        verticalSpacing: CGFloat = 4,
+        shadowColor: Color? = nil,
+        shadowRadius: CGFloat = 0,
+        shadowOffset: CGSize = .zero
     ) {
         self.backgroundColor = backgroundColor
         self.iconColor = iconColor
@@ -82,5 +97,8 @@ public struct BannerStyle: Equatable, Sendable {
         self.iconSize = iconSize
         self.spacing = spacing
         self.verticalSpacing = verticalSpacing
+        self.shadowColor = shadowColor
+        self.shadowRadius = shadowRadius
+        self.shadowOffset = shadowOffset
     }
 }

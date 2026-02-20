@@ -50,6 +50,12 @@ public struct Badge: View {
                 RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous)
                     .stroke(style.borderColor ?? Color.clear, lineWidth: style.borderWidth)
             )
+            .shadow(
+                color: style.shadowColor ?? .clear,
+                radius: style.shadowRadius,
+                x: style.shadowOffset.width,
+                y: style.shadowOffset.height
+            )
             .fixedSize()
             .accessibilityLabel(text)
     }
@@ -88,6 +94,15 @@ public struct Badge: View {
         Badge("1", style: .accent)
         Badge("5", style: .success)
         Badge("99+", style: .error)
+    }
+    .padding()
+}
+
+#Preview("3D Style") {
+    VStack(spacing: 12) {
+        Badge("3D", style: .threeDimensional())
+        Badge("New", style: .threeDimensional(.purple))
+        Badge("Pro", style: .threeDimensional(.green))
     }
     .padding()
 }

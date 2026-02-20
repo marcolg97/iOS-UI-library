@@ -101,6 +101,12 @@ public struct Banner<ActionContent: View>: View {
         .padding(style.padding)
         .background(style.backgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous))
+        .shadow(
+            color: style.shadowColor ?? .clear,
+            radius: style.shadowRadius,
+            x: style.shadowOffset.width,
+            y: style.shadowOffset.height
+        )
     }
 }
 
@@ -153,6 +159,40 @@ public extension Banner where ActionContent == EmptyView {
             title: "Error",
             subtitle: "Something went wrong.",
             style: .error()
+        )
+    }
+    .padding()
+}
+
+#Preview("3D Styles") {
+    VStack(spacing: 16) {
+        Banner(
+            title: "App Update Available",
+            subtitle: "Version 2.0 is now available with new features.",
+            style: .threeDimensionalInfo(),
+            actionContent: {
+                Button(action: {}) {
+                    Label("Update Now", systemImage: "arrow.down.circle")
+                }
+            }
+        )
+        
+        Banner(
+            title: "Storage Almost Full",
+            subtitle: "You're using 95% of your available storage.",
+            style: .threeDimensionalWarning()
+        )
+        
+        Banner(
+            title: "Backup Complete",
+            subtitle: "Your data has been safely backed up.",
+            style: .threeDimensionalSuccess()
+        )
+        
+        Banner(
+            title: "Connection Lost",
+            subtitle: "Unable to connect to the server.",
+            style: .threeDimensionalError()
         )
     }
     .padding()

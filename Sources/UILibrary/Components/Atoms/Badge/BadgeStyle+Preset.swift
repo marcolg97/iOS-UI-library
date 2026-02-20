@@ -49,4 +49,21 @@ public extension BadgeStyle {
             borderWidth: 1
         )
     }
+    
+    /// 3D variant with elevated appearance and shadow.
+    /// - Parameter color: The base color for the badge (default: .blue).
+    /// - Returns: A `BadgeStyle` with 3D shadow effect.
+    static func threeDimensional(_ color: Color = .blue) -> BadgeStyle {
+        BadgeStyle(
+            backgroundColor: color,
+            foregroundColor: .white,
+            font: .caption.weight(.bold),
+            verticalPadding: 6,
+            horizontalPadding: 10,
+            cornerRadius: 10,
+            shadowColor: color.opacity(0.4),
+            shadowRadius: 4,
+            shadowOffset: CGSize(width: 0, height: 3)
+        )
+    }
 }

@@ -2,14 +2,39 @@
 
 ## 2026-02-20 — Added 3D preset styles to Badge and Banner
 
-- Extended `BadgeStyle` with shadow properties (`shadowColor`, `shadowRadius`, `shadowOffset`) for 3D effects.
-- Added `.threeDimensional(_:)` preset to `BadgeStyle+Preset` supporting customizable base color.
-- Extended `BannerStyle` with shadow properties for 3D effects.
-- Added 3D presets to `BannerStyle+Preset`: `.threeDimensionalInfo()`, `.threeDimensionalWarning()`, `.threeDimensionalSuccess()`, `.threeDimensionalError()`.
-- Updated both `Badge` and `Banner` views to apply shadow modifiers based on style properties.
-- Added comprehensive previews demonstrating the 3D style variants for both components.
-- Updated `README.md` and `CHANGELOG.md` with new preset documentation.
 
+## 2026-02-21 — TextFieldAtom atom
+
+- Created `TextFieldAtom` atom for single-line input, supporting error, hint, placeholder, disabled, and focused states.
+- Introduced `TextFieldAtomStyle` contract for all visual tokens, fully brand-agnostic and immutable.
+- Added style presets and comprehensive previews for all states.
+- Updated `README.md` and `CHANGELOG.md`.
+
+Rationale: Provide a reusable, accessible, and brand-agnostic text input primitive for apps and design systems. All theming is injected via `TextFieldAtomStyle`, ensuring strict separation of concerns and long-term scalability. The component supports all required states and accessibility/localization features, following UILibrary's Atomic Design and style-injection conventions.
+
+## 2026-02-21 — CheckboxAtom atom
+
+- Created `CheckboxAtom` atom as a binary selection control supporting error, hint, disabled states, and optional label.
+- Introduced `CheckboxAtomStyle` with presets (`.previewDefault`, `.compact`, `.modern`) to cover typical appearances.
+- Implemented accessibility labels, values and hints; previews demonstrate all major states.
+
+Rationale: Provide a small, composable, style-driven checkbox primitive for forms and lists. Styling is fully injected by the host app through `CheckboxAtomStyle` so the component remains brand-agnostic and reusable.
+
+## 2026-02-21 — SwitchAtom atom
+
+- Created `SwitchAtom` atom as an on/off toggle supporting error, hint, disabled states, and optional label.
+- Introduced `SwitchAtomStyle` with presets (`.previewDefault`, `.compact`, `.modern`) to cover typical appearances.
+- Implemented accessibility labels, values and hints; previews demonstrate all major states.
+
+Rationale: Provide a reusable, style-driven switch primitive for settings and form toggles. The style contract keeps the component brand-agnostic and allows apps to inject their own theme.
+
+## 2026-02-21 — RadioButtonAtom atom
+
+- Created `RadioButtonAtom` atom as a single-choice selector supporting error, hint, disabled states, and optional label.
+- Introduced `RadioButtonStyle` with presets (`.previewDefault`, `.compact`, `.modern`) to cover typical appearances.
+- Implemented accessibility labels, values and hints; previews demonstrate all major states.
+
+Rationale: Provide a compact, style-driven radio primitive for single-choice selections. The style contract ensures brand-agnostic integration and flexible appearance control.
 Rationale: The 3D style preset provides an elevated, modern appearance option for badges and banners, useful for emphasizing important UI elements or matching specific design languages. Shadow properties are additive (default to nil/0), ensuring full backward compatibility with existing styles. The implementation follows UILibrary's style-injection pattern, keeping the component code generic while allowing apps to choose between flat and 3D presentations.
 
 ## 2026-02-20 — Badge atom

@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^swift build --build-system swiftbuild$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

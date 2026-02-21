@@ -37,10 +37,7 @@ Layers:
 
 - Atoms
 - Molecules
-- Organisms
-
-Each component:
-
+ - `TextFieldAtom` — single-line, style-injected input field supporting error, hint, placeholder, disabled, and focused states. All visual tokens are injected via `TextFieldAtomStyle`. Previews cover all states. Brand-agnostic and accessible.
 - Lives in its own folder
 - Exposes a `Style` struct
 - Contains no brand tokens
@@ -104,17 +101,40 @@ Maintain an updated list of public components.
 - `ActionButton` — centralized, style-driven button with size variants, icon-only and custom-content initializers. Use `ActionButtonStyle` presets (`.primary`, `.secondary`, `.destructive`, `.ghost`, `.primaryCyan`, `.iconCircle`).
 - `AvatarImage` — circular avatar that shows either a supplied image or the first letter of a name when no image is provided. Appearance is controlled via `AvatarImageStyle` with presets such as `.default`, `.small`, `.large` and `bordered(_:)`.
 - `Badge` — small, style-driven status label for displaying status, count, or tag-like information. Use `BadgeStyle` presets (`.default`, `.neutral`, `.accent`, `.success`, `.warning`, `.error`, `.outlined(_:)`, `.threeDimensional(_:)`).
+- `Card` — style-driven container for grouping related content with customizable background, border, shadow, and padding. Use `CardStyle` presets (`.default`, `.elevated`, `.outlined`, `.flat`).
+- `LabelImage` — combines a label with an optional leading or trailing system icon. Use `LabelImageStyle` to control typography, colors, and layout.
 - `ProgressBar` — style-driven progress indicator supporting determinate, indeterminate and segmented (step) presentations. Build a custom look by composing tokens from `ProgressBarStyle` (layout, fill, presentation, track, metrics); built‑in presets include `.neutral`, `.accent` and `.threeD`.
+- `TextFieldAtom` — pure single-line input field without labels, hints, or errors. Compose with `FormLabel`, `FormHint`, and `FormError` for complete form fields. Appearance is controlled via `TextFieldAtomStyle` with presets such as `.previewDefault`, `.compact`, and `.modern`.
+- `CheckboxAtom` — pure binary toggle without labels, hints, or errors. Compose with `FormLabel`, `FormHint`, and `FormError` for complete form fields. Appearance is controlled via `CheckboxStyle` with presets such as `.previewDefault`, `.compact`, and `.modern`.
+- `SwitchAtom` — pure on/off toggle without labels, hints, or errors. Compose with `FormLabel`, `FormHint`, and `FormError` for complete form fields. Appearance is controlled via `SwitchAtomStyle` with presets such as `.previewDefault`, `.compact`, and `.modern`.
+- `RadioButtonAtom` — pure single-choice selector without labels, hints, or errors. Compose with `FormLabel`, `FormHint`, and `FormError` for complete form fields. Appearance is controlled via `RadioButtonStyle` with presets such as `.previewDefault`, `.compact`, and `.modern`.
+- `FormLabel` — text label with optional icon for form fields. Compose with input atoms in `FormItem`. Appearance is controlled via `FormLabelStyle`.
+- `FormHint` — helper text for form fields. Appearance is controlled via `FormHintStyle`.
+- `FormError` — error message text with optional icon for form fields. Appearance is controlled via `FormErrorStyle`.
 
 ## Molecules
 
-- **Banner** – Contextual banner for displaying informational messages with optional actions. Supports info, warning, success, and error styles in both flat and 3D variants. API: `Banner(title: String, subtitle: String? = nil, style: BannerStyle = .info(), actionContent: () -> ActionContent)`. Use presets: `.info()`, `.warning()`, `.success()`, `.error()`, `.threeDimensionalInfo()`, `.threeDimensionalWarning()`, `.threeDimensionalSuccess()`, `.threeDimensionalError()`.
+- `Banner` – Contextual banner for displaying informational messages with optional actions. Supports info, warning, success, and error styles in both flat and 3D variants. API: `Banner(title: String, subtitle: String? = nil, style: BannerStyle = .info(), actionContent: () -> ActionContent)`. Use presets: `.info()`, `.warning()`, `.success()`, `.error()`, `.threeDimensionalInfo()`, `.threeDimensionalWarning()`, `.threeDimensionalSuccess()`, `.threeDimensionalError()`.
+- `FormItem` — layout container for a single form field (label, input, hint/error). Supports vertical and horizontal layouts. API: `FormItem(layout: FormItemLayout = .vertical, style: FormItemStyle) { /* content */ }`.
+- `FormSection` — groups related form items with optional header and footer. API: `FormSection(header: String? = nil, footer: String? = nil, style: FormSectionStyle) { /* items */ }`.
 
 ## Organisms
 
-- **Popup** – Visual notification with icon and message, styled for status/alerts. API: `Popup(icon: String, message: String, style: PopupStyle = .neutral)`
-- **BackgroundStatusBarView** – Top overlay bar for app-wide status (e.g. offline, warning). Modifier: `.backgroundStatusBar(isVisible: Bool, style: BackgroundStatusBarStyle)`
-- **StatusBarAndPopupModifier** – Adds both a status bar and a dismissable popup to any view for critical states. Modifier: `.bannerAndPopup(isOffline: Binding<Bool>, backgroundStatusBarStyle: BackgroundStatusBarStyle, hasTabbar: Bool, popupContent: () -> PopupContent)`
+- `Form` – Top-level container for form sections providing consistent spacing and optional styling. API: `Form(style: FormStyle) { /* sections */ }`. Example usage:
+  ```swift
+  Form(style: formStyle) {
+      FormSection(header: "Account") {
+          FormItem(layout: .vertical, style: itemStyle) {
+              FormLabel("Username", style: labelStyle)
+              TextFieldAtom(text: $username, style: textFieldStyle)
+              FormHint("Between 4-20 characters", style: hintStyle)
+          }
+      }
+  }
+  ```
+- `Popup` – Visual notification with icon and message, styled for status/alerts. API: `Popup(icon: String, message: String, style: PopupStyle = .neutral)`.
+- `BackgroundStatusBarView` – Top overlay bar for app-wide status (e.g. offline, warning). Modifier: `.backgroundStatusBar(isVisible: Bool, style: BackgroundStatusBarStyle)`.
+- `StatusBarAndPopupModifier` – Adds both a status bar and a dismissable popup to any view for critical states. Modifier: `.bannerAndPopup(isOffline: Binding<Bool>, backgroundStatusBarStyle: BackgroundStatusBarStyle, hasTabbar: Bool, popupContent: () -> PopupContent)`.
 
 This list must always reflect the current public API. Component API reference must be authored in‑source using SwiftDoc/DocC (see "Documentation Structure" below).
 

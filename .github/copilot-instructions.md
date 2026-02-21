@@ -1,5 +1,8 @@
 # Copilot Instructions for UILibrary
 
+
+url: https://github.com/marcolg97/iOS-UI-library/
+
 ## Overview
 
 UILibrary is a SwiftUI component library built for multi-app reuse, white-labeling, and long-term scalability. It enforces strict separation of concerns, Atomic Design, and brand-agnosticism. All theming and brand tokens are injected from the consuming app or design system.
@@ -72,6 +75,12 @@ App/DesignSystem = Theme + Semantic Tokens + Style Builders
 Maintain strict separation for scalable, reusable, and brand-independent UI.
 
 ---
+
+## Important Notes
+- Do not use struct TextFieldAtom_Previews: PreviewProvider but #Preview and @Previewable for previews.
+- All documentation, code, and comments must be written in English.
+- Always ask before commit, and follow the checklist for every change.
+
 
 ## Checklist per ogni task
 

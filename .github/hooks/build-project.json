@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "swift build --build-system swiftbuild"
+      }
+    ]
+  }
+}

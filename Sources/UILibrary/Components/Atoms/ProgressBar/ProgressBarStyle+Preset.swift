@@ -18,7 +18,7 @@ public extension ProgressBarStyle {
         layout: .continuous,
         fill: .solid(.accentColor),
         presentation: .flat,
-        track: .init(color: Color.gray.opacity(0.18)),
+        track: .init(color: Color.primary.opacity(0.1)),
         metrics: .default
     )
 
@@ -29,7 +29,7 @@ public extension ProgressBarStyle {
         layout: .continuous,
         fill: .solid(Color(red: 0.00, green: 0.78, blue: 0.92)),
         presentation: .threeD(.default),
-        track: .init(color: Color.black.opacity(0.25)),
+        track: .init(color: Color.primary.opacity(0.1)),
         metrics: .init(height: 8, cornerRadius: 6, indeterminateDuration: Metrics.default.indeterminateDuration)
     )
     
@@ -37,7 +37,7 @@ public extension ProgressBarStyle {
         layout: .continuous,
         fill: .solid(.green),
         presentation: .threeD(.default),
-        track: .init(color: Color.black.opacity(0.25)),
+        track: .init(color: Color.primary.opacity(0.1)),
         metrics: .default.withHeight(20)
     )
 }

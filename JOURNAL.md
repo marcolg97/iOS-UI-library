@@ -35,6 +35,12 @@ Rationale: Provide a reusable, style-driven switch primitive for settings and fo
 - Implemented accessibility labels, values and hints; previews demonstrate all major states.
 
 Rationale: Provide a compact, style-driven radio primitive for single-choice selections. The style contract ensures brand-agnostic integration and flexible appearance control.
+## 2026-02-21 — Beta documentation & component alignment
+
+- Added detailed notes about Carousel, LockScreenView, Tabbar, ListItemCard, SelectableItemCard (+ university wrapper), and WeeklyTaskCalendar so the README's “Component List” now mirrors the actual tree.
+- Confirmed DocC/library-guideline references remain accurate for the new molecules and templates.
+
+Rationale: Ensure the first beta ship log and documentation fully describe the current API surface so integrators can discover each component, style contract, and template without guesswork.
 Rationale: The 3D style preset provides an elevated, modern appearance option for badges and banners, useful for emphasizing important UI elements or matching specific design languages. Shadow properties are additive (default to nil/0), ensuring full backward compatibility with existing styles. The implementation follows UILibrary's style-injection pattern, keeping the component code generic while allowing apps to choose between flat and 3D presentations.
 
 ## 2026-02-20 — Badge atom

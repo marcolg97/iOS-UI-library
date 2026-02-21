@@ -14,6 +14,7 @@
 - Style contracts for all new form components: `FormStyle`, `FormSectionStyle`, `FormItemStyle`, `FormLabelStyle`, `FormHintStyle`, `FormErrorStyle`
 - Preset styles for all new form components (`.previewDefault`, `.modern`, `.compact` variants where applicable)
 - Comprehensive previews demonstrating form composition patterns
+- Documented the full beta surface (Carousel, ListItemCard, SelectableItemCard variants, WeeklyTaskCalendar, LockScreenView, Tabbar, and related atoms) and refreshed `README.md`/DocC guidance so the component list now matches the shipped layout and templates.
 
 ### Changed (BREAKING)
 
@@ -91,4 +92,3 @@ Form(style: formStyle) {
 ### Fixed
 
  - `TextFieldAtom` atom (single-line, style-injected input field supporting error, hint, placeholder, disabled, and focused states. All visual tokens are injected via `TextFieldAtomStyle`. Previews cover all states. Brand-agnostic and accessible.)
-

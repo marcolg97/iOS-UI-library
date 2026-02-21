@@ -61,16 +61,16 @@ public struct Badge: View {
     }
 }
 
-#Preview("Default") {
+#Preview() {
+    Text("Default").font(.caption).foregroundColor(.gray)
     VStack(spacing: 12) {
         Badge("New")
         Badge("Default", style: .default)
         Badge("Neutral", style: .neutral)
     }
     .padding()
-}
-
-#Preview("Semantic Colors") {
+    
+    Text("Semantic Colors").font(.caption).foregroundColor(.gray)
     VStack(spacing: 12) {
         Badge("Info", style: .accent)
         Badge("Success", style: .success)
@@ -78,27 +78,24 @@ public struct Badge: View {
         Badge("Error", style: .error)
     }
     .padding()
-}
-
-#Preview("Outlined") {
+    
+    Text("Outlined").font(.caption).foregroundColor(.gray)
     VStack(spacing: 12) {
         Badge("Outlined", style: .outlined())
         Badge("Blue", style: .outlined(.blue))
         Badge("Red", style: .outlined(.red))
     }
     .padding()
-}
-
-#Preview("Count Badges") {
+    
+    Text("Count Badges").font(.caption).foregroundColor(.gray)
     HStack(spacing: 12) {
         Badge("1", style: .accent)
         Badge("5", style: .success)
         Badge("99+", style: .error)
     }
     .padding()
-}
-
-#Preview("3D Style") {
+    
+    Text("3D Style").font(.caption).foregroundColor(.gray)
     VStack(spacing: 12) {
         Badge("3D", style: .threeDimensional())
         Badge("New", style: .threeDimensional(.purple))

@@ -96,12 +96,11 @@ ComponentName/
 
 Maintain an updated list of public components.
 
-## Atoms
-
 - `ActionButton` — centralized, style-driven button with size variants, icon-only and custom-content initializers. Use `ActionButtonStyle` presets (`.primary`, `.secondary`, `.destructive`, `.ghost`, `.primaryCyan`, `.iconCircle`).
 - `AvatarImage` — circular avatar that shows either a supplied image or the first letter of a name when no image is provided. Appearance is controlled via `AvatarImageStyle` with presets such as `.default`, `.small`, `.large` and `bordered(_:)`.
 - `Badge` — small, style-driven status label for displaying status, count, or tag-like information. Use `BadgeStyle` presets (`.default`, `.neutral`, `.accent`, `.success`, `.warning`, `.error`, `.outlined(_:)`, `.threeDimensional(_:)`).
 - `Card` — style-driven container for grouping related content with customizable background, border, shadow, and padding. Use `CardStyle` presets (`.default`, `.elevated`, `.outlined`, `.flat`).
+- `CircularProgressBar` — determinate ring indicator that shows numeric progress inside a gradient circle. Configurable via `CircularProgressBarStyle` (track, gradients, label, animation).
 - `LabelImage` — combines a label with an optional leading or trailing system icon. Use `LabelImageStyle` to control typography, colors, and layout.
 - `ProgressBar` — style-driven progress indicator supporting determinate, indeterminate and segmented (step) presentations. Build a custom look by composing tokens from `ProgressBarStyle` (layout, fill, presentation, track, metrics); built‑in presets include `.neutral`, `.accent` and `.threeD`.
 - `TextFieldAtom` — pure single-line input field without labels, hints, or errors. Compose with `FormLabel`, `FormHint`, and `FormError` for complete form fields. Appearance is controlled via `TextFieldAtomStyle` with presets such as `.previewDefault`, `.compact`, and `.modern`.
@@ -111,14 +110,20 @@ Maintain an updated list of public components.
 - `FormLabel` — text label with optional icon for form fields. Compose with input atoms in `FormItem`. Appearance is controlled via `FormLabelStyle`.
 - `FormHint` — helper text for form fields. Appearance is controlled via `FormHintStyle`.
 - `FormError` — error message text with optional icon for form fields. Appearance is controlled via `FormErrorStyle`.
+- `Toolbar` — reusable toolbar content helpers such as `DismissToolbarItem`, whose behavior and icons are configured through `ToolbarItemStyle`.
 
-## Molecules
+- ## Molecules
 
 - `Banner` – Contextual banner for displaying informational messages with optional actions. Supports info, warning, success, and error styles in both flat and 3D variants. API: `Banner(title: String, subtitle: String? = nil, style: BannerStyle = .info(), actionContent: () -> ActionContent)`. Use presets: `.info()`, `.warning()`, `.success()`, `.error()`, `.threeDimensionalInfo()`, `.threeDimensionalWarning()`, `.threeDimensionalSuccess()`, `.threeDimensionalError()`.
-- `FormItem` — layout container for a single form field (label, input, hint/error). Supports vertical and horizontal layouts. API: `FormItem(layout: FormItemLayout = .vertical, style: FormItemStyle) { /* content */ }`.
-- `FormSection` — groups related form items with optional header and footer. API: `FormSection(header: String? = nil, footer: String? = nil, style: FormSectionStyle) { /* items */ }`.
+- `Carousel` – Horizontally scrollable list with paging behavior and optional dots, driven by `CarouselViewStyle`. Inject any view per item and set card size/padding via the style object.
+- `CourseProgressCard` — Progress-focused list item showing a circular progress ring plus title/subtitle and navigation indicator. Built on top of `ListItemCard` for consistent spacing.
+- `FormItem` — Layout container for a single form field (label, input, hint/error). Supports vertical and horizontal layouts. API: `FormItem(layout: FormItemLayout = .vertical, style: FormItemStyle) { /* content */ }`.
+- `FormSection` — Groups related form items with optional header and footer. API: `FormSection(header: String? = nil, footer: String? = nil, style: FormSectionStyle) { /* items */ }`.
+- `ListItemCard` — Generic row card that arranges leading/content/trailing slots and applies a `ListItemCardStyle` surface with press feedback.
+- `SelectableItemCard` — Model-agnostic selectable row with customizable content plus checked indicator; `UniversitySelectionCard` is a ready-made university variant built on top of it.
+- `WeeklyTaskCalendar` — Seven-day overview that shows completed/planned/upcoming study days with status labels, highlight rings, and day symbols. Configured by `WeeklyTaskCalendarStyle`.
 
-## Organisms
+- ## Organisms
 
 - `Form` – Top-level container for form sections providing consistent spacing and optional styling. API: `Form(style: FormStyle) { /* sections */ }`. Example usage:
   ```swift
@@ -134,7 +139,12 @@ Maintain an updated list of public components.
   ```
 - `Popup` – Visual notification with icon and message, styled for status/alerts. API: `Popup(icon: String, message: String, style: PopupStyle = .neutral)`.
 - `BackgroundStatusBarView` – Top overlay bar for app-wide status (e.g. offline, warning). Modifier: `.backgroundStatusBar(isVisible: Bool, style: BackgroundStatusBarStyle)`.
+- `Tabbar` – Custom tab bar organism that exposes icon/text slots, style tokens, and selection handling consistent with the rest of the library.
 - `StatusBarAndPopupModifier` – Adds both a status bar and a dismissable popup to any view for critical states. Modifier: `.bannerAndPopup(isOffline: Binding<Bool>, backgroundStatusBarStyle: BackgroundStatusBarStyle, hasTabbar: Bool, popupContent: () -> PopupContent)`.
+
+## Templates
+
+- `LockScreenView` – Full-screen overlay used during biometric lock, configurable via `LockScreenViewContent` and `LockScreenViewStyle`.
 
 This list must always reflect the current public API. Component API reference must be authored in‑source using SwiftDoc/DocC (see "Documentation Structure" below).
 

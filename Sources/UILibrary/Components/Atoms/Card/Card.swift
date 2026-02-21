@@ -50,7 +50,7 @@ public struct Card<BodyContent: View>: View {
             }
         }
     }
-    .frame(width: 300, height: 300)
+    .frame(width: 300)
     
     
     Card(style: .surface) {
@@ -61,5 +61,5 @@ public struct Card<BodyContent: View>: View {
             }
         }
     }
-    .frame(width: 300, height: 300)
+    .frame(width: 300)
 }

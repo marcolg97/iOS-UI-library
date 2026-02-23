@@ -1,5 +1,31 @@
 # Journal
 
+## 2026-02-23 — State View Components (ErrorStateView, EmptyStateView, LoadingStateView)
+
+- Created three new reusable state view molecules using iOS 17+ `ContentUnavailableView`:
+  - **ErrorStateView**: Displays error states with icon, title, description, and retry button action
+  - **EmptyStateView**: Displays empty states with icon, title, description, and optional action button
+  - **LoadingStateView**: Displays loading states with configurable progress indicator (spinner/linear) and optional message
+- Introduced style contracts (`ErrorStateViewStyle`, `EmptyStateViewStyle`, `LoadingStateViewStyle`) for complete visual customization
+- Added preset factory methods for common use cases:
+  - ErrorStateView: `.error()`, `.networkError()`, `.serverError()`, `.custom()`
+  - EmptyStateView: `.empty()`
+  - LoadingStateView: `.default()`, `.minimal()`, `.linear()`, `.custom()`
+- **Localization**: All text parameters use `LocalizedStringResource` following SwiftUI/SPM best practices for automatic string extraction and multi-language support
+- Comprehensive previews demonstrating all variants and style presets
+- Updated `README.md` component list and `CHANGELOG.md` following semantic versioning
+
+**Technical Decisions:**
+1. **ContentUnavailableView**: Chose iOS 17+ `ContentUnavailableView` as the foundation for consistent iOS-native appearance and accessibility support
+2. **LocalizedStringResource**: Used `LocalizedStringResource` directly as parameter types (not String) to enable automatic localization extraction during build without manual NSLocalizedString calls
+3. **Style Contracts**: Maintained strict separation - components own no brand tokens; all colors, fonts, spacing injected via style structs
+4. **ActionButton Integration**: Leveraged existing `ActionButton` component for retry/action buttons, ensuring visual consistency across the library
+5. **ControlSize Support**: LoadingStateView supports all ControlSize cases (.mini, .small, .regular, .large, .extraLarge) for flexible spinner sizing
+6. **Generic Presets**: Error presets cover common scenarios (network, server) while `.custom()` allows full brand customization
+
+**Rationale:**
+Provide brand-agnostic, localization-ready state views that apps can use consistently across error handling, empty states, and loading scenarios. Using `ContentUnavailableView` ensures iOS HIG compliance and future OS updates. The `LocalizedStringResource` approach eliminates manual localization boilerplate and enables compile-time string extraction for Xcode's String Catalog. Style injection maintains UILibrary's core architectural principle: components are presentational shells; apps provide theming.
+
 ## 2026-02-20 — Added 3D preset styles to Badge and Banner
 
 

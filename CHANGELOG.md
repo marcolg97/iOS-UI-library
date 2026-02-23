@@ -11,6 +11,11 @@
   - `FormLabel` atom – Text label with optional icon for form fields
   - `FormHint` atom – Helper text for form fields
   - `FormError` atom – Error message text with optional icon
+- **NEW State Components** – Introduced reusable state view molecules using iOS 17+ `ContentUnavailableView`:
+  - `ErrorStateView` molecule – Displays error states with icon, title, description, and retry button. Style contract: `ErrorStateViewStyle` with presets `.error()`, `.networkError()`, `.serverError()`, `.custom()`.
+  - `EmptyStateView` molecule – Displays empty states with icon, title, description, and optional action button. Style contract: `EmptyStateViewStyle` with preset `.empty()`.
+  - `LoadingStateView` molecule – Displays loading states with progress indicator (spinner or linear) and optional message. Style contract: `LoadingStateViewStyle` with presets `.default()`, `.minimal()`, `.linear()`, `.custom()`.
+- **Localization Support** – All new state components use `LocalizedStringResource` for text parameters, following SwiftUI best practices for SPM packages. Components are fully localizable and ready for multi-language support.
 - Style contracts for all new form components: `FormStyle`, `FormSectionStyle`, `FormItemStyle`, `FormLabelStyle`, `FormHintStyle`, `FormErrorStyle`
 - Preset styles for all new form components (`.previewDefault`, `.modern`, `.compact` variants where applicable)
 - Comprehensive previews demonstrating form composition patterns

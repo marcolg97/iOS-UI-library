@@ -65,7 +65,6 @@ public struct SelectableItemCard<Content: View>: View {
         } content: {
             HStack(spacing: 12) {
                 Image(systemName: "star.fill")
-                    .foregroundStyle(.yellow)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Title")

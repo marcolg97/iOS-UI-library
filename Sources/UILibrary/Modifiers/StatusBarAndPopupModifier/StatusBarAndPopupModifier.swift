@@ -54,9 +54,9 @@ public struct StatusBarAndPopupModifier<PopupContent: View>: ViewModifier {
     ) {
         self._hasToShow = hasToShow
         self.popupContent = popupContent()
-        self.showPopup = hasToShow.wrappedValue
         self.hasTabBar = hasTabBar
         self.backgroundStatusBarStyle = backgroundStatusBarStyle
+        self.showPopup = hasToShow.wrappedValue
     }
     
     public func body(content: Content) -> some View {

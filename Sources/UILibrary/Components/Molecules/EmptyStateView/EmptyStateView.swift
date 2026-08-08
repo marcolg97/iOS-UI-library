@@ -50,7 +50,6 @@ import SwiftUI
 ///     onAction: { clearFilters() }
 /// )
 /// ```
-@available(iOS 17.0, macOS 14.0, *)
 public struct EmptyStateView: View {
     /// The empty state title displayed prominently.
     private let title: LocalizedStringResource
@@ -111,11 +110,12 @@ public struct EmptyStateView: View {
         ContentUnavailableView {
             Label {
                 Text(title)
+                    .foregroundStyle(style.titleColor)
             } icon: {
                 Image(systemName: style.iconName)
+                    .foregroundStyle(style.iconColor)
             }
             .font(style.titleFont)
-            .foregroundStyle(style.titleColor)
             .symbolRenderingMode(.hierarchical)
             .imageScale(.large)
         } description: {
@@ -136,35 +136,32 @@ public struct EmptyStateView: View {
     }
 }
 
+#if DEBUG
 #Preview("Empty State - No Messages") {
     EmptyStateView(
-        title: "No Messages",
-        description: "You don't have any messages yet. Start a conversation!",
+        title: .verbatim("No Messages"),
+        description: .verbatim("You don't have any messages yet. Start a conversation!"),
         style: .empty()
     )
 }
 
 #Preview("Empty State - With Action") {
     EmptyStateView(
-        title: "No Items Found",
-        description: "You haven't added any items yet. Get started by adding your first item.",
+        title: .verbatim("No Items Found"),
+        description: .verbatim("You haven't added any items yet. Get started by adding your first item."),
         style: .empty(),
-        actionTitle: "Add Item",
-        onAction: {
-            print("Add item tapped")
-        }
+        actionTitle: .verbatim("Add Item"),
+        onAction: {}
     )
 }
 
 #Preview("Empty State - Search Results") {
     EmptyStateView(
-        title: "No Results",
-        description: "We couldn't find anything matching your search. Try different keywords.",
+        title: .verbatim("No Results"),
+        description: .verbatim("We couldn't find anything matching your search. Try different keywords."),
         style: .search(),
-        actionTitle: "Clear Search",
-        onAction: {
-            print("Clear search tapped")
-        }
+        actionTitle: .verbatim("Clear Search"),
+        onAction: {}
     )
 }
 
@@ -183,14 +180,13 @@ public struct EmptyStateView: View {
             cornerRadius: 10
         )
     )
-    
+
     EmptyStateView(
-        title: "No Favorites",
-        description: "Add items to your favorites to see them here.",
+        title: .verbatim("No Favorites"),
+        description: .verbatim("Add items to your favorites to see them here."),
         style: customStyle,
-        actionTitle: "Explore",
-        onAction: {
-            print("Explore tapped")
-        }
+        actionTitle: .verbatim("Explore"),
+        onAction: {}
     )
 }
+#endif

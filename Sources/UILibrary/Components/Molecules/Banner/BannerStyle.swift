@@ -27,8 +27,17 @@ public struct BannerStyle: Equatable, Sendable {
     /// Color used for action content (e.g., buttons, links).
     public let actionColor: Color
     
-    /// Optional custom icon (SF Symbol name). If nil, uses default for semantic type.
+    /// Optional custom icon (SF Symbol name). If nil, no icon is shown.
     public let customIcon: String?
+
+    /// Font used for the title text.
+    public let titleFont: Font
+
+    /// Font used for the subtitle text.
+    public let subtitleFont: Font
+
+    /// Font used for action content.
+    public let actionFont: Font
     
     /// Corner radius for the banner container.
     public let cornerRadius: CGFloat
@@ -61,7 +70,10 @@ public struct BannerStyle: Equatable, Sendable {
     ///   - titleColor: Color for the title text.
     ///   - subtitleColor: Color for the subtitle text.
     ///   - actionColor: Color for action content.
-    ///   - customIcon: Optional custom icon (SF Symbol name).
+    ///   - customIcon: Optional custom icon (SF Symbol name). When `nil`, no icon is shown.
+    ///   - titleFont: Font for the title text (default: `.subheadline` semibold).
+    ///   - subtitleFont: Font for the subtitle text (default: `.footnote`).
+    ///   - actionFont: Font for action content (default: `.footnote` semibold).
     ///   - cornerRadius: Corner radius for the banner container (default: 12).
     ///   - padding: Internal padding around content (default: 16).
     ///   - iconSize: Size of the icon (default: 20).
@@ -77,6 +89,9 @@ public struct BannerStyle: Equatable, Sendable {
         subtitleColor: Color,
         actionColor: Color,
         customIcon: String? = nil,
+        titleFont: Font = .subheadline.weight(.semibold),
+        subtitleFont: Font = .footnote,
+        actionFont: Font = .footnote.weight(.semibold),
         cornerRadius: CGFloat = 12,
         padding: CGFloat = 16,
         iconSize: CGFloat = 20,
@@ -92,6 +107,9 @@ public struct BannerStyle: Equatable, Sendable {
         self.subtitleColor = subtitleColor
         self.actionColor = actionColor
         self.customIcon = customIcon
+        self.titleFont = titleFont
+        self.subtitleFont = subtitleFont
+        self.actionFont = actionFont
         self.cornerRadius = cornerRadius
         self.padding = padding
         self.iconSize = iconSize

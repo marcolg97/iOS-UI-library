@@ -83,9 +83,15 @@ public struct LoadingStateView: View {
             }
         }
         .padding(style.padding)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(
+            maxWidth: style.expands ? .infinity : nil,
+            maxHeight: style.expands ? .infinity : nil
+        )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(message != nil ? Text(message!) : Text("Loading", comment: "Default loading accessibility label"))
+        .accessibilityLabel(
+            message.map { Text($0) } ?? Text("Loading", bundle: .module, comment: "Default loading accessibility label")
+        )
+        .accessibilityAddTraits(.updatesFrequently)
     }
 }
 
@@ -98,9 +104,10 @@ public enum LoadingProgressStyle: Equatable, Sendable {
     case linear
 }
 
+#if DEBUG
 #Preview("Loading State - Default") {
     LoadingStateView(
-        message: "Loading...",
+        message: .verbatim("Loading..."),
         style: .default()
     )
 }
@@ -111,14 +118,14 @@ public enum LoadingProgressStyle: Equatable, Sendable {
 
 #Preview("Loading State - Large") {
     LoadingStateView(
-        message: "Please wait while we load your data",
+        message: .verbatim("Please wait while we load your data"),
         style: .large()
     )
 }
 
 #Preview("Loading State - Linear") {
     LoadingStateView(
-        message: "Processing...",
+        message: .verbatim("Processing..."),
         style: .linear()
     )
 }
@@ -135,26 +142,27 @@ public enum LoadingProgressStyle: Equatable, Sendable {
         padding: 40,
         linearProgressWidth: 250
     )
-    
+
     LoadingStateView(
-        message: "Custom loading...",
+        message: .verbatim("Custom loading..."),
         style: customStyle
     )
 }
 
 #Preview("Loading State - In Container") {
     VStack {
-        Text("My App")
+        Text(verbatim: "Sample App")
             .font(.title.bold())
-        
+
         Spacer()
-        
+
         LoadingStateView(
-            message: "Fetching your content...",
+            message: .verbatim("Fetching your content..."),
             style: .default()
         )
-        
+
         Spacer()
     }
     .padding()
 }
+#endif

@@ -8,10 +8,6 @@
 import Foundation
 import SwiftUI
 
-#if canImport(UIKit)
-import UIKit
-#endif
-
 /// Scroll behavior for `CarouselView`.
 public enum CarouselScrollBehavior: Equatable, Sendable {
     case viewAligned
@@ -32,7 +28,7 @@ public struct CarouselViewStyle: Equatable, Sendable {
     public let inactivePagingDotColor: Color
     public let pagingDotsTopPadding: CGFloat
 
-public init(
+    public init(
         itemSpacing: CGFloat = 16,
         horizontalPadding: CGFloat = 15,
         showsIndicators: Bool = false,

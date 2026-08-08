@@ -1,24 +1,25 @@
 //
 //  LockScreenView.swift
-//  CleanExpenseTracker
+//  UILibrary
 //
 //  Created by Marco La Gala on 08/02/26.
 //
 
 import SwiftUI
 
-/// Lock screen overlay shown when biometric lock is enabled.
+/// Lock screen overlay shown when app lock is enabled.
 ///
 /// This view:
-/// - Covers the entire app content when locked
-/// - Shows app icon and unlock prompt
-/// - Provides retry button if authentication fails
-/// - Automatically triggers biometric authentication
+/// - Covers the entire app content when locked (opaque material background by default)
+/// - Shows a lock icon, title, subtitle, and an unlock button
+/// - Invokes `onUnlock` when the button is tapped; triggering the actual
+///   authentication (biometrics, passcode, …) is the app's responsibility
 public struct LockScreenView: View {
     private let content: LockScreenViewContent
     private let style: LockScreenViewStyle
     private let onUnlock: () -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isAnimating = false
 
     public init(
@@ -33,6 +34,12 @@ public struct LockScreenView: View {
 
     public var body: some View {
         ZStack {
+            if style.usesMaterialBackground {
+                Rectangle()
+                    .fill(.regularMaterial)
+                    .ignoresSafeArea()
+            }
+
             style.backgroundColor
                 .ignoresSafeArea()
 
@@ -42,14 +49,16 @@ public struct LockScreenView: View {
                 Image(systemName: content.iconSystemName)
                     .font(.system(size: style.iconSize))
                     .foregroundStyle(style.iconColor)
-                    .scaleEffect(isAnimating ? 1.0 : 0.9)
+                    .scaleEffect(isAnimating && !reduceMotion ? 1.0 : 0.9)
                     .animation(
-                        .easeInOut(duration: 1.5)
-                        .repeatForever(autoreverses: true),
+                        reduceMotion
+                            ? nil
+                            : .easeInOut(duration: 1.5).repeatForever(autoreverses: true),
                         value: isAnimating
                     )
+                    .accessibilityHidden(true)
 
-                VStack(spacing: 12) {
+                VStack(spacing: style.textSpacing) {
                     Text(content.title)
                         .font(style.titleFont)
                         .foregroundStyle(style.titleColor)
@@ -59,6 +68,7 @@ public struct LockScreenView: View {
                         .foregroundStyle(style.subtitleColor)
                         .multilineTextAlignment(.center)
                 }
+                .accessibilityElement(children: .combine)
 
                 Spacer()
 
@@ -68,6 +78,7 @@ public struct LockScreenView: View {
                     HStack {
                         Image(systemName: content.unlockIconSystemName)
                             .font(.title3)
+                            .accessibilityHidden(true)
                         Text(content.unlockButtonTitle)
                             .font(style.buttonFont)
                     }
@@ -87,10 +98,12 @@ public struct LockScreenView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     LockScreenView(
-        onUnlock: { print("Unlock tapped") },
+        onUnlock: {},
         content: .default,
         style: .default
     )
 }
+#endif

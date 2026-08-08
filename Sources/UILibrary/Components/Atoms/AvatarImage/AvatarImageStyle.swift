@@ -34,14 +34,14 @@ public struct AvatarImageStyle: Equatable, Sendable {
     ///   - size: Diameter of the avatar (default: 40).
     ///   - backgroundColor: Circle fill color (default: secondary system background).
     ///   - font: Font for the initial text (default: `.headline`).
-    ///   - textColor: Color for the initial (default: `.white`).
+    ///   - textColor: Color for the initial (default: `.primary`, adaptive and readable on the default background).
     ///   - borderColor: Optional stroke color (nil = no border).
     ///   - borderWidth: Width of the border stroke (default: 1).
     public init(
         size: CGFloat = 40,
         backgroundColor: Color = Color.secondary.opacity(0.2),
         font: Font = .headline,
-        textColor: Color = .white,
+        textColor: Color = .primary,
         borderColor: Color? = nil,
         borderWidth: CGFloat = 1
     ) {

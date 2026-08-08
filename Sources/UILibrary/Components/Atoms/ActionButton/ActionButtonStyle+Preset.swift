@@ -35,17 +35,17 @@ public extension ActionButtonStyle {
         defaultMaxWidth: nil
     )
 
-    /// Primary (cyan) — reproduces the look of `PrimaryActionButton` used in app screens.
-    static let primaryCyan = ActionButtonStyle(
-        backgroundColor: Color.cyan.opacity(0.2),
-        foregroundColor: Color.cyan,
+    /// Tonal — soft accent-tinted fill with an accent border, for medium-emphasis actions.
+    static let tonal = ActionButtonStyle(
+        backgroundColor: Color.accentColor.opacity(0.2),
+        foregroundColor: Color.accentColor,
         disabledBackgroundColor: Color.primary.opacity(0.04),
         disabledForegroundColor: Color.primary.opacity(0.6),
-        borderColor: Color.cyan.opacity(0.5),
+        borderColor: Color.accentColor.opacity(0.5),
         disabledBorderColor: Color.primary.opacity(0.12),
         font: .headline.weight(.bold),
         cornerRadius: 16,
-        shadowColor: Color.cyan.opacity(0.3),
+        shadowColor: Color.accentColor.opacity(0.3),
         shadowRadius: 10,
         shadowYOffset: 5,
         defaultMaxWidth: .infinity

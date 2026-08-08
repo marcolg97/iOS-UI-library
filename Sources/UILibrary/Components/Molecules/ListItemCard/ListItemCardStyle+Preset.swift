@@ -11,9 +11,10 @@ import SwiftUI
 public extension ListItemCardStyle {
     static let `default`: ListItemCardStyle = .init()
 
-    static let courseProgress: ListItemCardStyle = .init(
+    /// Prominent variant with a large radius and a soft shadow.
+    static let prominent: ListItemCardStyle = .init(
         cardStyle: .init(
-            backgroundColor: .white.opacity(0.08),
+            backgroundColor: .primary.opacity(0.05),
             cornerRadius: 24,
             padding: 20,
             shadowColor: .black.opacity(0.2),

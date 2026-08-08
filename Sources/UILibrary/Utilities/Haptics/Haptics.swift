@@ -1,6 +1,6 @@
 //
 //  Haptics.swift
-//  CleanExpenseTracker
+//  UILibrary
 //
 //  Created by Marco La Gala on 05/02/26.
 //
@@ -20,12 +20,12 @@ import UIKit
 @MainActor
 public enum Haptics {
     /// Cross-platform impact strength.
-    public enum ImpactStyle {
-        case light, medium, heavy
+    public enum ImpactStyle: Equatable, Sendable, CaseIterable {
+        case light, medium, heavy, soft, rigid
     }
 
     /// Cross-platform notification types.
-    public enum NotificationType {
+    public enum NotificationType: Equatable, Sendable, CaseIterable {
         case success, warning, error
     }
 
@@ -37,6 +37,8 @@ public enum Haptics {
         case .light: uiStyle = .light
         case .medium: uiStyle = .medium
         case .heavy: uiStyle = .heavy
+        case .soft: uiStyle = .soft
+        case .rigid: uiStyle = .rigid
         }
         let generator = UIImpactFeedbackGenerator(style: uiStyle)
         generator.prepare()

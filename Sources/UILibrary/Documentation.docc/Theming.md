@@ -43,7 +43,7 @@ Theme → Style Factory → Component(style:)
 
 Conceptual example:
 
-ActiveTheme ↓ OfflinePopupStyleFactory ↓ OfflinePopup(style: factory.error())
+ActiveTheme ↓ ToastStyleFactory ↓ Toast(message: "Offline", style: factory.error())
 
 Advantages:
 

@@ -14,9 +14,10 @@ import SwiftUI
 public struct BackgroundStatusBarStyle: Equatable, Sendable {
     /// Background color for the status bar.
     public let backgroundColor: Color
-    /// Height of the status bar.
+    /// Height of the status bar. Should roughly match the device's top
+    /// safe-area inset (the bar also extends into the safe area).
     public let height: CGFloat
-    
+
     /// Creates a `BackgroundStatusBarStyle`.
     /// - Parameters:
     ///   - backgroundColor: Background color for the bar.

@@ -57,9 +57,9 @@ public struct AvatarImage: View {
                     .frame(width: style.size, height: style.size)
                     .clipShape(Circle())
             } else {
-                Text(initial)
+                Text(verbatim: initial)
                     .font(style.font)
-                    .foregroundColor(style.textColor)
+                    .foregroundStyle(style.textColor)
             }
         }
         .overlay(
@@ -71,10 +71,16 @@ public struct AvatarImage: View {
             }
         )
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(name))
+        .accessibilityLabel(
+            name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? Text("Avatar", bundle: .module)
+                : Text(verbatim: name)
+        )
+        .accessibilityAddTraits(image != nil ? .isImage : [])
     }
 }
 
+#if DEBUG
 #Preview("Avatar with image") {
     AvatarImage(name: "Alice", image: Image(systemName: "person.crop.circle"))
 }
@@ -94,3 +100,4 @@ public struct AvatarImage: View {
         AvatarImage(name: "Frank", style: .large)
     }
 }
+#endif

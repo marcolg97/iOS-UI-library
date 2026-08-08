@@ -38,7 +38,11 @@ public struct LoadingStateViewStyle: Equatable, Sendable {
     
     /// Width of the linear progress bar (only used when progressStyle is .linear).
     public let linearProgressWidth: CGFloat
-    
+
+    /// Whether the view greedily fills the available space (full-screen
+    /// loading) or hugs its content (inline loading).
+    public let expands: Bool
+
     /// Creates a `LoadingStateViewStyle`.
     /// - Parameters:
     ///   - progressStyle: Style of progress indicator (default: .spinner).
@@ -50,6 +54,7 @@ public struct LoadingStateViewStyle: Equatable, Sendable {
     ///   - spacing: Spacing between indicator and message (default: 16).
     ///   - padding: Padding around the loading view (default: 20).
     ///   - linearProgressWidth: Width of linear progress bar (default: 200).
+    ///   - expands: Whether the view fills the available space (default: true).
     public init(
         progressStyle: LoadingProgressStyle = .spinner,
         progressColor: Color = .accentColor,
@@ -59,7 +64,8 @@ public struct LoadingStateViewStyle: Equatable, Sendable {
         messageFont: Font = .body,
         spacing: CGFloat = 16,
         padding: CGFloat = 20,
-        linearProgressWidth: CGFloat = 200
+        linearProgressWidth: CGFloat = 200,
+        expands: Bool = true
     ) {
         self.progressStyle = progressStyle
         self.progressColor = progressColor
@@ -70,5 +76,6 @@ public struct LoadingStateViewStyle: Equatable, Sendable {
         self.spacing = spacing
         self.padding = padding
         self.linearProgressWidth = linearProgressWidth
+        self.expands = expands
     }
 }

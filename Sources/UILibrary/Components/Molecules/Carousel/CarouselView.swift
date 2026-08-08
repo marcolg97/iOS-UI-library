@@ -7,18 +7,22 @@
 
 import SwiftUI
 
-/// CarouselView è un componente riutilizzabile che mostra elementi orizzontalmente con snap/paging.
+/// Reusable horizontal carousel with snap/paging behavior and optional paging dots.
 /// - Parameters:
-///   - items: Identificabili dati da visualizzare
-///   - cardSize: Dimensione fissa per tutte le card
-///   - content: ViewBuilder che costruisce il contenuto di ogni card
+///   - items: Identifiable data to display
+///   - cardSize: Fixed size applied to every card
+///   - content: ViewBuilder producing each card's content
+///
+/// - Note: Changing `style.scrollBehavior` at runtime rebuilds the scroll
+///   view and resets the scroll position; pick a behavior per instance.
 public struct CarouselView<Item: Identifiable, Content: View>: View {
     private let items: [Item]
     private let cardSize: CGSize
     private let style: CarouselViewStyle
     @ViewBuilder private let content: (Item) -> Content
     @State private var currentItemID: Item.ID?
-    
+    @State private var lastPageIndex: Int = 0
+
     public init(
         items: [Item],
         cardSize: CGSize,
@@ -30,7 +34,7 @@ public struct CarouselView<Item: Identifiable, Content: View>: View {
         self.style = style
         self.content = content
     }
-    
+
     public var body: some View {
         VStack(spacing: 0) {
             ScrollView(.horizontal) {
@@ -44,9 +48,7 @@ public struct CarouselView<Item: Identifiable, Content: View>: View {
                     }
                 }
                 .padding(.horizontal, style.horizontalPadding)
-                .if(style.scrollBehavior != .none) { view in
-                    view.scrollTargetLayout()
-                }
+                .scrollTargetLayout()
             }
             .scrollIndicators(style.showsIndicators ? .visible : .hidden)
             .if(style.scrollBehavior == .viewAligned) { view in
@@ -55,9 +57,7 @@ public struct CarouselView<Item: Identifiable, Content: View>: View {
             .if(style.scrollBehavior == .paging) { view in
                 view.scrollTargetBehavior(.paging)
             }
-            .if(style.scrollBehavior != .none) { view in
-                view.scrollPosition(id: $currentItemID)
-            }
+            .scrollPosition(id: $currentItemID)
 
             if shouldShowPagingDots {
                 HStack(spacing: style.pagingDotSpacing) {
@@ -70,12 +70,17 @@ public struct CarouselView<Item: Identifiable, Content: View>: View {
                 }
                 .padding(.top, style.pagingDotsTopPadding)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Page \(currentPageIndex + 1) of \(itemIDs.count)")
+                .accessibilityLabel(Text("Page \(currentPageIndex + 1) of \(itemIDs.count)", bundle: .module))
             }
         }
         .onAppear {
             if currentItemID == nil {
                 currentItemID = items.first?.id
+            }
+        }
+        .onChange(of: currentItemID) { _, newID in
+            if let newID, let index = itemIDs.firstIndex(of: newID) {
+                lastPageIndex = index
             }
         }
         .onChange(of: itemIDs) { _, newIDs in
@@ -97,30 +102,36 @@ public struct CarouselView<Item: Identifiable, Content: View>: View {
         style.showsPagingDots && itemIDs.count > 1 && style.scrollBehavior != .none
     }
 
+    /// Index used by the paging dots. While a scroll gesture is in flight
+    /// `scrollPosition(id:)` can be `nil`; fall back to the last known page
+    /// instead of snapping the dots back to the first one.
     private var currentPageIndex: Int {
-        guard let currentItemID, let index = itemIDs.firstIndex(of: currentItemID) else { return 0 }
+        guard let currentItemID, let index = itemIDs.firstIndex(of: currentItemID) else {
+            return min(lastPageIndex, max(0, itemIDs.count - 1))
+        }
         return index
     }
 }
 
 #if DEBUG
-struct DemoItem: Identifiable {
+private struct DemoItem: Identifiable {
     let id: UUID
     let title: String
     let subtitle: String
 }
 
-@MainActor func demoCard(item: DemoItem) -> some View {
+@MainActor
+private func demoCard(item: DemoItem) -> some View {
     Card {
         VStack(alignment: .leading, spacing: 6) {
-            Text(item.title)
+            Text(verbatim: item.title)
                 .font(.title2)
                 .bold()
                 .dynamicTypeSize(.large ... .accessibility5)
 
-            Text(item.subtitle)
+            Text(verbatim: item.subtitle)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .dynamicTypeSize(.medium ... .accessibility5)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -129,14 +140,14 @@ struct DemoItem: Identifiable {
 
 #Preview("Carousel · Preview Table") {
     let demoItems = [
-        DemoItem(id: .init(), title: "Uno", subtitle: "Prima Card"),
-        DemoItem(id: .init(), title: "Due", subtitle: "Seconda Card"),
-        DemoItem(id: .init(), title: "Tre", subtitle: "Terza Card"),
-        DemoItem(id: .init(), title: "Quattro", subtitle: "Quarta Card")
+        DemoItem(id: .init(), title: "One", subtitle: "First card"),
+        DemoItem(id: .init(), title: "Two", subtitle: "Second card"),
+        DemoItem(id: .init(), title: "Three", subtitle: "Third card"),
+        DemoItem(id: .init(), title: "Four", subtitle: "Fourth card")
     ]
-    
+
     VStack(spacing: 24) {
-        Text("Default paging")
+        Text(verbatim: "Default paging")
             .font(.headline)
 
         CarouselView(
@@ -146,7 +157,7 @@ struct DemoItem: Identifiable {
             demoCard(item: item)
         }
 
-        Text("Dots + paging")
+        Text(verbatim: "Dots + paging")
             .font(.headline)
 
         CarouselView(
@@ -157,7 +168,7 @@ struct DemoItem: Identifiable {
             demoCard(item: item)
         }
 
-        Text("No paging dots, custom spacing")
+        Text(verbatim: "No paging dots, custom spacing")
             .font(.headline)
 
         CarouselView(

@@ -41,7 +41,6 @@ import SwiftUI
 ///     onRetry: { reload() }
 /// )
 /// ```
-@available(iOS 17.0, macOS 14.0, *)
 public struct ErrorStateView: View {
     /// The error title displayed prominently.
     private let title: LocalizedStringResource
@@ -78,11 +77,12 @@ public struct ErrorStateView: View {
         ContentUnavailableView {
             Label {
                 Text(title)
+                    .foregroundStyle(style.titleColor)
             } icon: {
                 Image(systemName: style.iconName)
+                    .foregroundStyle(style.iconColor)
             }
             .font(style.titleFont)
-            .foregroundStyle(style.titleColor)
             .symbolRenderingMode(.hierarchical)
             .imageScale(.large)
         } description: {
@@ -101,28 +101,25 @@ public struct ErrorStateView: View {
     }
 }
 
+#if DEBUG
 #Preview("Error State - Network Error") {
     ErrorStateView(
-        title: "Connection Failed",
-        description: "Unable to connect to the server. Please check your internet connection and try again.",
+        title: .verbatim("Connection Failed"),
+        description: .verbatim("Unable to connect to the server. Please check your internet connection and try again."),
         style: .error(),
-        onRetry: {
-            print("Retrying...")
-        }
+        onRetry: {}
     )
 }
 
 #Preview("Error State - Server Error") {
     ErrorStateView(
-        title: "Server Error",
-        description: "Something went wrong on our end. We're working to fix it.",
+        title: .verbatim("Server Error"),
+        description: .verbatim("Something went wrong on our end. We're working to fix it."),
         style: .error(
             iconName: "server.rack",
-            retryButtonTitle: "Try Again"
+            retryButtonTitle: .verbatim("Try Again")
         ),
-        onRetry: {
-            print("Retrying...")
-        }
+        onRetry: {}
     )
 }
 
@@ -134,7 +131,7 @@ public struct ErrorStateView: View {
         titleFont: .title2.bold(),
         descriptionColor: .secondary,
         descriptionFont: .body,
-        retryButtonTitle: "Reload",
+        retryButtonTitle: .verbatim("Reload"),
         retryButtonStyle: .init(
             backgroundColor: .orange,
             foregroundColor: .white,
@@ -142,13 +139,12 @@ public struct ErrorStateView: View {
             cornerRadius: 8
         )
     )
-    
+
     ErrorStateView(
-        title: "Warning",
-        description: "Some features may not work properly.",
+        title: .verbatim("Warning"),
+        description: .verbatim("Some features may not work properly."),
         style: customStyle,
-        onRetry: {
-            print("Reloading...")
-        }
+        onRetry: {}
     )
 }
+#endif

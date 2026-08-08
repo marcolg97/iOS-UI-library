@@ -1,6 +1,6 @@
 //
 //  Theme.swift
-//  CoreModules
+//  UILibrary
 //
 //  Created by Marco La Gala on 08/02/26.
 //
@@ -8,9 +8,12 @@
 import Foundation
 import SwiftUI
 
-/// Represents the app's theme mode preference.
+/// Represents the app's appearance mode preference (Light, Dark, or System).
 ///
-/// Defines the visual appearance of the app (Light, Dark, or System-based).
+/// - Note: This type only models the color-scheme preference. Design tokens
+///   (colors, typography, spacing) are intentionally NOT part of this library:
+///   the app or its design-system module owns them and injects them through
+///   each component's `Style` struct (Theme → StyleFactory → Component(style:)).
 public enum Theme: String, CaseIterable, Identifiable, Sendable {
     case light
     case dark
@@ -18,12 +21,12 @@ public enum Theme: String, CaseIterable, Identifiable, Sendable {
     
     public var id: String { rawValue }
     
-    /// Display name for the theme (English fallback).
+    /// Display name for the theme, localized from the library's string catalog.
     public var displayName: LocalizedStringResource {
         switch self {
-        case .light: LocalizedStringResource("Light")
-        case .dark: LocalizedStringResource("Dark")
-        case .system: LocalizedStringResource("System")
+        case .light: LocalizedStringResource("Light", bundle: .atURL(Bundle.module.bundleURL))
+        case .dark: LocalizedStringResource("Dark", bundle: .atURL(Bundle.module.bundleURL))
+        case .system: LocalizedStringResource("System", bundle: .atURL(Bundle.module.bundleURL))
         }
     }
     

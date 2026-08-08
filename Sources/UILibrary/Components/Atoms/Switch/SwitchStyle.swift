@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Style contract for SwitchAtom
-public struct SwitchAtomStyle: Equatable {
+public struct SwitchAtomStyle: Equatable, Sendable {
     public let trackWidth: CGFloat
     public let trackHeight: CGFloat
     public let thumbSize: CGFloat
@@ -10,6 +10,9 @@ public struct SwitchAtomStyle: Equatable {
     public let trackOffColor: Color
     public let thumbColor: Color
     public let disabledOpacity: Double
+    /// Minimum tap-target side length. The hit area is expanded to at least
+    /// this size (HIG recommends 44pt) without changing the drawn control size.
+    public let minTapTarget: CGFloat
 
     public init(
         trackWidth: CGFloat,
@@ -19,7 +22,8 @@ public struct SwitchAtomStyle: Equatable {
         trackOnColor: Color,
         trackOffColor: Color,
         thumbColor: Color,
-        disabledOpacity: Double
+        disabledOpacity: Double,
+        minTapTarget: CGFloat = 44
     ) {
         self.trackWidth = trackWidth
         self.trackHeight = trackHeight
@@ -29,5 +33,6 @@ public struct SwitchAtomStyle: Equatable {
         self.trackOffColor = trackOffColor
         self.thumbColor = thumbColor
         self.disabledOpacity = disabledOpacity
+        self.minTapTarget = minTapTarget
     }
 }

@@ -7,18 +7,18 @@ import SwiftUI
 /// Use within FormItem to display validation errors.
 public struct FormError: View {
     // MARK: - Public API
-    public let text: String
+    public let text: LocalizedStringResource
     public let style: FormErrorStyle
-    
+
     // MARK: - Init
     public init(
-        _ text: String,
-        style: FormErrorStyle
+        _ text: LocalizedStringResource,
+        style: FormErrorStyle = .default
     ) {
         self.text = text
         self.style = style
     }
-    
+
     // MARK: - Body
     public var body: some View {
         HStack(spacing: style.iconSpacing) {
@@ -28,21 +28,24 @@ public struct FormError: View {
                     .scaledToFit()
                     .frame(width: style.iconSize, height: style.iconSize)
                     .foregroundStyle(style.textColor)
+                    .accessibilityHidden(true)
             }
-            
+
             Text(text)
                 .font(style.font)
                 .foregroundStyle(style.textColor)
         }
-        .accessibilityLabel(text)
+        .accessibilityElement(children: .combine)
     }
 }
 
+#if DEBUG
 #Preview("FormError — Variants") {
     VStack(alignment: .leading, spacing: 16) {
-        FormError("This field is required", style: .previewDefault)
-        FormError("Invalid email address", style: .previewDefault)
-        FormError("Password must be at least 8 characters", style: .modern)
+        FormError(.verbatim("This field is required"), style: .default)
+        FormError(.verbatim("Invalid email address"), style: .default)
+        FormError(.verbatim("Password must be at least 8 characters"), style: .modern)
     }
     .padding()
 }
+#endif

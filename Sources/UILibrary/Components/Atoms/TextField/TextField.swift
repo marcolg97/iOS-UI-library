@@ -8,10 +8,10 @@ import SwiftUI
 public struct TextFieldAtom: View {
     // MARK: - Public API
     public let style: TextFieldAtomStyle
-    public let placeholder: String?
+    public let placeholder: LocalizedStringResource?
     public let isDisabled: Bool
     public let hasError: Bool
-    
+
     // MARK: - Bindings / State
     @Binding public var text: String
     @FocusState private var isFocused: Bool
@@ -19,10 +19,10 @@ public struct TextFieldAtom: View {
     // MARK: - Init
     public init(
         text: Binding<String>,
-        placeholder: String? = nil,
+        placeholder: LocalizedStringResource? = nil,
         isDisabled: Bool = false,
         hasError: Bool = false,
-        style: TextFieldAtomStyle
+        style: TextFieldAtomStyle = .default
     ) {
         self.style = style
         self.placeholder = placeholder
@@ -34,10 +34,11 @@ public struct TextFieldAtom: View {
     // MARK: - Body
     public var body: some View {
         TextField(
-            "",
             text: $text,
-            prompt: (placeholder != nil) ? Text(placeholder!) : nil
-        )
+            prompt: placeholder.map { Text($0).foregroundStyle(style.placeholderColor) }
+        ) {
+            EmptyView()
+        }
         .disabled(isDisabled)
         .font(style.font)
         .foregroundStyle(style.textColor)
@@ -52,74 +53,74 @@ public struct TextFieldAtom: View {
                 )
         )
         .opacity(isDisabled ? style.disabledOpacity : 1)
-        .accessibilityLabel(placeholder ?? "Text field")
+        .accessibilityLabel(placeholder.map { Text($0) } ?? Text("Text field", bundle: .module))
     }
 }
 
-
+#if DEBUG
 #Preview("TextFieldAtom — All Variants") {
     @Previewable @State var text1 = ""
     @Previewable @State var text2 = "Some text"
     @Previewable @State var text3 = ""
     @Previewable @State var text4 = "Error text"
-    
+
     VStack(alignment: .leading, spacing: 20) {
         Group {
-            Text("Default").font(.caption).foregroundStyle(.secondary)
+            Text(verbatim: "Default").font(.caption).foregroundStyle(.secondary)
             TextFieldAtom(
                 text: $text1,
-                placeholder: "Enter text",
-                style: .previewDefault
+                placeholder: .verbatim("Enter text"),
+                style: .default
             )
         }
 
         Group {
-            Text("With Value").font(.caption).foregroundStyle(.secondary)
+            Text(verbatim: "With Value").font(.caption).foregroundStyle(.secondary)
             TextFieldAtom(
                 text: $text2,
-                placeholder: "Enter text",
-                style: .previewDefault
+                placeholder: .verbatim("Enter text"),
+                style: .default
             )
         }
 
         Group {
-            Text("Disabled").font(.caption).foregroundStyle(.secondary)
+            Text(verbatim: "Disabled").font(.caption).foregroundStyle(.secondary)
             TextFieldAtom(
                 text: $text3,
-                placeholder: "Enter text",
+                placeholder: .verbatim("Enter text"),
                 isDisabled: true,
-                style: .previewDefault
+                style: .default
             )
         }
 
         Group {
-            Text("Error State").font(.caption).foregroundStyle(.secondary)
+            Text(verbatim: "Error State").font(.caption).foregroundStyle(.secondary)
             TextFieldAtom(
                 text: $text4,
-                placeholder: "Enter text",
+                placeholder: .verbatim("Enter text"),
                 hasError: true,
-                style: .previewDefault
+                style: .default
             )
         }
 
         Group {
-            Text("Modern").font(.caption).foregroundStyle(.secondary)
+            Text(verbatim: "Modern").font(.caption).foregroundStyle(.secondary)
             TextFieldAtom(
                 text: .constant(""),
-                placeholder: "Modern style",
+                placeholder: .verbatim("Modern style"),
                 style: .modern
             )
         }
 
         Group {
-            Text("Compact").font(.caption).foregroundStyle(.secondary)
+            Text(verbatim: "Compact").font(.caption).foregroundStyle(.secondary)
             TextFieldAtom(
                 text: .constant(""),
-                placeholder: "Compact",
+                placeholder: .verbatim("Compact"),
                 style: .compact
             )
         }
     }
     .padding()
 }
-
+#endif

@@ -1,6 +1,6 @@
 //
 //  Backport.swift
-//  FeatureCategory
+//  UILibrary
 //
 //  Created by Marco La Gala on 23/09/25.
 //
@@ -21,7 +21,7 @@ public extension View {
 
 public extension Backport where Content: View {
     @ViewBuilder func navigationSubtitle(_ subtitleKey: LocalizedStringResource?) -> some View {
-        if let subtitleKey, #available(iOS 26, *) {
+        if let subtitleKey, #available(iOS 26, macOS 26, *) {
             content.navigationSubtitle(subtitleKey)
         } else {
             content

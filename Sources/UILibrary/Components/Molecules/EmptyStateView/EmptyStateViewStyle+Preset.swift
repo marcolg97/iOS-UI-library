@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// Common, brand-agnostic `EmptyStateViewStyle` presets for quick usage.
-@available(iOS 17.0, macOS 14.0, *)
 public extension EmptyStateViewStyle {
     /// Creates a standard empty state style with gray theme.
     /// - Parameters:

@@ -1,8 +1,8 @@
 import SwiftUI
 
-extension FormSectionStyle {
-    /// Preview preset for FormSection (iOS-like)
-    public static let previewDefault = FormSectionStyle(
+public extension FormSectionStyle {
+    /// Default preset for FormSection (iOS-like)
+    static let `default` = FormSectionStyle(
         headerFont: .footnote.weight(.semibold),
         headerColor: .secondary,
         headerTextCase: .uppercase,
@@ -11,9 +11,9 @@ extension FormSectionStyle {
         contentSpacing: 8,
         itemSpacing: 16
     )
-    
+
     /// Modern preset with no uppercase
-    public static let modern = FormSectionStyle(
+    static let modern = FormSectionStyle(
         headerFont: .subheadline.weight(.bold),
         headerColor: .primary,
         headerTextCase: nil,
@@ -22,9 +22,9 @@ extension FormSectionStyle {
         contentSpacing: 12,
         itemSpacing: 20
     )
-    
+
     /// Compact preset
-    public static let compact = FormSectionStyle(
+    static let compact = FormSectionStyle(
         headerFont: .caption.weight(.medium),
         headerColor: .secondary,
         headerTextCase: .uppercase,

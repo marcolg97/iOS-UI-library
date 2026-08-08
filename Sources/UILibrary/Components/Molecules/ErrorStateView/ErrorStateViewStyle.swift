@@ -11,7 +11,6 @@ import SwiftUI
 ///
 /// Describes visual tokens used by `ErrorStateView` (icon, colors, fonts, button style).
 /// Immutable and brand-agnostic.
-@available(iOS 17.0, macOS 14.0, *)
 public struct ErrorStateViewStyle: Equatable, Sendable {
     /// SF Symbol name for the error icon.
     public let iconName: String
@@ -45,7 +44,7 @@ public struct ErrorStateViewStyle: Equatable, Sendable {
     ///   - titleFont: Font for the title (default: .title2.bold()).
     ///   - descriptionColor: Color for the description (default: .secondary).
     ///   - descriptionFont: Font for the description (default: .body).
-    ///   - retryButtonTitle: Title for the retry button (localizable, default: "Retry").
+    ///   - retryButtonTitle: Title for the retry button (localizable; `nil` uses the library's localized "Retry").
     ///   - retryButtonStyle: Style for the retry button (default: .primary).
     public init(
         iconName: String = "exclamationmark.triangle.fill",
@@ -54,7 +53,7 @@ public struct ErrorStateViewStyle: Equatable, Sendable {
         titleFont: Font = .title2.bold(),
         descriptionColor: Color = .secondary,
         descriptionFont: Font = .body,
-        retryButtonTitle: LocalizedStringResource = "Retry",
+        retryButtonTitle: LocalizedStringResource? = nil,
         retryButtonStyle: ActionButtonStyle = .primary
     ) {
         self.iconName = iconName
@@ -64,6 +63,7 @@ public struct ErrorStateViewStyle: Equatable, Sendable {
         self.descriptionColor = descriptionColor
         self.descriptionFont = descriptionFont
         self.retryButtonTitle = retryButtonTitle
+            ?? LocalizedStringResource("Retry", bundle: .atURL(Bundle.module.bundleURL))
         self.retryButtonStyle = retryButtonStyle
     }
 }

@@ -11,11 +11,14 @@ public struct SwitchAtom: View {
     public let isDisabled: Bool
     public let style: SwitchAtomStyle
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ScaledMetric(relativeTo: .body) private var scale: CGFloat = 1
+
     // MARK: - Init
     public init(
         isOn: Binding<Bool>,
         isDisabled: Bool = false,
-        style: SwitchAtomStyle
+        style: SwitchAtomStyle = .default
     ) {
         self._isOn = isOn
         self.isDisabled = isDisabled
@@ -28,21 +31,26 @@ public struct SwitchAtom: View {
             ZStack {
                 Capsule()
                     .fill(isOn ? style.trackOnColor : style.trackOffColor)
-                    .frame(width: style.trackWidth, height: style.trackHeight)
+                    .frame(width: style.trackWidth * scale, height: style.trackHeight * scale)
 
                 Circle()
                     .fill(style.thumbColor)
-                    .frame(width: style.thumbSize, height: style.thumbSize)
-                    .offset(x: isOn ? style.thumbOffset : -style.thumbOffset)
+                    .frame(width: style.thumbSize * scale, height: style.thumbSize * scale)
+                    .offset(x: (isOn ? style.thumbOffset : -style.thumbOffset) * scale)
             }
+            .frame(
+                minWidth: max(style.trackWidth * scale, style.minTapTarget),
+                minHeight: max(style.trackHeight * scale, style.minTapTarget)
+            )
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(isDisabled)
         .opacity(isDisabled ? style.disabledOpacity : 1)
-        .accessibilityLabel("Switch")
-        .accessibilityValue(isOn ? "On" : "Off")
-        .accessibilityAddTraits(.isButton)
-        .animation(.easeInOut(duration: 0.2), value: isOn)
+        .accessibilityLabel(Text("Switch", bundle: .module))
+        .accessibilityValue(isOn ? Text("On", bundle: .module) : Text("Off", bundle: .module))
+        .accessibilityAddTraits(.isToggle)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: isOn)
     }
 
     // MARK: - Actions
@@ -52,42 +60,43 @@ public struct SwitchAtom: View {
     }
 }
 
-
+#if DEBUG
 #Preview("SwitchAtom — All Variants") {
     @Previewable @State var off = false
     @Previewable @State var on = true
     @Previewable @State var disabled = false
-    
+
     VStack(alignment: .leading, spacing: 20) {
         HStack {
-            Text("Off").font(.body)
+            Text(verbatim: "Off").font(.body)
             Spacer()
-            SwitchAtom(isOn: $off, style: .previewDefault)
+            SwitchAtom(isOn: $off, style: .default)
         }
 
         HStack {
-            Text("On").font(.body)
+            Text(verbatim: "On").font(.body)
             Spacer()
-            SwitchAtom(isOn: $on, style: .previewDefault)
+            SwitchAtom(isOn: $on, style: .default)
         }
 
         HStack {
-            Text("Disabled").font(.body).foregroundStyle(.secondary)
+            Text(verbatim: "Disabled").font(.body).foregroundStyle(.secondary)
             Spacer()
-            SwitchAtom(isOn: $disabled, isDisabled: true, style: .previewDefault)
+            SwitchAtom(isOn: $disabled, isDisabled: true, style: .default)
         }
 
         HStack {
-            Text("Modern Style").font(.body)
+            Text(verbatim: "Modern Style").font(.body)
             Spacer()
             SwitchAtom(isOn: .constant(true), style: .modern)
         }
 
         HStack {
-            Text("Compact Style").font(.body)
+            Text(verbatim: "Compact Style").font(.body)
             Spacer()
             SwitchAtom(isOn: .constant(false), style: .compact)
         }
     }
     .padding()
 }
+#endif

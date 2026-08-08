@@ -1,6 +1,6 @@
 //
 //  Color+Hex.swift
-//  DesignSystem
+//  UILibrary
 //
 //  Created by Marco La Gala on 09/02/26.
 //
@@ -21,8 +21,9 @@ public extension Color {
     /// - Returns: A Color instance, or nil if the hex string is invalid
     init?(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        guard !hex.isEmpty, hex.allSatisfy(\.isHexDigit) else { return nil }
         var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
+        guard Scanner(string: hex).scanHexInt64(&int) else { return nil }
         let a, r, g, b: UInt64
         switch hex.count {
         case 3: // RGB (12-bit)
@@ -48,15 +49,17 @@ public extension Color {
     /// - Returns: A hexadecimal color string (e.g., "#FF0000"), or nil if conversion fails
     func toHex() -> String? {
         #if canImport(UIKit)
-        guard let components = UIColor(self).cgColor.components, components.count >= 3 else {
+        let cgColor = UIColor(self).cgColor
+        #elseif canImport(AppKit)
+        guard let converted = NSColor(self).usingColorSpace(.sRGB) else { return nil }
+        let cgColor = converted.cgColor
+        #endif
+        guard let components = cgColor.components, components.count >= 3 else {
             return nil
         }
         let r = Float(components[0])
         let g = Float(components[1])
         let b = Float(components[2])
         return String(format: "#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255))
-        #else
-        return nil
-        #endif
     }
 }

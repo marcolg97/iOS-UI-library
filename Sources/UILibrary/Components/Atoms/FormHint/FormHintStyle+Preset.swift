@@ -1,14 +1,14 @@
 import SwiftUI
 
-extension FormHintStyle {
-    /// Preview preset for FormHint
-    public static let previewDefault = FormHintStyle(
+public extension FormHintStyle {
+    /// Default preset for FormHint
+    static let `default` = FormHintStyle(
         font: .caption,
         textColor: .secondary
     )
-    
+
     /// Modern preset
-    public static let modern = FormHintStyle(
+    static let modern = FormHintStyle(
         font: .footnote,
         textColor: Color.gray.opacity(0.8)
     )

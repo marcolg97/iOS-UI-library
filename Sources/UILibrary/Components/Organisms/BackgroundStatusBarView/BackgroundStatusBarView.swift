@@ -11,15 +11,23 @@ struct BackgroundStatusBarOverlay: ViewModifier {
     let isVisible: Bool
     let style: BackgroundStatusBarStyle
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     func body(content: Content) -> some View {
         content
             .overlay(alignment: .top) {
-                if isVisible {
-                    BackgroundStatusBarView(style: style)
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                ZStack(alignment: .top) {
+                    if isVisible {
+                        BackgroundStatusBarView(style: style)
+                            .transition(
+                                reduceMotion
+                                    ? .opacity
+                                    : .move(edge: .top).combined(with: .opacity)
+                            )
+                    }
                 }
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: isVisible)
             }
-            .animation(.easeInOut(duration: 0.25), value: isVisible)
     }
 }
 
@@ -31,7 +39,12 @@ struct BackgroundStatusBarOverlay: ViewModifier {
 /// Visually displays a status bar at the top of the screen, styled via `BackgroundStatusBarStyle`.
 ///
 /// **Usage:**
-/// Use to indicate app-wide status (e.g. offline, warning) without business logic or navigation. All visual tokens are injected via style.
+/// Use to indicate app-wide status (e.g. offline, warning) without business logic or navigation.
+/// All visual tokens are injected via style.
+///
+/// The bar is purely decorative (a colored strip with no text), so it is
+/// hidden from assistive technologies; announce the underlying state change
+/// (e.g. via `AccessibilityNotification.Announcement`) from the app.
 ///
 /// Example:
 /// ```swift
@@ -59,31 +72,33 @@ private struct BackgroundStatusBarView: View {
     let style: BackgroundStatusBarStyle
 
     var body: some View {
-        Spacer(minLength: 0)
+        style.backgroundColor
             .frame(maxWidth: .infinity)
             .frame(height: style.height)
-            .background(style.backgroundColor)
             .ignoresSafeArea(edges: .top)
+            .accessibilityHidden(true)
     }
 }
 
 #if DEBUG
-struct OfflineBannerTestView: View {
+private struct OfflineBannerTestView: View {
 
     @State private var isOffline = true
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                NavigationLink("Push detail") {
-                    DetailView()
+                NavigationLink {
+                    OfflineBannerDetailPreview()
+                } label: {
+                    Text(verbatim: "Push detail")
                 }
 
-                Button(isOffline ? "Go online" : "Go offline") {
-                    isOffline.toggle()
+                Button(action: { isOffline.toggle() }) {
+                    Text(verbatim: isOffline ? "Go online" : "Go offline")
                 }
             }
-            .navigationTitle("Home")
+            .navigationTitle(Text(verbatim: "Home"))
         }
         .backgroundStatusBar(
             isVisible: isOffline,
@@ -92,12 +107,12 @@ struct OfflineBannerTestView: View {
     }
 }
 
-struct DetailView: View {
+private struct OfflineBannerDetailPreview: View {
     var body: some View {
         VStack {
-            Text("Detail screen")
+            Text(verbatim: "Detail screen")
         }
-        .navigationTitle("Detail")
+        .navigationTitle(Text(verbatim: "Detail"))
     }
 }
 

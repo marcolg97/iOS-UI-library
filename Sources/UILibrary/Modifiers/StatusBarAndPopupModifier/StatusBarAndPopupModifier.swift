@@ -7,214 +7,201 @@
 
 import SwiftUI
 
-import PopupView
-
-// Internal constants used to control popup vertical padding. Keeps magic numbers in one place.
-private enum Constants {
-    static let tabBarPadding: CGFloat = 60
-    static let defaultPadding: CGFloat = 20
-}
-
-/// A view modifier that adds an offline banner and a dismissable popup to any view.
-/// - Parameters:
-///   - showOfflineBanner: Binding controlling the offline banner visibility.
-///   - popupContent: The view to display as the popup.
-///   - offlineBannerBackground: The background color for the offline banner.
-/// ViewModifier that displays a top status bar and a bottom popup when the app is offline.
+/// ViewModifier that displays a top status bar and a bottom toast for an
+/// app-wide state (offline, maintenance, restricted access, etc.).
 ///
 /// - Layer: Organism
 /// - Responsibility: Present an app-wide visual indicator (top status bar) and a transient
-///   bottom popup for offline / critical status. Styling is injected via
-///   `BackgroundStatusBarStyle` and `Popup` content.
-/// - Usage: Apply to any root view to surface offline UI consistently across screens.
+///   bottom toast for critical status. Styling is injected via
+///   `BackgroundStatusBarStyle` and the toast content builder.
+/// - Usage: Apply to any root view to surface app-wide status UI consistently across screens.
 @MainActor
 public struct StatusBarAndPopupModifier<PopupContent: View>: ViewModifier {
-    /// Generic boolean that controls visibility of the top status bar and bottom popup.
-    /// Use `hasToShow` when the modifier should represent a generic app‑wide state (offline,
-    /// maintenance, restricted access, etc.). Kept generic for reusability across use cases.
-    @Binding public var hasToShow: Bool
-    
-    private let popupContent: PopupContent
-    private let hasTabBar: Bool
+    /// Generic boolean that controls visibility of the top status bar and bottom toast.
+    @Binding private var hasToShow: Bool
+
+    private let popupContent: () -> PopupContent
+    private let popupBottomPadding: CGFloat
     private let backgroundStatusBarStyle: BackgroundStatusBarStyle
-    
-    @State private var showPopup: Bool = false
-    
+
     /// Creates a `StatusBarAndPopupModifier`.
     /// - Parameters:
-    ///   - hasToShow: Binding controlling whether the top status bar / popup is shown.
+    ///   - hasToShow: Binding controlling whether the top status bar / toast is shown.
+    ///     Dismissing the toast (drag) writes `false` back to this binding.
     ///   - backgroundStatusBarStyle: Visual style for the top status bar.
-    ///   - hasTabBar: Whether the host view contains a tab bar (affects popup padding).
-    ///   - popupContent: Builder for the popup content.
+    ///   - popupBottomPadding: Distance of the toast from the bottom edge (default: 20).
+    ///     Increase it when a tab bar or other bottom chrome is present.
+    ///   - popupContent: Builder for the toast content.
     public init(
         hasToShow: Binding<Bool>,
         backgroundStatusBarStyle: BackgroundStatusBarStyle,
-        hasTabBar: Bool,
-        @ViewBuilder popupContent: () -> PopupContent
+        popupBottomPadding: CGFloat = 20,
+        @ViewBuilder popupContent: @escaping () -> PopupContent
     ) {
         self._hasToShow = hasToShow
-        self.popupContent = popupContent()
-        self.hasTabBar = hasTabBar
+        self.popupContent = popupContent
+        self.popupBottomPadding = popupBottomPadding
         self.backgroundStatusBarStyle = backgroundStatusBarStyle
-        self.showPopup = hasToShow.wrappedValue
     }
-    
+
     public func body(content: Content) -> some View {
         content
             .backgroundStatusBar(
                 isVisible: hasToShow,
                 style: backgroundStatusBarStyle
             )
-            .popup(isPresented: $showPopup) {
-                popupContent
-            } customize: {
-                $0
-                    .type(.floater(verticalPadding: hasTabBar ? Constants.tabBarPadding : Constants.defaultPadding))
-                    .position(.bottom)
-                    .animation(.spring())
-            }
-            .onChange(of: hasToShow) { _, newValue in
-                showPopup = newValue
+            .toast(
+                isPresented: $hasToShow,
+                autoDismissAfter: nil,
+                bottomPadding: popupBottomPadding
+            ) {
+                popupContent()
             }
     }
 }
 
-/// Adds an offline status bar at the top and a dismissable popup at the bottom of any view.
+/// Adds a top status bar and a dismissable bottom toast for app-wide states.
 ///
 /// **Layer:** Organism
 ///
 /// **Responsibility:**
-/// Visually displays an offline banner and a popup for status/alerts, styled via `BackgroundStatusBarStyle`.
+/// Visually displays a status banner and a toast for status/alerts, styled via `BackgroundStatusBarStyle`.
 ///
 /// **Usage:**
-/// Use to indicate offline or critical app-wide status, with both a top banner and a bottom popup. All visual tokens are injected via style.
+/// Use to indicate offline or critical app-wide status, with both a top banner and a bottom toast.
+/// All visual tokens are injected via style.
 ///
 /// Example:
 /// ```swift
-/// .bannerAndPopup(hasToShow: $hasToShow, backgroundStatusBarStyle: .warning, hasTabBar: true) {
-///     Popup(...)
+/// .bannerAndPopup(hasToShow: $isOffline, backgroundStatusBarStyle: .warning) {
+///     Toast(icon: "wifi.slash", message: "You are offline", style: .warning)
 /// }
 /// ```
 public extension View {
-    /// Adds a top status bar and a dismissable popup for offline state.
+    /// Adds a top status bar and a dismissable bottom toast for an app-wide state.
     /// - Parameters:
-    ///   - hasToShow: Binding controlling visibility of the top status bar / popup.
+    ///   - hasToShow: Binding controlling visibility of the top status bar / toast.
     ///   - backgroundStatusBarStyle: Style used for the top status bar.
-    ///   - hasTabBar: Whether the host view contains a tab bar.
-    ///   - popupContent: Builder for the popup content.
+    ///   - popupBottomPadding: Distance of the toast from the bottom edge (default: 20).
+    ///     Increase it when a tab bar or other bottom chrome is present.
+    ///   - popupContent: Builder for the toast content.
     func bannerAndPopup<PopupContent: View>(
         hasToShow: Binding<Bool>,
         backgroundStatusBarStyle: BackgroundStatusBarStyle,
-        hasTabBar: Bool,
-        @ViewBuilder popupContent: () -> PopupContent
+        popupBottomPadding: CGFloat = 20,
+        @ViewBuilder popupContent: @escaping () -> PopupContent
     ) -> some View {
         self.modifier(StatusBarAndPopupModifier(
             hasToShow: hasToShow,
             backgroundStatusBarStyle: backgroundStatusBarStyle,
-            hasTabBar: hasTabBar,
+            popupBottomPadding: popupBottomPadding,
             popupContent: popupContent
         ))
     }
 }
 
 #if DEBUG
-struct BannerAndPopupTestView: View {
+private struct BannerAndPopupTestView: View {
     @State private var isOffline = true
-    
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
-                NavigationLink("Push detail") {
-                    DetailView2()
+                NavigationLink {
+                    BannerAndPopupDetailPreview()
+                } label: {
+                    Text(verbatim: "Push detail")
                 }
-                
-                Button(isOffline ? "Go online" : "Go offline") {
-                    isOffline.toggle()
+
+                Button(action: { isOffline.toggle() }) {
+                    Text(verbatim: isOffline ? "Go online" : "Go offline")
                 }
             }
-            .navigationTitle("Home")
+            .navigationTitle(Text(verbatim: "Home"))
         }
         .bannerAndPopup(
             hasToShow: $isOffline,
-            backgroundStatusBarStyle: .warning,
-            hasTabBar: false
+            backgroundStatusBarStyle: .warning
         ) {
-            Popup(icon: "wifi.slash", message: "This is the message", style: .warning)
+            Toast(icon: "wifi.slash", message: .verbatim("This is the message"), style: .warning)
         }
     }
 }
 
-struct DetailView2: View {
+private struct BannerAndPopupDetailPreview: View {
     var body: some View {
         VStack {
-            Text("Detail screen")
+            Text(verbatim: "Detail screen")
         }
-        .navigationTitle("Detail")
+        .navigationTitle(Text(verbatim: "Detail"))
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     BannerAndPopupTestView()
 }
 
-
-// MARK: - Preview con TabBar e senza
-
-struct BannerAndPopupWithTabBarPreview: View {
+private struct BannerAndPopupWithTabBarPreview: View {
     @State private var isOffline = true
     @State private var selectedTab = 0
-    
+
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
                 VStack(spacing: 24) {
-                    Text("Tab 1")
-                    Button(isOffline ? "Go online" : "Go offline") {
-                        isOffline.toggle()
+                    Button(action: { isOffline.toggle() }) {
+                        Text(verbatim: isOffline ? "Go online" : "Go offline")
                     }
                 }
-                .navigationTitle("Tab 1")
+                .navigationTitle(Text(verbatim: "Tab 1"))
             }
             .tabItem {
-                Label("Home", systemImage: "house")
-                
-                Text("Tab 2")
-                    .tabItem {
-                        Label("Other", systemImage: "star")
-                    }.tag(1)
-            }
-            .bannerAndPopup(
-                hasToShow: $isOffline,
-                backgroundStatusBarStyle: .warning,
-                hasTabBar: false
-            ) {
-                Popup(icon: "wifi.slash", message: "This is the message", style: .warning)
-            }
-        }
-    }
-}
-
-struct BannerAndPopupNoTabBarPreview: View {
-    @State private var isOffline = true
-    
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 24) {
-                Text("No tab bar")
-                Button(isOffline ? "Go online" : "Go offline") {
-                    isOffline.toggle()
+                Label {
+                    Text(verbatim: "Home")
+                } icon: {
+                    Image(systemName: "house")
                 }
             }
-            .navigationTitle("No tab bar")
+            .tag(0)
+
+            Text(verbatim: "Tab 2")
+                .tabItem {
+                    Label {
+                        Text(verbatim: "Other")
+                    } icon: {
+                        Image(systemName: "star")
+                    }
+                }
+                .tag(1)
         }
         .bannerAndPopup(
             hasToShow: $isOffline,
             backgroundStatusBarStyle: .warning,
-            hasTabBar: false
+            popupBottomPadding: 60
         ) {
-            Popup(icon: "wifi.slash", message: "This is the message", style: .warning)
+            Toast(icon: "wifi.slash", message: .verbatim("This is the message"), style: .warning)
+        }
+    }
+}
+
+private struct BannerAndPopupNoTabBarPreview: View {
+    @State private var isOffline = true
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                Text(verbatim: "No tab bar")
+                Button(action: { isOffline.toggle() }) {
+                    Text(verbatim: isOffline ? "Go online" : "Go offline")
+                }
+            }
+            .navigationTitle(Text(verbatim: "No tab bar"))
+        }
+        .bannerAndPopup(
+            hasToShow: $isOffline,
+            backgroundStatusBarStyle: .warning
+        ) {
+            Toast(icon: "wifi.slash", message: .verbatim("This is the message"), style: .warning)
         }
     }
 }

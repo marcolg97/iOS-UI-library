@@ -1,12 +1,12 @@
 import SwiftUI
 
-extension FormItemStyle {
-    /// Preview preset for FormItem
-    public static let previewDefault = FormItemStyle(spacing: 8)
-    
+public extension FormItemStyle {
+    /// Default preset for FormItem
+    static let `default` = FormItemStyle(spacing: 8)
+
     /// Compact preset with less spacing
-    public static let compact = FormItemStyle(spacing: 4)
-    
+    static let compact = FormItemStyle(spacing: 4)
+
     /// Spacious preset with more spacing
-    public static let spacious = FormItemStyle(spacing: 12)
+    static let spacious = FormItemStyle(spacing: 12)
 }

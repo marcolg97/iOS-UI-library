@@ -7,21 +7,21 @@ import SwiftUI
 /// Use within FormItem or standalone for custom layouts.
 public struct FormLabel: View {
     // MARK: - Public API
-    public let text: String
+    public let text: LocalizedStringResource
     public let systemImage: String?
     public let style: FormLabelStyle
-    
+
     // MARK: - Init
     public init(
-        _ text: String,
+        _ text: LocalizedStringResource,
         systemImage: String? = nil,
-        style: FormLabelStyle
+        style: FormLabelStyle = .default
     ) {
         self.text = text
         self.systemImage = systemImage
         self.style = style
     }
-    
+
     // MARK: - Body
     public var body: some View {
         HStack(spacing: style.iconSpacing) {
@@ -31,23 +31,26 @@ public struct FormLabel: View {
                     .scaledToFit()
                     .frame(width: style.iconSize, height: style.iconSize)
                     .foregroundStyle(style.iconColor)
+                    .accessibilityHidden(true)
             }
-            
+
             Text(text)
                 .font(style.font)
                 .tracking(style.tracking)
                 .foregroundStyle(style.textColor)
         }
-        .accessibilityLabel(text)
+        .accessibilityElement(children: .combine)
     }
 }
 
+#if DEBUG
 #Preview("FormLabel — Variants") {
     VStack(alignment: .leading, spacing: 16) {
-        FormLabel("Username", style: .previewDefault)
-        FormLabel("Email", systemImage: "envelope", style: .previewDefault)
-        FormLabel("Password", systemImage: "lock", style: .previewDefault)
-        FormLabel("Modern Style", systemImage: "star.fill", style: .modern)
+        FormLabel(.verbatim("Username"), style: .default)
+        FormLabel(.verbatim("Email"), systemImage: "envelope", style: .default)
+        FormLabel(.verbatim("Password"), systemImage: "lock", style: .default)
+        FormLabel(.verbatim("Modern Style"), systemImage: "star.fill", style: .modern)
     }
     .padding()
 }
+#endif

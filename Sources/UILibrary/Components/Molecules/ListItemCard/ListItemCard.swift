@@ -10,7 +10,6 @@ import SwiftUI
 /// Reusable list row card made of leading, content, and trailing slots.
 ///
 /// Built on top of `Card` to keep a consistent base surface across components.
-/// Reusable list row card with leading/content/trailing slots.
 /// Use it to standardize the surface, spacing, and press feedback of action rows.
 public struct ListItemCard<Leading: View, Content: View, Trailing: View>: View {
     private let style: ListItemCardStyle
@@ -48,27 +47,55 @@ public struct ListItemCard<Leading: View, Content: View, Trailing: View>: View {
     }
 }
 
-private struct PressScaleButtonStyle: ButtonStyle {
-    let pressedScale: CGFloat
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? pressedScale : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: configuration.isPressed)
+/// Convenience initializers for rows without leading or trailing slots.
+public extension ListItemCard where Leading == EmptyView {
+    init(
+        style: ListItemCardStyle = .default,
+        action: @escaping () -> Void,
+        @ViewBuilder content: @escaping () -> Content,
+        @ViewBuilder trailing: @escaping () -> Trailing
+    ) {
+        self.init(style: style, action: action, leading: { EmptyView() }, content: content, trailing: trailing)
     }
 }
 
+public extension ListItemCard where Leading == EmptyView, Trailing == EmptyView {
+    init(
+        style: ListItemCardStyle = .default,
+        action: @escaping () -> Void,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.init(style: style, action: action, leading: { EmptyView() }, content: content, trailing: { EmptyView() })
+    }
+}
+
+private struct PressScaleButtonStyle: ButtonStyle {
+    let pressedScale: CGFloat
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed && !reduceMotion ? pressedScale : 1.0)
+            .animation(
+                reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.7),
+                value: configuration.isPressed
+            )
+    }
+}
+
+#if DEBUG
 #Preview {
     ListItemCard(style: .default, action: {}) {
         Image(systemName: "book.fill")
             .font(.title2)
-            .foregroundStyle(.cyan)
+            .foregroundStyle(.tint)
     } content: {
         VStack(alignment: .leading, spacing: 4) {
-            Text("Course title")
+            Text(verbatim: "Item title")
                 .font(.headline)
                 .foregroundStyle(.primary)
-            Text("Subtitle")
+            Text(verbatim: "Subtitle")
                 .font(.subheadline)
                 .foregroundStyle(.primary.opacity(0.7))
         }
@@ -78,3 +105,4 @@ private struct PressScaleButtonStyle: ButtonStyle {
     }
     .padding()
 }
+#endif

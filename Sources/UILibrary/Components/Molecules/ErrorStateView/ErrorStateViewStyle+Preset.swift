@@ -8,7 +8,6 @@
 import SwiftUI
 
 /// Common, brand-agnostic `ErrorStateViewStyle` presets for quick usage.
-@available(iOS 17.0, macOS 14.0, *)
 public extension ErrorStateViewStyle {
     /// Creates a standard error state style with red theme.
     /// - Parameters:
@@ -26,11 +25,11 @@ public extension ErrorStateViewStyle {
             titleFont: .title2.bold(),
             descriptionColor: .secondary,
             descriptionFont: .body,
-            retryButtonTitle: retryButtonTitle ?? "Retry",
+            retryButtonTitle: retryButtonTitle ?? LocalizedStringResource("Retry", bundle: .atURL(Bundle.module.bundleURL)),
             retryButtonStyle: .primary
         )
     }
-    
+
     /// Creates a network error style with custom icon and messaging.
     /// - Parameters:
     ///   - iconName: Optional custom icon (default: "wifi.exclamationmark").
@@ -47,7 +46,7 @@ public extension ErrorStateViewStyle {
             titleFont: .title2.bold(),
             descriptionColor: .secondary,
             descriptionFont: .body,
-            retryButtonTitle: retryButtonTitle ?? "Try Again",
+            retryButtonTitle: retryButtonTitle ?? LocalizedStringResource("Try Again", bundle: .atURL(Bundle.module.bundleURL)),
             retryButtonStyle: .primary
         )
     }
@@ -68,7 +67,7 @@ public extension ErrorStateViewStyle {
             titleFont: .title2.bold(),
             descriptionColor: .secondary,
             descriptionFont: .body,
-            retryButtonTitle: retryButtonTitle ?? "Refresh",
+            retryButtonTitle: retryButtonTitle ?? LocalizedStringResource("Refresh", bundle: .atURL(Bundle.module.bundleURL)),
             retryButtonStyle: .primary
         )
     }
@@ -80,7 +79,7 @@ public extension ErrorStateViewStyle {
     ///   - titleColor: Color for the title.
     ///   - descriptionColor: Color for the description.
     ///   - retryButtonStyle: Style for the retry button.
-    ///   - retryButtonTitle: Title for the retry button (default: "Retry").
+    ///   - retryButtonTitle: Title for the retry button (`nil` uses the library's localized "Retry").
     /// - Returns: A custom `ErrorStateViewStyle`.
     static func custom(
         iconName: String = "xmark.circle.fill",
@@ -88,7 +87,7 @@ public extension ErrorStateViewStyle {
         titleColor: Color,
         descriptionColor: Color,
         retryButtonStyle: ActionButtonStyle,
-        retryButtonTitle: LocalizedStringResource = "Retry"
+        retryButtonTitle: LocalizedStringResource? = nil
     ) -> ErrorStateViewStyle {
         ErrorStateViewStyle(
             iconName: iconName,

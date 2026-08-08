@@ -11,7 +11,7 @@ import SwiftUI
 public extension CircularProgressBarStyle {
     static let `default`: CircularProgressBarStyle = .init(
         trackColor: .primary.opacity(0.1),
-        progressGradientColors: [.cyan, Color(hex: "00B4D8") ?? .cyan],
+        progressGradientColors: [.accentColor, .accentColor.opacity(0.7)],
         shineGradientColors: [.white.opacity(0.4), .clear],
         textColor: .primary
     )

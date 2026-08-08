@@ -1,8 +1,8 @@
 import SwiftUI
 
-extension FormLabelStyle {
-    /// Preview preset for FormLabel
-    public static let previewDefault = FormLabelStyle(
+public extension FormLabelStyle {
+    /// Default preset for FormLabel
+    static let `default` = FormLabelStyle(
         font: .subheadline.weight(.medium),
         textColor: .primary,
         iconColor: .accentColor,
@@ -10,12 +10,12 @@ extension FormLabelStyle {
         iconSpacing: 8,
         tracking: 0
     )
-    
-    /// Modern preset with larger text
-    public static let modern = FormLabelStyle(
+
+    /// Modern preset with uppercase-friendly tracking
+    static let modern = FormLabelStyle(
         font: .caption.weight(.bold),
-        textColor: .cyan,
-        iconColor: .cyan,
+        textColor: .accentColor,
+        iconColor: .accentColor,
         iconSize: 16,
         iconSpacing: 8,
         tracking: 2

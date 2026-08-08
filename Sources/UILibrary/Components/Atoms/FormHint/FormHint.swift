@@ -7,32 +7,33 @@ import SwiftUI
 /// Use within FormItem to provide guidance or context.
 public struct FormHint: View {
     // MARK: - Public API
-    public let text: String
+    public let text: LocalizedStringResource
     public let style: FormHintStyle
-    
+
     // MARK: - Init
     public init(
-        _ text: String,
-        style: FormHintStyle
+        _ text: LocalizedStringResource,
+        style: FormHintStyle = .default
     ) {
         self.text = text
         self.style = style
     }
-    
+
     // MARK: - Body
     public var body: some View {
         Text(text)
             .font(style.font)
             .foregroundStyle(style.textColor)
-            .accessibilityLabel(text)
     }
 }
 
+#if DEBUG
 #Preview("FormHint — Variants") {
     VStack(alignment: .leading, spacing: 16) {
-        FormHint("Enter your username (4-20 characters)", style: .previewDefault)
-        FormHint("This field is optional", style: .previewDefault)
-        FormHint("Modern style hint text", style: .modern)
+        FormHint(.verbatim("Enter your username (4-20 characters)"), style: .default)
+        FormHint(.verbatim("This field is optional"), style: .default)
+        FormHint(.verbatim("Modern style hint text"), style: .modern)
     }
     .padding()
 }
+#endif

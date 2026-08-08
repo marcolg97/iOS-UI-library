@@ -25,14 +25,14 @@ import SwiftUI
 /// Badge("Pro", style: .outlined(.blue))
 /// ```
 public struct Badge: View {
-    public let text: String
+    public let text: LocalizedStringResource
     public let style: BadgeStyle
 
     /// Creates a `Badge`.
     /// - Parameters:
     ///   - text: Accessible text shown inside the badge.
     ///   - style: Visual style for the badge. Defaults to `.default`.
-    public init(_ text: String, style: BadgeStyle = .default) {
+    public init(_ text: LocalizedStringResource, style: BadgeStyle = .default) {
         self.text = text
         self.style = style
     }
@@ -40,7 +40,7 @@ public struct Badge: View {
     public var body: some View {
         Text(text)
             .font(style.font)
-            .foregroundColor(style.foregroundColor)
+            .foregroundStyle(style.foregroundColor)
             .padding(.init(top: style.verticalPadding, leading: style.horizontalPadding, bottom: style.verticalPadding, trailing: style.horizontalPadding))
             .background(
                 RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous)
@@ -57,50 +57,51 @@ public struct Badge: View {
                 y: style.shadowOffset.height
             )
             .fixedSize()
-            .accessibilityLabel(text)
     }
 }
 
+#if DEBUG
 #Preview() {
-    Text("Default").font(.caption).foregroundColor(.gray)
+    Text(verbatim: "Default").font(.caption).foregroundStyle(.gray)
     VStack(spacing: 12) {
-        Badge("New")
-        Badge("Default", style: .default)
-        Badge("Neutral", style: .neutral)
+        Badge(.verbatim("New"))
+        Badge(.verbatim("Default"), style: .default)
+        Badge(.verbatim("Neutral"), style: .neutral)
     }
     .padding()
-    
-    Text("Semantic Colors").font(.caption).foregroundColor(.gray)
+
+    Text(verbatim: "Semantic Colors").font(.caption).foregroundStyle(.gray)
     VStack(spacing: 12) {
-        Badge("Info", style: .accent)
-        Badge("Success", style: .success)
-        Badge("Warning", style: .warning)
-        Badge("Error", style: .error)
+        Badge(.verbatim("Info"), style: .accent)
+        Badge(.verbatim("Success"), style: .success)
+        Badge(.verbatim("Warning"), style: .warning)
+        Badge(.verbatim("Error"), style: .error)
     }
     .padding()
-    
-    Text("Outlined").font(.caption).foregroundColor(.gray)
+
+    Text(verbatim: "Outlined").font(.caption).foregroundStyle(.gray)
     VStack(spacing: 12) {
-        Badge("Outlined", style: .outlined())
-        Badge("Blue", style: .outlined(.blue))
-        Badge("Red", style: .outlined(.red))
+        Badge(.verbatim("Outlined"), style: .outlined())
+        Badge(.verbatim("Blue"), style: .outlined(.blue))
+        Badge(.verbatim("Red"), style: .outlined(.red))
     }
     .padding()
-    
-    Text("Count Badges").font(.caption).foregroundColor(.gray)
+
+    Text(verbatim: "Count Badges").font(.caption).foregroundStyle(.gray)
     HStack(spacing: 12) {
-        Badge("1", style: .accent)
-        Badge("5", style: .success)
-        Badge("99+", style: .error)
+        Badge(.verbatim("1"), style: .accent)
+        Badge(.verbatim("5"), style: .success)
+        Badge(.verbatim("99+"), style: .error)
     }
     .padding()
-    
-    Text("3D Style").font(.caption).foregroundColor(.gray)
+
+    Text(verbatim: "3D Style").font(.caption).foregroundStyle(.gray)
     VStack(spacing: 12) {
-        Badge("3D", style: .threeDimensional())
-        Badge("New", style: .threeDimensional(.purple))
-        Badge("Pro", style: .threeDimensional(.green))
+        Badge(.verbatim("3D"), style: .threeDimensional())
+        Badge(.verbatim("New"), style: .threeDimensional(.purple))
+        Badge(.verbatim("Pro"), style: .threeDimensional(.green))
     }
     .padding()
 }
+#endif
 

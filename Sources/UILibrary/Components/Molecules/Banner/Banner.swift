@@ -39,17 +39,17 @@ import SwiftUI
 /// ```
 public struct Banner<ActionContent: View>: View {
     /// The main banner message.
-    private let title: String
-    
+    private let title: LocalizedStringResource
+
     /// Optional secondary message.
-    private let subtitle: String?
-    
+    private let subtitle: LocalizedStringResource?
+
     /// Visual style of the banner.
     private let style: BannerStyle
-    
+
     /// Optional custom action view displayed at the bottom.
     @ViewBuilder private let actionContent: () -> ActionContent
-    
+
     /// Creates a banner with custom action content.
     ///
     /// - Parameters:
@@ -58,8 +58,8 @@ public struct Banner<ActionContent: View>: View {
     ///   - style: Visual style (default: `.info()`).
     ///   - actionContent: ViewBuilder for custom action content.
     public init(
-        title: String,
-        subtitle: String? = nil,
+        title: LocalizedStringResource,
+        subtitle: LocalizedStringResource? = nil,
         style: BannerStyle = .info(),
         @ViewBuilder actionContent: @escaping () -> ActionContent
     ) {
@@ -68,33 +68,38 @@ public struct Banner<ActionContent: View>: View {
         self.style = style
         self.actionContent = actionContent
     }
-    
+
     public var body: some View {
         HStack(alignment: .top, spacing: style.spacing) {
-            Image(systemName: style.customIcon ?? "")
-                .font(.system(size: style.iconSize))
-                .foregroundStyle(style.iconColor)
-                .accessibilityHidden(true)
-            
+            if let icon = style.customIcon {
+                Image(systemName: icon)
+                    .font(.system(size: style.iconSize))
+                    .foregroundStyle(style.iconColor)
+                    .accessibilityHidden(true)
+            }
+
             VStack(alignment: .leading, spacing: style.verticalSpacing) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(style.titleColor)
-                    .multilineTextAlignment(.leading)
-                    .accessibilityAddTraits(.isHeader)
-
-                if let subtitle {
-                    Text(subtitle)
-                        .font(.footnote)
-                        .foregroundStyle(style.subtitleColor)
+                VStack(alignment: .leading, spacing: style.verticalSpacing) {
+                    Text(title)
+                        .font(style.titleFont)
+                        .foregroundStyle(style.titleColor)
                         .multilineTextAlignment(.leading)
-                }
 
-                actionContent()
-                    .font(.footnote.weight(.semibold))
-                    .buttonStyle(.plain)
-                    .foregroundStyle(style.actionColor)
-                    .padding(.top, 4)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(style.subtitleFont)
+                            .foregroundStyle(style.subtitleColor)
+                            .multilineTextAlignment(.leading)
+                    }
+                }
+                .accessibilityElement(children: .combine)
+
+                if ActionContent.self != EmptyView.self {
+                    actionContent()
+                        .font(style.actionFont)
+                        .foregroundStyle(style.actionColor)
+                        .padding(.top, 4)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -119,8 +124,8 @@ public extension Banner where ActionContent == EmptyView {
     ///   - subtitle: Optional secondary message.
     ///   - style: Visual style (default: `.info()`).
     init(
-        title: String,
-        subtitle: String? = nil,
+        title: LocalizedStringResource,
+        subtitle: LocalizedStringResource? = nil,
         style: BannerStyle = .info()
     ) {
         self.title = title
@@ -130,34 +135,39 @@ public extension Banner where ActionContent == EmptyView {
     }
 }
 
+#if DEBUG
 #Preview("Styles") {
     VStack(spacing: 16) {
         Banner(
-            title: "Missing your language?",
-            subtitle: "Email us and we'll try to add it as soon as possible.",
+            title: .verbatim("Missing your language?"),
+            subtitle: .verbatim("Email us and we'll try to add it as soon as possible."),
             style: .info(),
             actionContent: {
                 Button(action: {}) {
-                    Label("Email us", systemImage: "arrow.up.right")
+                    Label {
+                        Text(verbatim: "Email us")
+                    } icon: {
+                        Image(systemName: "arrow.up.right")
+                    }
                 }
             }
         )
-        
+
         Banner(
-            title: "Warning",
-            subtitle: "This action cannot be undone.",
+            title: .verbatim("Warning"),
+            subtitle: .verbatim("This action cannot be undone."),
             style: .warning()
         )
-        
+
         Banner(
-            title: "Success!",
-            subtitle: "Your changes have been saved.",
+            title: .verbatim("Success!"),
+            subtitle: .verbatim("Your changes have been saved."),
             style: .success()
         )
-        
+
         Banner(
-            title: "Error",
-            subtitle: "Something went wrong.",
+            title: .verbatim("Error"),
+            subtitle: .verbatim("Something went wrong."),
             style: .error()
         )
     }
@@ -167,33 +177,38 @@ public extension Banner where ActionContent == EmptyView {
 #Preview("3D Styles") {
     VStack(spacing: 16) {
         Banner(
-            title: "App Update Available",
-            subtitle: "Version 2.0 is now available with new features.",
+            title: .verbatim("App Update Available"),
+            subtitle: .verbatim("Version 2.0 is now available with new features."),
             style: .threeDimensionalInfo(),
             actionContent: {
                 Button(action: {}) {
-                    Label("Update Now", systemImage: "arrow.down.circle")
+                    Label {
+                        Text(verbatim: "Update Now")
+                    } icon: {
+                        Image(systemName: "arrow.down.circle")
+                    }
                 }
             }
         )
-        
+
         Banner(
-            title: "Storage Almost Full",
-            subtitle: "You're using 95% of your available storage.",
+            title: .verbatim("Storage Almost Full"),
+            subtitle: .verbatim("You're using 95% of your available storage."),
             style: .threeDimensionalWarning()
         )
-        
+
         Banner(
-            title: "Backup Complete",
-            subtitle: "Your data has been safely backed up.",
+            title: .verbatim("Backup Complete"),
+            subtitle: .verbatim("Your data has been safely backed up."),
             style: .threeDimensionalSuccess()
         )
-        
+
         Banner(
-            title: "Connection Lost",
-            subtitle: "Unable to connect to the server.",
+            title: .verbatim("Connection Lost"),
+            subtitle: .verbatim("Unable to connect to the server."),
             style: .threeDimensionalError()
         )
     }
     .padding()
 }
+#endif

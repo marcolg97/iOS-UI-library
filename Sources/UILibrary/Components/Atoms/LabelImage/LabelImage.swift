@@ -47,9 +47,9 @@ public struct LabelImage<LabelContent: View, IconContent: View>: View {
         self.icon = icon
     }
     
-    var iconView: some View {
+    private var iconView: some View {
         icon()
-            .foregroundColor(style.iconColor)
+            .foregroundStyle(style.iconColor)
             .accessibilityHidden(style.hideIconFromAccessibility)
     }
     
@@ -70,41 +70,47 @@ public struct LabelImage<LabelContent: View, IconContent: View>: View {
 public extension LabelImage where LabelContent == Text, IconContent == Image {
     /// Convenience initializer for Text and SF Symbol combinations.
     ///
+    /// Note: `style.font` and `style.textColor` are applied by this
+    /// initializer only; the custom-content initializer leaves styling of the
+    /// label entirely to the caller.
+    ///
     /// - Parameters:
-    ///   - titleKey: Localized string key for the text
+    ///   - title: Localized text to display.
     ///   - systemImage: SF Symbol name for the icon
     ///   - style: `LabelImageStyle` used to configure spacing, placement and visual tokens.
     init(
-        _ titleKey: LocalizedStringKey,
+        _ title: LocalizedStringResource,
         systemImage: String,
         style: LabelImageStyle = .neutral
     ) {
         self.init(
             style: style
         ) {
-            Text(titleKey)
+            Text(title)
                 .font(style.font)
-                .foregroundColor(style.textColor)
+                .foregroundStyle(style.textColor)
         } icon: {
             Image(systemName: systemImage)
         }
     }
 }
 
+#if DEBUG
 #Preview("Default") {
     VStack(spacing: 12) {
-        LabelImage("Follow on Instagram", systemImage: "camera")
-        LabelImage("Rate on App Store", systemImage: "star.fill", style: .init(iconPosition: .trailing))
-        LabelImage("Compact style", systemImage: "star.fill", style: .compact)
-        LabelImage("4.5", systemImage: "star.fill", style: .init(hideIconFromAccessibility: false))
-            .accessibilityLabel("Rating: 4.5 stars")
+        LabelImage(.verbatim("Follow on Instagram"), systemImage: "camera")
+        LabelImage(.verbatim("Rate on App Store"), systemImage: "star.fill", style: .init(iconPosition: .trailing))
+        LabelImage(.verbatim("Compact style"), systemImage: "star.fill", style: .compact)
+        LabelImage(.verbatim("4.5"), systemImage: "star.fill", style: .init(hideIconFromAccessibility: false))
+            .accessibilityLabel(Text(verbatim: "Rating: 4.5 stars"))
     }
-    
+
     LabelImage(style: .init(iconPosition: .leading)) {
-        Text("Custom label")
+        Text(verbatim: "Custom label")
             .font(.headline)
     } icon: {
         Image(systemName: "sparkles")
             .foregroundStyle(.tint)
     }
 }
+#endif

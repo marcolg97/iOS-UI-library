@@ -82,9 +82,9 @@ Composition of atoms.
 
 Examples:
 
-- LabeledIcon
-- TextFieldWithTitle
-- BadgeWithIcon
+- Banner
+- Toast
+- FormItem
 
 Rules:
 
@@ -100,9 +100,9 @@ Complex UI sections.
 
 Examples:
 
-- OfflinePopup
-- LoginForm
-- ProductCard
+- FormContainer
+- TabbarView
+- BackgroundStatusBarView
 
 Rules:
 
@@ -132,7 +132,7 @@ Never pass raw colors individually.
 
 Correct:
 
-Component(style: OfflinePopupStyle)
+Component(style: ToastStyle)
 
 Wrong:
 
@@ -247,34 +247,38 @@ UILibrary
 │       └── Spacing.swift
 │
 ├── Molecules
-│   └── LabeledIcon
-│       ├── LabeledIcon.swift
-│       └── LabeledIconStyle.swift
+│   └── LabelImage
+│       ├── LabelImage.swift
+│       ├── LabelImageStyle.swift
+│       └── LabelImageStyle+Preset.swift
+│
+├── Molecules
+│   └── Toast
+│       ├── Toast.swift
+│       ├── ToastStyle.swift
+│       └── ToastStyle+Preset.swift
 │
 ├── Organisms
-│   └── OfflinePopup
-│       ├── OfflinePopup.swift
-│       ├── OfflinePopupStyle.swift
-│       ├── OfflinePopupConfiguration.swift
-│       └── OfflinePopupModifier.swift
+│   └── FormContainer
+│       ├── FormContainer.swift
+│       ├── FormContainerStyle.swift
+│       └── FormContainerStyle+Preset.swift
 │
 ├── Modifiers
-│   ├── ShadowModifier.swift
-│   ├── RoundedSurfaceModifier.swift
-│   └── LoadingModifier.swift
+│   ├── ScrollDrivenNavigationBarTitleModifier.swift
+│   └── StatusBarAndPopupModifier/
 │
 ├── Extensions
-│   ├── View+Extensions.swift
-│   ├── Color+Extensions.swift
-│   └── Font+Extensions.swift
-│
-├── Layout
-│   ├── StackLayout.swift
-│   └── GridLayout.swift
+│   ├── Color+Hex.swift
+│   └── View+ReadHeight.swift
 │
 └── Utilities
-    ├── Constants.swift
-    └── Configuration.swift
+    ├── Haptics/
+    ├── ShareSheet/
+    ├── Backport/
+    ├── Theme/
+    ├── Preview/
+    └── ViewState/
 ```
 
 ---
@@ -285,14 +289,13 @@ Each component must live inside its own folder.
 
 Example:
 
-Organisms/OfflinePopup/
+Molecules/Toast/
 
 Contains only:
 
-- OfflinePopup.swift
-- OfflinePopupStyle.swift
-- OfflinePopupConfiguration.swift
-- OfflinePopup+Preview.swift (optional)
+- Toast.swift (component + `#if DEBUG` previews)
+- ToastStyle.swift
+- ToastStyle+Preset.swift
 
 Never mix unrelated components in same folder.
 
@@ -438,17 +441,19 @@ The repository should contain:
 UILibrary
 │
 ├── Sources/
+│   └── UILibrary/
+│       ├── Components/
+│       ├── Modifiers/
+│       ├── Extensions/
+│       ├── Utilities/
+│       ├── Resources/
+│       └── Documentation.docc/
+│           ├── LibraryGuidelines.md (Architecture content consolidated)
+│           ├── Theming.md
+│           └── Overview.md
 ├── Tests/
 ├── README.md
-├── CHANGELOG.md
-├── LICENSE
-└── Docs/
-    ├── LibraryGuidelines.md (Architecture content consolidated)
-    ├── Contributing.md
-    ├── Theming.md
-    └── Components/
-        ├── OfflinePopup.md
-        └── PrimaryButton.md
+└── CHANGELOG.md
 ```
 
 ---

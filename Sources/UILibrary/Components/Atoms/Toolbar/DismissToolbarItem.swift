@@ -1,6 +1,6 @@
 //
 //  DismissToolbarItem.swift
-//  DesignSystem
+//  UILibrary
 //
 //  Created by Marco La Gala on 09/02/26.
 //
@@ -21,6 +21,7 @@ public struct DismissToolbarItem: ToolbarContent {
             } label: {
                 Image(systemName: "xmark")
             }
+            .accessibilityLabel(Text("Close", bundle: .module))
         }
     }
 }

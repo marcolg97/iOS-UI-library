@@ -1,6 +1,6 @@
 //
 //  ScrollDrivenNavigationBarTitleModifier.swift
-//  CleanExpenseTracker
+//  UILibrary
 //
 //  Created by Marco La Gala on 04/02/26.
 //
@@ -8,9 +8,8 @@
 import SwiftUI
 
 /// A preference key to track scroll position for iOS 17 compatibility
-
-private struct ScrollOffsetPreferenceKey: @MainActor PreferenceKey {
-    @MainActor static var defaultValue: CGFloat = 0
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    nonisolated static let defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
     }
@@ -18,19 +17,16 @@ private struct ScrollOffsetPreferenceKey: @MainActor PreferenceKey {
 
 /// A view modifier that reveals the navigation bar title after scrolling past a threshold.
 ///
-/// This modifier tracks scroll position and shows the navigation bar title with a fade animation 
-/// once the user scrolls beyond a specified distance. It's particularly useful for screens with 
+/// This modifier tracks scroll position and shows the navigation bar title with a fade animation
+/// once the user scrolls beyond a specified distance. It's particularly useful for screens with
 /// large headers where you want to conserve space initially but provide context after scrolling.
 ///
 /// ## Implementation
 /// - iOS 18+: Uses SwiftUI's native `.onScrollGeometryChange` for optimal performance
-/// - iOS 17: Uses `PreferenceKey` with `GeometryReader` for backward compatibility
+/// - iOS 17: Reads the preference emitted by `scrollDrivenNavigationBarTitleTracking()`,
+///   which must be attached to the content *inside* the ScrollView
 ///
 /// The navigation bar background automatically hides when scrolled to the top.
-///
-/// ## Concurrency
-/// This type is isolated to the main actor since it manages UI state (`@State` properties) and
-/// interacts with SwiftUI's navigation bar APIs.
 ///
 /// ## Usage
 /// ```swift
@@ -44,22 +40,34 @@ private struct ScrollOffsetPreferenceKey: @MainActor PreferenceKey {
 @MainActor
 public struct ScrollDrivenNavigationBarTitleModifier: ViewModifier {
     /// The localized title to display in the navigation bar
-    let title: LocalizedStringResource
-    
+    private let title: LocalizedStringResource
+
     /// The scroll distance threshold (in points) that must be exceeded before showing the title
-    let revealAfter: CGFloat
-    
+    private let revealAfter: CGFloat
+
     /// The duration of the fade animation when showing/hiding the title
-    let animationDuration: Double
-    
+    private let animationDuration: Double
+
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// The current vertical scroll offset from the top
     @State private var scrollOffset: CGFloat = 0
-    
+
     /// The initial scroll offset captured when the view first appears
     @State private var initialScrollOffset: CGFloat?
-    
+
+    /// Creates the modifier. Prefer the `scrollDrivenNavigationBarTitle(_:revealAfter:animationDuration:)`
+    /// view extension over instantiating this type directly.
+    public init(
+        title: LocalizedStringResource,
+        revealAfter: CGFloat,
+        animationDuration: Double = 0.18
+    ) {
+        self.title = title
+        self.revealAfter = revealAfter
+        self.animationDuration = animationDuration
+    }
+
     /// The scroll delta from the initial position
     private var scrollDelta: CGFloat {
         guard let initialScrollOffset else { return 0 }
@@ -71,25 +79,28 @@ public struct ScrollDrivenNavigationBarTitleModifier: ViewModifier {
     }
 
     public func body(content: Content) -> some View {
-        if #available(iOS 18.0, *) {
+        if #available(iOS 18.0, macOS 15.0, *) {
             ios18Implementation(content: content)
         } else {
             ios17Implementation(content: content)
         }
     }
-    
-    @available(iOS 18.0, *)
+
+    private func updateOffset(_ newValue: CGFloat) {
+        if initialScrollOffset == nil {
+            initialScrollOffset = newValue
+        }
+        scrollOffset = newValue
+    }
+
+    @available(iOS 18.0, macOS 15.0, *)
     private func ios18Implementation(content: Content) -> some View {
         content
             .onScrollGeometryChange(for: CGFloat.self) { geometry in
                 // Return the content offset Y (positive when scrolling down)
                 geometry.contentOffset.y
-            } action: { oldValue, newValue in
-                // Capture initial offset on first call
-                if initialScrollOffset == nil {
-                    initialScrollOffset = newValue
-                }
-                scrollOffset = newValue
+            } action: { _, newValue in
+                updateOffset(newValue)
             }
             .applyNavigationBarTitle(
                 title: title,
@@ -98,24 +109,13 @@ public struct ScrollDrivenNavigationBarTitleModifier: ViewModifier {
                 reduceMotion: reduceMotion
             )
     }
-    
+
     private func ios17Implementation(content: Content) -> some View {
         content
-            .background(
-                GeometryReader { geometry in
-                    Color.clear
-                        .preference(
-                            key: ScrollOffsetPreferenceKey.self,
-                            value: geometry.frame(in: .named("scroll")).minY
-                        )
-                }
-            )
             .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                // Capture initial offset on first call
-                if initialScrollOffset == nil {
-                    initialScrollOffset = value
+                MainActor.assumeIsolated {
+                    updateOffset(value)
                 }
-                scrollOffset = value
             }
             .applyNavigationBarTitle(
                 title: title,
@@ -135,7 +135,7 @@ private extension View {
         reduceMotion: Bool
     ) -> some View {
         self
-            .navigationTitle("")
+            .navigationTitle(Text(title))
 #if os(iOS) || targetEnvironment(macCatalyst)
             .navigationBarTitleDisplayMode(.inline)
 #endif
@@ -161,7 +161,8 @@ public extension View {
     ///
     /// Automatically uses the best available API for the iOS version:
     /// - iOS 18+: Uses `.onScrollGeometryChange` for optimal performance
-    /// - iOS 17: Uses `PreferenceKey` with `GeometryReader` for compatibility
+    /// - iOS 17: Reads the scroll offset published by
+    ///   `scrollDrivenNavigationBarTitleTracking()` (see below)
     ///
     /// The title fades in smoothly once the user scrolls beyond the specified threshold,
     /// and the navigation bar background becomes visible. When scrolled back to the top,
@@ -183,18 +184,16 @@ public extension View {
     /// .scrollDrivenNavigationBarTitle("Settings", revealAfter: 50)
     /// ```
     ///
-    /// **iOS 17** (Requires coordinate space):
+    /// **iOS 17** (requires the tracking modifier on the scroll *content*):
     /// ```swift
     /// ScrollView {
     ///     content
+    ///         .scrollDrivenNavigationBarTitleTracking()
     /// }
-    /// .coordinateSpace(name: "scroll")
     /// .scrollDrivenNavigationBarTitle("Settings", revealAfter: 50)
     /// ```
     ///
-    /// - Important: For iOS 17 support, you must add `.coordinateSpace(name: "scroll")` to your ScrollView
-    ///
-    /// - Note: 
+    /// - Note:
     ///   - Minimum iOS 17.0
     ///   - Respects `accessibilityReduceMotion` setting
     ///   - Works with ScrollView, List, and Form
@@ -210,6 +209,34 @@ public extension View {
                 revealAfter: revealAfter,
                 animationDuration: animationDuration
             )
+        )
+    }
+
+    /// Publishes the scroll offset of the view it is attached to, for consumption by
+    /// `scrollDrivenNavigationBarTitle(_:revealAfter:animationDuration:)` on iOS 17.
+    ///
+    /// Attach this to the content **inside** the ScrollView (it measures the content's
+    /// position in global coordinates, so no named coordinate space is required):
+    ///
+    /// ```swift
+    /// ScrollView {
+    ///     VStack { ... }
+    ///         .scrollDrivenNavigationBarTitleTracking()
+    /// }
+    /// .scrollDrivenNavigationBarTitle("Settings", revealAfter: 50)
+    /// ```
+    ///
+    /// On iOS 18+ this modifier is unnecessary (and harmless): the title modifier
+    /// uses `.onScrollGeometryChange` instead.
+    func scrollDrivenNavigationBarTitleTracking() -> some View {
+        background(
+            GeometryReader { geometry in
+                Color.clear
+                    .preference(
+                        key: ScrollOffsetPreferenceKey.self,
+                        value: -geometry.frame(in: .global).minY
+                    )
+            }
         )
     }
 }

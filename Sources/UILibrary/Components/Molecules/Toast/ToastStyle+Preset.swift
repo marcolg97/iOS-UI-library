@@ -1,35 +1,35 @@
 //
-//  PopupStyle+Preset.swift
+//  ToastStyle+Preset.swift
 //  UILibrary
 //
 //  Created by Marco La Gala on 18/02/26.
 //
 
-/// Common, branded-agnostic `PopupStyle` presets used by apps/design systems for quick usage.
-public extension PopupStyle {
-    /// Warning style (yellow background).
-    static let warning = PopupStyle(
-        iconColor: .white,
-        textColor: .white,
+/// Common, brand-agnostic `ToastStyle` presets used by apps/design systems for quick usage.
+public extension ToastStyle {
+    /// Warning style (yellow background, dark content for contrast).
+    static let warning = ToastStyle(
+        iconColor: .black,
+        textColor: .black,
         backgroundColor: .yellow
     )
-    
+
     /// Error style (red background).
-    static let error = PopupStyle(
+    static let error = ToastStyle(
         iconColor: .white,
         textColor: .white,
         backgroundColor: .red
     )
-    
+
     /// Success style (green background).
-    static let success = PopupStyle(
+    static let success = ToastStyle(
         iconColor: .white,
         textColor: .white,
         backgroundColor: .green
     )
-    
+
     /// Neutral/default style (gray background).
-    static let neutral = PopupStyle(
+    static let neutral = ToastStyle(
         iconColor: .white,
         textColor: .white,
         backgroundColor: .gray

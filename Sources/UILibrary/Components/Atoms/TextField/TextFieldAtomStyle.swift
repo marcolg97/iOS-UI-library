@@ -4,7 +4,7 @@ import SwiftUI
 /// - Layer: Atom
 /// - Responsibility: All visual tokens for TextFieldAtom
 /// - Usage: Inject from app/design system
-public struct TextFieldAtomStyle: Equatable {
+public struct TextFieldAtomStyle: Equatable, Sendable {
     public let font: Font
     public let textColor: Color
     public let placeholderColor: Color

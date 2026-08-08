@@ -9,7 +9,7 @@ import SwiftUI
 /// - Style-driven (immutable `ActionButtonStyle`)
 /// - Size variants (`.compact`, `.regular`, `.large`)
 /// - Content-based initializer for custom labels
-/// - Icon-only convenience initializer
+/// - Icon-only convenience initializer (requires an accessibility label)
 /// - Accessibility-aware (configurable `accessibilityTrait`)
 ///
 /// ## Usage
@@ -17,8 +17,8 @@ import SwiftUI
 /// // Simple text button
 /// ActionButton("Continue", style: .primary) { submit() }
 ///
-/// // Icon-only
-/// ActionButton(systemName: "trash", style: .destructive) { delete() }
+/// // Icon-only — the accessibility label is required
+/// ActionButton(systemName: "trash", accessibilityLabel: "Delete", style: .destructive) { delete() }
 ///
 /// // Custom label (content initializer)
 /// ActionButton(isEnabled: true, style: .primary) {
@@ -27,7 +27,7 @@ import SwiftUI
 /// ```
 public struct ActionButton<Label: View>: View {
     /// Size variants for `ActionButton`.
-    public enum Size: Equatable {
+    public enum Size: Equatable, Sendable {
         case compact, regular, large
     }
 
@@ -37,6 +37,9 @@ public struct ActionButton<Label: View>: View {
 
     // Accessibility trait (default: button)
     private let accessibilityTrait: AccessibilityTraits
+
+    // Optional explicit accessibility label (used by the icon-only initializer)
+    private let accessibilityLabelText: Text?
 
     private let style: ActionButtonStyle
     private let action: () -> Void
@@ -55,39 +58,65 @@ public struct ActionButton<Label: View>: View {
         self.isEnabled = isEnabled
         self.size = size
         self.accessibilityTrait = accessibilityTrait
+        self.accessibilityLabelText = nil
+        self.style = style
+        self.action = action
+    }
+
+    fileprivate init(
+        isEnabled: Bool,
+        size: Size,
+        style: ActionButtonStyle,
+        accessibilityTrait: AccessibilityTraits,
+        accessibilityLabelText: Text?,
+        action: @escaping () -> Void,
+        @ViewBuilder label: () -> Label
+    ) {
+        self.label = label()
+        self.isEnabled = isEnabled
+        self.size = size
+        self.accessibilityTrait = accessibilityTrait
+        self.accessibilityLabelText = accessibilityLabelText
         self.style = style
         self.action = action
     }
 
     public var body: some View {
+        if let accessibilityLabelText {
+            core.accessibilityLabel(accessibilityLabelText)
+        } else {
+            core
+        }
+    }
+
+    private var core: some View {
         Button(action: action) {
             Group {
                 if let w = fixedWidth {
-                    label
-                        .font(fontForSize)
-                        .foregroundColor(currentForeground)
-                        .padding(.vertical, verticalPaddingForSize)
-                        .padding(.horizontal, style.horizontalPadding)
-                        .contentShape(Rectangle())
+                    styledLabel
                         .frame(minWidth: w, maxWidth: w, minHeight: style.minTapTarget.height)
                 } else {
-                    label
-                        .font(fontForSize)
-                        .foregroundColor(currentForeground)
-                        .padding(.vertical, verticalPaddingForSize)
-                        .padding(.horizontal, style.horizontalPadding)
-                        .contentShape(Rectangle())
+                    styledLabel
                         .frame(maxWidth: style.defaultMaxWidth, minHeight: style.minTapTarget.height)
                 }
             }
             .background(backgroundView)
             .overlay(borderOverlay)
-            .cornerRadius(style.cornerRadius)
+            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous))
             .shadow(color: shadowColor, radius: style.shadowRadius, x: 0, y: style.shadowYOffset)
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
         .accessibilityAddTraits(accessibilityTrait)
+    }
+
+    private var styledLabel: some View {
+        label
+            .font(fontForSize)
+            .foregroundStyle(currentForeground)
+            .padding(.vertical, verticalPaddingForSize)
+            .padding(.horizontal, style.horizontalPadding)
+            .contentShape(Rectangle())
     }
 
     private var currentForeground: Color { isEnabled ? style.foregroundColor : style.disabledForegroundColor }
@@ -152,98 +181,113 @@ extension ActionButton {
     }
 
     /// Convenience initializer for icon-only buttons (`Label == Image`).
+    ///
+    /// - Parameter accessibilityLabel: Required VoiceOver label for the button —
+    ///   an icon-only button is otherwise announced as an unlabeled button.
     public init(
         systemName: String,
+        accessibilityLabel: LocalizedStringResource,
         isEnabled: Bool = true,
         size: Size = .regular,
         style: ActionButtonStyle = .primary,
         accessibilityTrait: AccessibilityTraits = .isButton,
         action: @escaping () -> Void
     ) where Label == Image {
-        self.init(isEnabled: isEnabled, size: size, style: style, accessibilityTrait: accessibilityTrait, action: action) {
+        self.init(
+            isEnabled: isEnabled,
+            size: size,
+            style: style,
+            accessibilityTrait: accessibilityTrait,
+            accessibilityLabelText: Text(accessibilityLabel),
+            action: action
+        ) {
             Image(systemName: systemName)
         }
     }
 }
 
+#if DEBUG
 #Preview("Styles · Sizes") {
     ScrollView {
         VStack(spacing: 20) {
             Group {
-                Text("Primary").font(.caption).foregroundColor(.gray)
+                Text(verbatim: "Primary").font(.caption).foregroundStyle(.gray)
                 VStack(spacing: 8) {
-                    ActionButton("Compact", size: .compact, style: .primary) {}
-                    ActionButton("Compact (disabled)", isEnabled: false, size: .compact, style: .primary) {}
-                    ActionButton("Regular", size: .regular, style: .primary) {}
-                    ActionButton("Regular (disabled)", isEnabled: false, size: .regular, style: .primary) {}
-                    ActionButton("Large", size: .large, style: .primary) {}
-                    ActionButton("Large (disabled)", isEnabled: false, size: .large, style: .primary) {}
+                    ActionButton(.verbatim("Compact"), size: .compact, style: .primary) {}
+                    ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .primary) {}
+                    ActionButton(.verbatim("Regular"), size: .regular, style: .primary) {}
+                    ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .primary) {}
+                    ActionButton(.verbatim("Large"), size: .large, style: .primary) {}
+                    ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .primary) {}
                 }
                 .frame(maxWidth: 320)
 
-                Text("Primary (cyan)").font(.caption).foregroundColor(.gray)
+                Text(verbatim: "Tonal").font(.caption).foregroundStyle(.gray)
                 VStack(spacing: 8) {
-                    ActionButton("CONTINUA", style: .primaryCyan) {}
-                    ActionButton("COMPLETA I DATI", isEnabled: false, style: .primaryCyan) {}
-                }
-                .frame(maxWidth: 320)
-            }
-
-            Group {
-                Text("Secondary").font(.caption).foregroundColor(.gray)
-                VStack(spacing: 8) {
-                    ActionButton("Compact", size: .compact, style: .secondary) {}
-                    ActionButton("Compact (disabled)", isEnabled: false, size: .compact, style: .secondary) {}
-                    ActionButton("Regular", size: .regular, style: .secondary) {}
-                    ActionButton("Regular (disabled)", isEnabled: false, size: .regular, style: .secondary) {}
-                    ActionButton("Large", size: .large, style: .secondary) {}
-                    ActionButton("Large (disabled)", isEnabled: false, size: .large, style: .secondary) {}
+                    ActionButton(.verbatim("Continue"), style: .tonal) {}
+                    ActionButton(.verbatim("Complete your data"), isEnabled: false, style: .tonal) {}
                 }
                 .frame(maxWidth: 320)
             }
 
             Group {
-                Text("Destructive").font(.caption).foregroundColor(.gray)
+                Text(verbatim: "Secondary").font(.caption).foregroundStyle(.gray)
                 VStack(spacing: 8) {
-                    ActionButton("Compact", size: .compact, style: .destructive) {}
-                    ActionButton("Compact (disabled)", isEnabled: false, size: .compact, style: .destructive) {}
-                    ActionButton("Regular", size: .regular, style: .destructive) {}
-                    ActionButton("Regular (disabled)", isEnabled: false, size: .regular, style: .destructive) {}
-                    ActionButton("Large", size: .large, style: .destructive) {}
-                    ActionButton("Large (disabled)", isEnabled: false, size: .large, style: .destructive) {}
+                    ActionButton(.verbatim("Compact"), size: .compact, style: .secondary) {}
+                    ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .secondary) {}
+                    ActionButton(.verbatim("Regular"), size: .regular, style: .secondary) {}
+                    ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .secondary) {}
+                    ActionButton(.verbatim("Large"), size: .large, style: .secondary) {}
+                    ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .secondary) {}
                 }
                 .frame(maxWidth: 320)
             }
 
             Group {
-                Text("Ghost (intrinsic width)").font(.caption).foregroundColor(.gray)
+                Text(verbatim: "Destructive").font(.caption).foregroundStyle(.gray)
+                VStack(spacing: 8) {
+                    ActionButton(.verbatim("Compact"), size: .compact, style: .destructive) {}
+                    ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .destructive) {}
+                    ActionButton(.verbatim("Regular"), size: .regular, style: .destructive) {}
+                    ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .destructive) {}
+                    ActionButton(.verbatim("Large"), size: .large, style: .destructive) {}
+                    ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .destructive) {}
+                }
+                .frame(maxWidth: 320)
+            }
+
+            Group {
+                Text(verbatim: "Ghost (intrinsic width)").font(.caption).foregroundStyle(.gray)
                 VStack(spacing: 12) {
-                    ActionButton("Compact", size: .compact, style: .ghost) {}
-                    ActionButton("Compact (disabled)", isEnabled: false, size: .compact, style: .ghost) {}
-                    ActionButton("Regular", size: .regular, style: .ghost) {}
-                    ActionButton("Regular (disabled)", isEnabled: false, size: .regular, style: .ghost) {}
-                    ActionButton("Large", size: .large, style: .ghost) {}
-                    ActionButton("Large (disabled)", isEnabled: false, size: .large, style: .ghost) {}
+                    ActionButton(.verbatim("Compact"), size: .compact, style: .ghost) {}
+                    ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .ghost) {}
+                    ActionButton(.verbatim("Regular"), size: .regular, style: .ghost) {}
+                    ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .ghost) {}
+                    ActionButton(.verbatim("Large"), size: .large, style: .ghost) {}
+                    ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .ghost) {}
                 }
             }
 
             Group {
-                Text("Mixed row").font(.caption).foregroundColor(.gray)
+                Text(verbatim: "Mixed row").font(.caption).foregroundStyle(.gray)
                 HStack(spacing: 12) {
-                    ActionButton("Primary", size: .regular, style: .primary) {}
-                    ActionButton("Secondary", size: .regular, style: .secondary) {}
+                    ActionButton(.verbatim("Primary"), size: .regular, style: .primary) {}
+                    ActionButton(.verbatim("Secondary"), size: .regular, style: .secondary) {}
                 }
                 .frame(maxWidth: 320)
             }
 
             Group {
-                Text("Custom / icon-only examples").font(.caption).foregroundColor(.gray)
+                Text(verbatim: "Custom / icon-only examples").font(.caption).foregroundStyle(.gray)
                 VStack(spacing: 12) {
-                    ActionButton(systemName: "heart.fill", style: .ghost) {}
-                    ActionButton(systemName: "trash", style: .destructive) {}
-                    ActionButton(systemName: "star", style: .iconCircle) {}
+                    ActionButton(systemName: "heart.fill", accessibilityLabel: .verbatim("Favorite"), style: .ghost) {}
+                    ActionButton(systemName: "trash", accessibilityLabel: .verbatim("Delete"), style: .destructive) {}
+                    ActionButton(systemName: "star", accessibilityLabel: .verbatim("Star"), style: .iconCircle) {}
                     ActionButton(isEnabled: true, style: .primary, action: { }) {
-                        HStack { Image(systemName: "plus"); Text("Add item") }
+                        HStack {
+                            Image(systemName: "plus")
+                            Text(verbatim: "Add item")
+                        }
                     }
                 }
                 .frame(maxWidth: 320)
@@ -253,11 +297,11 @@ extension ActionButton {
     }
 }
 
-#Preview("Primary (cyan) — disabled check") {
+#Preview("Tonal — disabled check") {
     VStack(spacing: 8) {
-        ActionButton("CONTINUA", style: .primaryCyan) {}
-        ActionButton("COMPLETA I DATI", isEnabled: false, style: .primaryCyan) {}
+        ActionButton(.verbatim("Continue"), style: .tonal) {}
+        ActionButton(.verbatim("Complete your data"), isEnabled: false, style: .tonal) {}
     }
     .padding()
-    .cornerRadius(8)
 }
+#endif

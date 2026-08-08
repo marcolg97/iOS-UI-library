@@ -9,29 +9,24 @@ import SwiftUI
 
 public struct CircularProgressBar: View {
     public let progress: Double // 0.0 to 1.0
-    public let size: CGFloat
-    public let lineWidth: CGFloat
     public let style: CircularProgressBarStyle
-    
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     public init(
         progress: Double,
-        size: CGFloat = 60,
-        lineWidth: CGFloat = 8,
         style: CircularProgressBarStyle = .default
     ) {
         self.progress = progress
-        self.size = size
-        self.lineWidth = lineWidth
         self.style = style
     }
-    
+
     public var body: some View {
         ZStack {
             // Background Track
             Circle()
-                .stroke(style.trackColor, lineWidth: lineWidth)
-                .frame(width: size, height: size)
-            
+                .stroke(style.trackColor, lineWidth: style.lineWidth)
+
             // Progress Fill
             Circle()
                 .trim(from: 0, to: CGFloat(normalizedProgress))
@@ -41,13 +36,11 @@ public struct CircularProgressBar: View {
                         startPoint: .top,
                         endPoint: .bottom
                     ),
-                    style: StrokeStyle(lineWidth: lineWidth, lineCap: .round)
+                    style: StrokeStyle(lineWidth: style.lineWidth, lineCap: .round)
                 )
-                .frame(width: size, height: size)
                 .rotationEffect(.degrees(-90))
-                .animation(progressAnimation, value: normalizedProgress)
                 .overlay(
-                    // Shine effect (radial-ish)
+                    // Shine effect layered on the same arc
                     Circle()
                         .trim(from: 0, to: CGFloat(normalizedProgress))
                         .stroke(
@@ -56,24 +49,30 @@ public struct CircularProgressBar: View {
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            style: StrokeStyle(lineWidth: lineWidth / 2, lineCap: .round)
+                            style: StrokeStyle(lineWidth: style.lineWidth / 2, lineCap: .round)
                         )
-                        .frame(width: size - (lineWidth / 2), height: size - (lineWidth / 2))
                         .rotationEffect(.degrees(-90))
-                        .padding(lineWidth / 4)
-                        .animation(progressAnimation, value: normalizedProgress)
                 )
-            
+                .animation(reduceMotion ? nil : progressAnimation, value: normalizedProgress)
+
             if style.showPercentageLabel {
-                Text("\(Int(normalizedProgress * 100))%")
-                    .font(.system(size: size * 0.25, weight: .bold, design: .rounded))
+                Text(verbatim: "\(percentage)%")
+                    .font(.system(size: style.size * 0.25, weight: .bold, design: .rounded))
                     .foregroundStyle(style.textColor)
             }
         }
+        .frame(width: style.size, height: style.size)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Progress", bundle: .module))
+        .accessibilityValue(Text(verbatim: "\(percentage)%"))
     }
 
     private var normalizedProgress: Double {
         min(max(progress, 0), 1)
+    }
+
+    private var percentage: Int {
+        Int((normalizedProgress * 100).rounded())
     }
 
     private var progressAnimation: Animation {
@@ -84,6 +83,18 @@ public struct CircularProgressBar: View {
     }
 }
 
+#if DEBUG
 #Preview {
-    CircularProgressBar(progress: 0.65, size: 100, lineWidth: 12)
+    CircularProgressBar(
+        progress: 0.65,
+        style: .init(
+            trackColor: .primary.opacity(0.1),
+            progressGradientColors: [.accentColor, .accentColor.opacity(0.7)],
+            shineGradientColors: [.white.opacity(0.4), .clear],
+            textColor: .primary,
+            size: 100,
+            lineWidth: 12
+        )
+    )
 }
+#endif

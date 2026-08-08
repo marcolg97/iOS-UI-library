@@ -14,11 +14,12 @@ This library is designed for:
 # Core Principles
 
 - Atomic Design structure
-- Brand-agnostic components
-- Explicit Style Injection
+- Brand-agnostic components (no app copy, no brand colors, no domain concepts)
+- Explicit Style Injection (every component takes an immutable `Style` struct)
 - No business logic inside components
-- Clear dependency direction (App → UILibrary)
-- Strong documentation discipline
+- Clear dependency direction (App → UILibrary); UILibrary has **zero third-party dependencies**
+- Library-owned strings localized via `Bundle.module`; preview copy uses `Text(verbatim:)` / `.verbatim(...)` so it never enters the string catalog
+- Accessibility as a requirement: 44pt tap targets, VoiceOver labels/values/traits, Dynamic Type scaling, Reduce Motion respected
 
 ---
 
@@ -29,17 +30,18 @@ This library is designed for:
 3. Insert repository URL.
 4. Select version following Semantic Versioning.
 
+Platforms: iOS 17+, macOS 15+ (some utilities such as `ShareSheet` and `Haptics` impact feedback are iOS-only).
+
 ---
 
 # Architectural Overview
 
-Layers:
+Layers: Atoms → Molecules → Organisms → Templates, plus Modifiers, Extensions, and Utilities.
 
-- Atoms
-- Molecules
- - `TextFieldAtom` — single-line, style-injected input field supporting error, hint, placeholder, disabled, and focused states. All visual tokens are injected via `TextFieldAtomStyle`. Previews cover all states. Brand-agnostic and accessible.
+Each component:
+
 - Lives in its own folder
-- Exposes a `Style` struct
+- Exposes a `Style` struct (immutable, `Equatable`, `Sendable`)
 - Contains no brand tokens
 - Contains no feature logic
 
@@ -68,110 +70,132 @@ See `Theming.md` for full details.
 # Folder Structure
 
 ```
-UILibrary
-├── Atoms/
-├── Molecules/
-├── Organisms/
+Sources/UILibrary
+├── Components/
+│   ├── Atoms/
+│   ├── Molecules/
+│   ├── Organisms/
+│   └── Template/
 ├── Modifiers/
 ├── Extensions/
-├── Layout/
 ├── Utilities/
-├── Docs/
-└── Tests/
+├── Resources/            (Localizable.xcstrings)
+└── Documentation.docc/
 ```
 
 Each component folder contains:
 
 ```
 ComponentName/
-    ComponentName.swift
+    ComponentName.swift            (component + #if DEBUG previews)
     ComponentNameStyle.swift
-    ComponentNameConfiguration.swift (if needed)
-    ComponentName+Preview.swift
+    ComponentNameStyle+Preset.swift
 ```
 
 ---
 
 # Component List
 
-Maintain an updated list of public components.
+## Atoms
 
-- `ActionButton` — centralized, style-driven button with size variants, icon-only and custom-content initializers. Use `ActionButtonStyle` presets (`.primary`, `.secondary`, `.destructive`, `.ghost`, `.primaryCyan`, `.iconCircle`).
-- `AvatarImage` — circular avatar that shows either a supplied image or the first letter of a name when no image is provided. Appearance is controlled via `AvatarImageStyle` with presets such as `.default`, `.small`, `.large` and `bordered(_:)`.
-- `Badge` — small, style-driven status label for displaying status, count, or tag-like information. Use `BadgeStyle` presets (`.default`, `.neutral`, `.accent`, `.success`, `.warning`, `.error`, `.outlined(_:)`, `.threeDimensional(_:)`).
-- `Card` — style-driven container for grouping related content with customizable background, border, shadow, and padding. Use `CardStyle` presets (`.default`, `.elevated`, `.outlined`, `.flat`).
-- `CircularProgressBar` — determinate ring indicator that shows numeric progress inside a gradient circle. Configurable via `CircularProgressBarStyle` (track, gradients, label, animation).
-- `LabelImage` — combines a label with an optional leading or trailing system icon. Use `LabelImageStyle` to control typography, colors, and layout.
-- `ProgressBar` — style-driven progress indicator supporting determinate, indeterminate and segmented (step) presentations. Build a custom look by composing tokens from `ProgressBarStyle` (layout, fill, presentation, track, metrics); built‑in presets include `.neutral`, `.accent` and `.threeD`.
-- `TextFieldAtom` — pure single-line input field without labels, hints, or errors. Compose with `FormLabel`, `FormHint`, and `FormError` for complete form fields. Appearance is controlled via `TextFieldAtomStyle` with presets such as `.previewDefault`, `.compact`, and `.modern`.
-- `CheckboxAtom` — pure binary toggle without labels, hints, or errors. Compose with `FormLabel`, `FormHint`, and `FormError` for complete form fields. Appearance is controlled via `CheckboxStyle` with presets such as `.previewDefault`, `.compact`, and `.modern`.
-- `SwitchAtom` — pure on/off toggle without labels, hints, or errors. Compose with `FormLabel`, `FormHint`, and `FormError` for complete form fields. Appearance is controlled via `SwitchAtomStyle` with presets such as `.previewDefault`, `.compact`, and `.modern`.
-- `RadioButtonAtom` — pure single-choice selector without labels, hints, or errors. Compose with `FormLabel`, `FormHint`, and `FormError` for complete form fields. Appearance is controlled via `RadioButtonStyle` with presets such as `.previewDefault`, `.compact`, and `.modern`.
-- `FormLabel` — text label with optional icon for form fields. Compose with input atoms in `FormItem`. Appearance is controlled via `FormLabelStyle`.
-- `FormHint` — helper text for form fields. Appearance is controlled via `FormHintStyle`.
-- `FormError` — error message text with optional icon for form fields. Appearance is controlled via `FormErrorStyle`.
-- `Toolbar` — reusable toolbar content helpers such as `DismissToolbarItem`, whose behavior and icons are configured through `ToolbarItemStyle`.
+- `ActionButton` — centralized, style-driven button with size variants, icon-only (requires an accessibility label) and custom-content initializers. Presets: `.primary`, `.secondary`, `.destructive`, `.ghost`, `.tonal`, `.iconCircle`.
+- `AvatarImage` — circular avatar showing either a supplied image or the first letter of a name. Presets: `.default`, `.small`, `.large`, `.bordered(_:)`.
+- `Badge` — small status label for status/count/tag information (`LocalizedStringResource`). Presets: `.default`, `.neutral`, `.accent`, `.success`, `.warning`, `.error`, `.outlined(_:)`, `.threeDimensional(_:)`.
+- `Card` — style-driven container with optional color and/or material background, corner radius, padding, shadow, and `expandsHorizontally` control. Presets: `.neutral`, `.surface`.
+- `CheckboxAtom` — pure binary toggle (44pt tap target, Dynamic Type scaling). Presets: `.default`, `.compact`, `.modern`.
+- `Chip` — tag/filter chip with optional icon, selection state, tap action, and removal affordance. Presets: `.default`, `.outlined`.
+- `CircularProgressBar` — determinate ring indicator with optional percentage label; geometry lives in `CircularProgressBarStyle`. Preset: `.default`.
+- `DividerAtom` — horizontal or vertical separator with color/thickness/inset tokens. Presets: `.default`, `.inset`.
+- `FormError` — error message text with optional icon. Preset: `.default`, `.modern`.
+- `FormHint` — helper text for form fields. Preset: `.default`, `.modern`.
+- `FormLabel` — text label with optional icon for form fields. Preset: `.default`, `.modern`.
+- `LabelImage` — label with a leading or trailing icon. Presets: `.neutral`, `.compact`.
+- `ProgressBar` — determinate, indeterminate, and segmented (step) progress presentations. Presets: `.neutral`, `.accent`, `.threeD`, `.bold`, `.segmented`.
+- `RadioButtonAtom` — pure single-choice selector with radio (select-only) semantics. Presets: `.default`, `.compact`, `.modern`.
+- `SegmentedControlAtom` — segmented picker with a sliding selection indicator over any `Hashable` options. Presets: `.default`, `.accent`.
+- `SkeletonView` / `.skeleton(isLoading:)` — shimmering loading placeholder (static under Reduce Motion). Presets: `.default`, `.rounded`.
+- `SwitchAtom` — pure on/off toggle. Presets: `.default`, `.compact`, `.modern`.
+- `TextFieldAtom` — pure single-line input with error/focused/disabled states; compose with `FormLabel`/`FormHint`/`FormError`. Presets: `.default`, `.compact`, `.modern`.
+- `DismissToolbarItem` — toolbar close button with a localized accessibility label.
 
-- ## Molecules
+## Molecules
 
-- `Banner` – Contextual banner for displaying informational messages with optional actions. Supports info, warning, success, and error styles in both flat and 3D variants. API: `Banner(title: String, subtitle: String? = nil, style: BannerStyle = .info(), actionContent: () -> ActionContent)`. Use presets: `.info()`, `.warning()`, `.success()`, `.error()`, `.threeDimensionalInfo()`, `.threeDimensionalWarning()`, `.threeDimensionalSuccess()`, `.threeDimensionalError()`.
-- `Carousel` – Horizontally scrollable list with paging behavior and optional dots, driven by `CarouselViewStyle`. Inject any view per item and set card size/padding via the style object.
-- `CourseProgressCard` — Progress-focused list item showing a circular progress ring plus title/subtitle and navigation indicator. Built on top of `ListItemCard` for consistent spacing.
-- `EmptyStateView` — Displays an empty state using `ContentUnavailableView` with optional action button. Fully customizable via `EmptyStateViewStyle`. API: `EmptyStateView(title: LocalizedStringResource, description: LocalizedStringResource, style: EmptyStateViewStyle = .empty(), actionTitle: LocalizedStringResource?, onAction: (() -> Void)?)`. Use preset: `.empty()`.
-- `ErrorStateView` — Displays an error state using `ContentUnavailableView` with retry action. Fully customizable via `ErrorStateViewStyle`. API: `ErrorStateView(title: LocalizedStringResource, description: LocalizedStringResource, style: ErrorStateViewStyle = .error(), onRetry: () -> Void)`. Use presets: `.error()`, `.networkError()`, `.serverError()`, `.custom()`.
-- `FormItem` — Layout container for a single form field (label, input, hint/error). Supports vertical and horizontal layouts. API: `FormItem(layout: FormItemLayout = .vertical, style: FormItemStyle) { /* content */ }`.
-- `FormSection` — Groups related form items with optional header and footer. API: `FormSection(header: String? = nil, footer: String? = nil, style: FormSectionStyle) { /* items */ }`.
-- `ListItemCard` — Generic row card that arranges leading/content/trailing slots and applies a `ListItemCardStyle` surface with press feedback.
-- `LoadingStateView` — Displays a loading state with progress indicator and optional message. Fully customizable via `LoadingStateViewStyle`. API: `LoadingStateView(message: LocalizedStringResource? = nil, style: LoadingStateViewStyle = .default())`. Use presets: `.default()`, `.minimal()`, `.linear()`, `.custom()`.
-- `SelectableItemCard` — Model-agnostic selectable row with customizable content plus checked indicator; `UniversitySelectionCard` is a ready-made university variant built on top of it.
-- `WeeklyTaskCalendar` — Seven-day overview that shows completed/planned/upcoming study days with status labels, highlight rings, and day symbols. Configured by `WeeklyTaskCalendarStyle`.
+- `Banner` — contextual banner with icon, title, optional subtitle and action content. Presets: `.info()`, `.warning()`, `.success()`, `.error()` + `threeDimensional` variants.
+- `CarouselView` — horizontally scrolling list with snap/paging and optional paging dots, driven by `CarouselViewStyle`.
+- `EmptyStateView` — empty state built on `ContentUnavailableView` with optional action. Presets: `.empty()`, `.search()`, `.inbox()`, `.favorites()`, `.list()`, `.custom(...)`.
+- `ErrorStateView` — error state with retry action. Presets: `.error()`, `.networkError()`, `.serverError()`, `.custom(...)`.
+- `FormItem` — layout container for a single form field (label, input, hint/error); vertical and horizontal layouts.
+- `FormSection` — groups related form items with optional localized header and footer.
+- `ListItemCard` — generic row card with leading/content/trailing slots (leading/trailing optional) and press feedback. Presets: `.default`, `.prominent`.
+- `LoadingStateView` — loading state with spinner or linear indicator and optional message; `expands` token for inline use. Presets: `.default()`, `.minimal()`, `.large()`, `.linear()`, `.custom(...)`.
+- `SelectableItemCard` — selectable row with customizable content and a configurable selection indicator.
+- `Toast` / `.toast(isPresented:)` — transient message with icon; the modifier adds slide+fade presentation, drag-to-dismiss, and optional auto-dismiss. Presets: `.neutral`, `.success`, `.warning`, `.error`.
+- `WeekdayStatusStrip` — locale-aware seven-day status strip (weekday symbols and first weekday from `Calendar`); statuses and captions are caller-defined.
 
-- ## Organisms
+## Organisms
 
-- `Form` – Top-level container for form sections providing consistent spacing and optional styling. API: `Form(style: FormStyle) { /* sections */ }`. Example usage:
+- `FormContainer` — top-level container for form sections (named to avoid colliding with `SwiftUI.Form`). Example:
   ```swift
-  Form(style: formStyle) {
-      FormSection(header: "Account") {
-          FormItem(layout: .vertical, style: itemStyle) {
-              FormLabel("Username", style: labelStyle)
-              TextFieldAtom(text: $username, style: textFieldStyle)
-              FormHint("Between 4-20 characters", style: hintStyle)
+  ScrollView {
+      FormContainer(style: .default) {
+          FormSection(header: "Account") {
+              FormItem {
+                  FormLabel("Username")
+                  TextFieldAtom(text: $username, placeholder: "Enter username")
+                  FormHint("Between 4-20 characters")
+              }
           }
       }
   }
   ```
-- `Popup` – Visual notification with icon and message, styled for status/alerts. API: `Popup(icon: String, message: String, style: PopupStyle = .neutral)`.
-- `BackgroundStatusBarView` – Top overlay bar for app-wide status (e.g. offline, warning). Modifier: `.backgroundStatusBar(isVisible: Bool, style: BackgroundStatusBarStyle)`.
-- `Tabbar` – Custom tab bar organism that exposes icon/text slots, style tokens, and selection handling consistent with the rest of the library.
-- `StatusBarAndPopupModifier` – Adds both a status bar and a dismissable popup to any view for critical states. Modifier: `.bannerAndPopup(isOffline: Binding<Bool>, backgroundStatusBarStyle: BackgroundStatusBarStyle, hasTabbar: Bool, popupContent: () -> PopupContent)`.
+- `TabbarView` — tab bar built from `TabbarItem` conformances (title, icon, order, optional badge and `TabRole`); supports dynamic tab subsets and `TabbarStyle` tint.
+- `BackgroundStatusBarView` — top overlay bar for app-wide status. Modifier: `.backgroundStatusBar(isVisible:style:)`.
 
 ## Templates
 
-- `LockScreenView` – Full-screen overlay used during biometric lock, configurable via `LockScreenViewContent` and `LockScreenViewStyle`.
+- `LockScreenView` — full-screen overlay for app lock, configurable via `LockScreenViewContent` (localized, biometric-agnostic) and `LockScreenViewStyle` (material background by default).
 
-This list must always reflect the current public API. Component API reference must be authored in‑source using SwiftDoc/DocC (see "Documentation Structure" below).
+## Modifiers
+
+- `.bannerAndPopup(hasToShow:backgroundStatusBarStyle:popupBottomPadding:popupContent:)` — top status bar + dismissable bottom toast for app-wide states.
+- `.scrollDrivenNavigationBarTitle(_:revealAfter:)` — reveals the navigation title after a scroll threshold (iOS 18+ automatic; on iOS 17 also attach `.scrollDrivenNavigationBarTitleTracking()` to the scroll content).
+- `.toast(isPresented:autoDismissAfter:bottomPadding:content:)` — transient toast presentation.
+- `.skeleton(isLoading:style:)` — skeleton placeholder over any view.
+- `.readHeight(_:)` — reports a view's height changes.
+- `.if(_:transform:)` — conditional modifier (see its documentation for the view-identity caveat).
+- `Backport` — availability backports (`backport.navigationSubtitle(_:)`).
+
+## Utilities
+
+- `Haptics` — cross-platform impact/notification feedback.
+- `ShareSheet` — `UIActivityViewController` wrapper (iOS only) with excluded activities and completion handler.
+- `Theme` — light/dark/system appearance preference (design tokens intentionally live in the app).
+- `ViewState` — generic `success/empty/loading/error` view state with accessors.
+- `Color(hex:)` / `toHex()` — hex color parsing/serialization.
+- `PreviewContainer`, `PreviewSection`, `PreviewVariants`, `LocalizedStringResource.verbatim(_:)` — preview helpers (DEBUG only).
+
+This list must always reflect the current public API. Component API reference must be authored in-source using SwiftDoc/DocC (see "Documentation Structure" below).
+
+---
+
+# Localization Rules
+
+- Every user-facing string owned by the library resolves against the package catalog: `Text("Key", bundle: .module)` or `LocalizedStringResource("Key", bundle: .atURL(Bundle.module.bundleURL))`.
+- Public APIs that accept copy from the app take `LocalizedStringResource`, so the app's own catalog is used for app copy.
+- Preview and demo strings must use `Text(verbatim:)` or the `.verbatim(...)` helper so they are never extracted into `Localizable.xcstrings`.
+- Preview scaffolding types are `private` and wrapped in `#if DEBUG`.
 
 ---
 
 # Documentation Structure
 
-All public API documentation must be authored in‑source using SwiftDoc/DocC comments. Use `Sources/UILibrary/Documentation.docc/` only for high‑level conceptual articles (guides, theming, architecture). Avoid creating per‑component Markdown files to prevent documentation drift.
+All public API documentation must be authored in-source using SwiftDoc/DocC comments. Use `Sources/UILibrary/Documentation.docc/` only for high-level conceptual articles (guides, theming, architecture). Avoid creating per-component Markdown files to prevent documentation drift.
 
 How to preview the DocC catalog locally
 
 - Open the package in Xcode (File → Open... → `Package.swift`).
-- Build the documentation: Product → Build Documentation (or Option‑Command‑Shift‑D).
+- Build the documentation: Product → Build Documentation (or Option-Command-Shift-D).
 - The DocC catalog is generated from `Sources/UILibrary/Documentation.docc/` and the SwiftDoc comments in `Sources/UILibrary`.
-
-Notes
-
-- Keep the in‑source SwiftDoc comments as the single source of truth for component API docs; use `Documentation.docc/` for tutorials and conceptual articles only.
-
----
-
-# Code Documentation Rules
-
-Public API documentation lives in-source (SwiftDoc). Keep `Sources/UILibrary` as the canonical location for component reference comments; use `Sources/UILibrary/Documentation.docc/` for high-level conceptual articles only. See `LibraryGuidelines.md` for the authoritative rules.
 
 ---
 
@@ -179,60 +203,13 @@ Public API documentation lives in-source (SwiftDoc). Keep `Sources/UILibrary` as
 
 Every change to a public component requires the following steps.
 
-## 1. Update the Component Code
-
-- Keep backward compatibility when possible.
-- If a breaking change is required, bump MAJOR version and document migration.
-
-## 2. Update Component Documentation
-
-- Update SwiftDoc comments in the component's source files so DocC generates up-to-date symbol pages.
-- If you need long-form guidance for a component, add a conceptual article to `Sources/UILibrary/Documentation.docc/` (avoid per-component Markdown duplication).
-- Update Style contract description if changed.
-
-## 3. Update Component List in README
-
-- Add new component under correct Atomic layer.
-- Remove deprecated components if necessary.
-
-## 4. Update CHANGELOG.md
-
-Follow Semantic Versioning format:
-
-```
-## [1.2.0] - 2026-02-18
-
-### Added
-- New Badge component
-
-### Changed
-- OfflinePopupStyle now supports borderColor
-
-### Fixed
-- Layout issue in LabeledIcon
-```
-
-Rules:
-
-- Added → new backward-compatible feature
-- Changed → behavior modifications
-- Fixed → bug fixes
-- Removed → breaking removal
-
-## 5. Review Public API Stability
-
-- Verify no accidental breaking changes
-- Ensure Style structs remain compatible
-
-## 6. Update Previews
-
-- Ensure preview compiles
-- Add preview cases for new variants
-
-## 7. If Breaking Change
-
-- Bump MAJOR version
-- Document migration steps in CHANGELOG
+1. **Update the component code** — keep backward compatibility when possible; if a breaking change is required, bump MAJOR (or MINOR pre-1.0) and document the migration.
+2. **Update SwiftDoc comments** so DocC generates up-to-date symbol pages.
+3. **Update the component list in this README** under the correct Atomic layer.
+4. **Update CHANGELOG.md** following the Keep-a-Changelog sections (Added / Changed / Fixed / Removed).
+5. **Review public API stability** — no accidental breaking changes; Style structs stay compatible.
+6. **Update previews** — `#if DEBUG`, verbatim strings, cover new variants.
+7. **Update tests** — construction smoke test + behavior tests where meaningful.
 
 ---
 
@@ -244,7 +221,7 @@ Follow Semantic Versioning:
 - MINOR → Backward-compatible additions
 - PATCH → Fixes
 
-Never introduce silent breaking changes.
+Pre-1.0, breaking changes bump MINOR and must be documented in the CHANGELOG. Never introduce silent breaking changes.
 
 ---
 
@@ -253,11 +230,12 @@ Never introduce silent breaking changes.
 Before merging:
 
 - Component follows Atomic Design
-- Style struct exists
-- No brand tokens inside UILibrary
-- Documentation updated
-- README component list updated
-- CHANGELOG updated
+- Style struct exists (immutable, `Equatable`, `Sendable`) with a `.default`-style preset
+- No brand tokens, app copy, or domain concepts inside UILibrary
+- Library strings localized via `Bundle.module`; preview strings verbatim
+- Accessibility: labels/traits/values, 44pt targets, Reduce Motion
+- Documentation, README component list, and CHANGELOG updated
+- `swift build` and `swift test` green
 
 ---
 

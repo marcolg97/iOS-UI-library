@@ -23,7 +23,11 @@ public extension View {
                     .preference(key: HeightPreferenceKey.self, value: proxy.size.height)
             }
         )
-        .onPreferenceChange(HeightPreferenceKey.self, perform: onChange)
+        .onPreferenceChange(HeightPreferenceKey.self) { height in
+            MainActor.assumeIsolated {
+                onChange(height)
+            }
+        }
     }
 }
 

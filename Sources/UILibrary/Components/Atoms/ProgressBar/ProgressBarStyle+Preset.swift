@@ -24,27 +24,37 @@ public extension ProgressBarStyle {
 
     /// Glossy 3‑D appearance suitable for high‑impact, playful UI elements.
     ///
-    /// Uses a solid cyan‑blue fill, darker track and the 3‑D presentation tokens.
+    /// Uses the accent color for fill and glow, darker track and the 3‑D presentation tokens.
     static let threeD = ProgressBarStyle(
         layout: .continuous,
-        fill: .solid(Color(red: 0.00, green: 0.78, blue: 0.92)),
+        fill: .solid(.accentColor),
         presentation: .threeD(.default),
         track: .init(color: Color.primary.opacity(0.1)),
         metrics: .init(height: 8, cornerRadius: 6, indeterminateDuration: Metrics.default.indeterminateDuration)
     )
-    
-    static let quizStyle = ProgressBarStyle(
+
+    /// Tall, glossy variant for prominent progress displays.
+    static let bold = ProgressBarStyle(
         layout: .continuous,
         fill: .solid(.green),
         presentation: .threeD(.default),
         track: .init(color: Color.primary.opacity(0.1)),
         metrics: .default.withHeight(20)
     )
+
+    /// Segmented/step layout preset for onboarding flows.
+    static let segmented = ProgressBarStyle(
+        layout: .segmented(.default),
+        fill: .solid(.accentColor),
+        presentation: .flat,
+        track: .default,
+        metrics: .default
+    )
 }
 
 public extension ProgressBarStyle.Presentation.ThreeD {
     static let `default` = ProgressBarStyle.Presentation.ThreeD(
-        glowColor: Color(red: 0.00, green: 0.78, blue: 0.92).opacity(0.28),
+        glowColor: Color.accentColor.opacity(0.28),
         highlightColor: Color.white.opacity(0.28),
         shadowRadius: 6
     )
@@ -56,7 +66,7 @@ public extension ProgressBarStyle.Metrics {
         cornerRadius: 3,
         indeterminateDuration: 14
     )
-    
+
     func withHeight(_ height: CGFloat) -> Self {
         .init(height: height, cornerRadius: cornerRadius, indeterminateDuration: indeterminateDuration)
     }

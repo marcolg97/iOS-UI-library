@@ -11,7 +11,6 @@ import SwiftUI
 ///
 /// Describes visual tokens used by `EmptyStateView` (icon, colors, fonts, button style).
 /// Immutable and brand-agnostic.
-@available(iOS 17.0, macOS 14.0, *)
 public struct EmptyStateViewStyle: Equatable, Sendable {
     /// SF Symbol name for the empty state icon.
     public let iconName: String

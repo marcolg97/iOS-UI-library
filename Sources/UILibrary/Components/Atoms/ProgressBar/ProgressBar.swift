@@ -19,9 +19,9 @@ public struct ProgressBar: View {
     private let currentStep: Int?
     private let totalSteps: Int?
     private let style: ProgressBarStyle
-    
-    @State private var indeterminateOffset: CGFloat = -0.6
-    
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     /// Determinate or indeterminate initializer. When `value` is `nil` the component shows an indeterminate animation.
     public init(value: Double? = nil, style: ProgressBarStyle = .neutral) {
         self.value = value
@@ -29,7 +29,7 @@ public struct ProgressBar: View {
         self.totalSteps = nil
         self.style = style
     }
-    
+
     /// Segmented/step-based initializer used by onboarding flows.
     /// - Parameters:
     ///   - currentStep: 1-based current step index.
@@ -41,7 +41,7 @@ public struct ProgressBar: View {
         self.totalSteps = max(1, totalSteps)
         self.style = style
     }
-    
+
     public var body: some View {
         if let current = currentStep, let total = totalSteps {
             segmentedBody(current: current, total: total)
@@ -49,7 +49,41 @@ public struct ProgressBar: View {
             determinateOrIndeterminateBody()
         }
     }
-    
+
+    // MARK: - Shared fill helpers
+
+    private var fillShapeStyle: AnyShapeStyle {
+        if let start = style.progressGradientStartColor, let end = style.progressGradientEndColor {
+            return AnyShapeStyle(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
+        }
+        return AnyShapeStyle(style.progressColor)
+    }
+
+    /// Progress capsule with optional 3D gloss/glow decorations.
+    @ViewBuilder
+    private func fillCapsule(width: CGFloat?) -> some View {
+        Capsule()
+            .fill(fillShapeStyle)
+            .frame(width: width, height: style.height)
+            .shadow(
+                color: style.threeDConfig?.glowColor ?? .clear,
+                radius: style.threeDConfig?.shadowRadius ?? 0,
+                x: 0, y: 0
+            )
+            .overlay {
+                if let threeD = style.threeDConfig {
+                    Capsule()
+                        .fill(threeD.highlightColor)
+                        .frame(height: max(1, style.height * 0.45))
+                        .offset(y: -style.height * 0.20)
+                        .opacity(0.85)
+                        .blendMode(.screen)
+                }
+            }
+    }
+
+    // MARK: - Continuous (determinate / indeterminate)
+
     @ViewBuilder
     private func determinateOrIndeterminateBody() -> some View {
         GeometryReader { geo in
@@ -57,194 +91,131 @@ public struct ProgressBar: View {
                 Capsule()
                     .fill(style.trackColor)
                     .frame(height: style.height)
-                
-                if let v = value {
-                    // determinate — choose gradient fill when 3D tokens are present, otherwise solid color.
-                    let width = max(0, min(1, v)) * geo.size.width
 
-                    if let start = style.progressGradientStartColor, let end = style.progressGradientEndColor {
-                        Capsule()
-                            .fill(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
-                            .frame(width: width, height: style.height)
-                            .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
-                            .overlay(
-                                Capsule()
-                                    .fill(style.threeDConfig?.highlightColor ?? Color.white.opacity(0))
-                                    .opacity(style.threeDConfig != nil ? 0.6 : 0)
-                            )
-                    } else {
-                        // solid-fill path — support 3D tokens (glow + highlight) when present
-                        Capsule()
-                            .fill(style.progressColor)
-                            .frame(width: width, height: style.height)
-                            .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
-                            .overlay(
-                                // top gloss/highlight (smaller capsule) — solid highlight when threeD is configured
-                                Capsule()
-                                    .fill(style.threeDConfig?.highlightColor ?? Color.white.opacity(0))
-                                    .frame(height: max(1, style.height * 0.45))
-                                    .offset(y: -style.height * 0.20)
-                                    .opacity(style.threeDConfig != nil ? 0.85 : 0)
-                                    .blendMode(.screen)
-                            )
-                    }
+                if let v = value {
+                    fillCapsule(width: max(0, min(1, v)) * geo.size.width)
+                } else if reduceMotion {
+                    // Static representation when the user prefers reduced motion.
+                    fillCapsule(width: geo.size.width * 0.6)
+                        .opacity(0.6)
                 } else {
-                    if let start = style.progressGradientStartColor, let end = style.progressGradientEndColor {
-                        Capsule()
-                            .fill(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
-                            .frame(width: geo.size.width * 0.6, height: style.height)
-                            .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
-                            .offset(x: geo.size.width * indeterminateOffset)
-                            .onAppear {
-                                withAnimation(.linear(duration: style.indeterminateAnimationDuration).repeatForever(autoreverses: false)) {
-                                    indeterminateOffset = 1.1
-                                }
-                            }
-                    } else {
-                        // indeterminate solid-fill path — apply glow when available
-                        Capsule()
-                            .fill(style.progressColor.opacity(0.9))
-                            .frame(width: geo.size.width * 0.6, height: style.height)
-                            .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
-                            .offset(x: geo.size.width * indeterminateOffset)
-                            .onAppear {
-                                withAnimation(.linear(duration: style.indeterminateAnimationDuration).repeatForever(autoreverses: false)) {
-                                    indeterminateOffset = 1.1
-                                }
-                            }
+                    // TimelineView derives the sweep offset from the clock, so the
+                    // animation survives view rebuilds without any @State.
+                    TimelineView(.animation) { context in
+                        let duration = max(0.1, style.indeterminateAnimationDuration)
+                        let elapsed = context.date.timeIntervalSinceReferenceDate
+                        let progress = elapsed.truncatingRemainder(dividingBy: duration) / duration
+                        let offset = -0.6 + progress * 1.7
+
+                        fillCapsule(width: geo.size.width * 0.6)
+                            .offset(x: geo.size.width * offset)
                     }
                 }
             }
             .frame(height: style.height)
-            .cornerRadius(style.cornerRadius)
-            .accessibilityValue(accessibilityValue)
+            .clipShape(RoundedRectangle(cornerRadius: style.cornerRadius, style: .continuous))
         }
         .frame(height: style.height)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Progress", bundle: .module))
+        .accessibilityValue(accessibilityValue)
+        .accessibilityAddTraits(value == nil ? .updatesFrequently : [])
     }
-    
+
+    // MARK: - Segmented
+
     @ViewBuilder
     private func segmentedBody(current: Int, total: Int) -> some View {
         let cfg = style.segmentedConfig
         HStack(spacing: cfg.spacing) {
             ForEach(Array(1...total), id: \.self) { step in
-                let isActive = step <= current
                 let width = step == current ? cfg.activeWidth : cfg.inactiveWidth
 
-                if isActive, let start = style.progressGradientStartColor, let end = style.progressGradientEndColor {
-                    Capsule()
-                        .fill(LinearGradient(colors: [start, end], startPoint: .leading, endPoint: .trailing))
-                        .frame(width: width, height: style.height)
-                        .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
-                        .overlay(
-                            Capsule()
-                                .fill(style.threeDConfig?.highlightColor ?? Color.white.opacity(0))
-                                .opacity(style.threeDConfig != nil ? 0.6 : 0)
-                        )
+                if step <= current {
+                    fillCapsule(width: width)
                 } else {
-                    if isActive {
-                        // active segment (non-gradient) — solid fill with gloss + glow when available
-                        Capsule()
-                            .fill(style.progressColor)
-                            .frame(width: width, height: style.height)
-                        .shadow(color: style.threeDConfig?.glowColor ?? .clear, radius: style.threeDConfig?.shadowRadius ?? 0, x: 0, y: 0)
-                        .overlay(
-                                Capsule()
-                                    .fill(style.threeDConfig?.highlightColor ?? Color.white.opacity(0))
-                                    .frame(height: max(1, style.height * 0.45))
-                                    .offset(y: -style.height * 0.20)
-                                    .opacity(style.threeDConfig != nil ? 0.85 : 0)
-                                    .blendMode(.screen)
-                            )
-                    } else {
-                        Capsule()
-                            .fill(segmentFillColor(for: step, current: current))
-                            .frame(width: width, height: style.height)
-                    }
+                    Capsule()
+                        .fill(style.trackColor)
+                        .frame(width: width, height: style.height)
                 }
             }
-            
+
             Spacer()
-            
-            Text("Step \(current)/\(total)")
+
+            Text("Step \(current)/\(total)", bundle: .module)
                 .font(.caption)
                 .fontWeight(.semibold)
-                .foregroundColor(cfg.textColor)
+                .foregroundStyle(cfg.textColor ?? .secondary)
         }
         .frame(height: max(style.height, 20))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("Progress"))
-        .accessibilityValue(Text("Step \(current) of \(total)"))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Progress", bundle: .module))
+        .accessibilityValue(Text("Step \(current) of \(total)", bundle: .module))
     }
-    
-    private func segmentFillColor(for step: Int, current: Int) -> Color {
-        if step <= current {
-            return style.progressColor
-        } else {
-            return style.trackColor
-        }
-    }
-    
+
     private var accessibilityValue: Text {
         if let v = value {
-            return Text(String(format: "%.0f%%", v * 100))
-        } else {
-            return Text("In progress")
+            let percent = Int((max(0, min(1, v)) * 100).rounded())
+            return Text(verbatim: "\(percent)%")
         }
+        return Text("In progress", bundle: .module)
     }
 }
 
+#if DEBUG
 #Preview("ProgressBar · Determinate / Indeterminate / Segmented") {
     VStack(spacing: 16) {
-        
-        
         ProgressBar(value: 0.5, style: .accent)
             .frame(height: 8)
-        
-        Text("Indeterminate")
+
+        Text(verbatim: "Indeterminate")
             .font(.caption)
-            .foregroundColor(.gray)
+            .foregroundStyle(.gray)
         ProgressBar(style: .accent)
             .frame(height: 6)
             .frame(maxWidth: 300)
-        
-        Text("Segmented (onboarding style)")
+
+        Text(verbatim: "Segmented (onboarding style)")
             .font(.caption)
-            .foregroundColor(.gray)
-        
+            .foregroundStyle(.gray)
+
         ProgressBar(currentStep: 2, totalSteps: 4, style: .neutral)
             .frame(maxWidth: 360)
-        
+
         ProgressBar(currentStep: 2, totalSteps: 4, style: .threeD)
             .frame(maxWidth: 360)
 
-        Text("3D / Glossy")
+        Text(verbatim: "3D / Glossy")
             .font(.caption)
-            .foregroundColor(.gray)
-        
+            .foregroundStyle(.gray)
+
         ProgressBar(value: 0.65, style: .threeD)
             .frame(height: 10)
             .frame(maxWidth: 360)
-        
+
         ProgressBar(
             value: 0.25,
-            style: .quizStyle
+            style: .bold
         )
         .frame(height: 6)
     }
     .padding()
 }
 
-#Preview("ProgressView Animation") {
+#Preview("ProgressBar Animation") {
     @Previewable @State var value: Double = 0.05
-    
+
     ProgressBar(
         value: value,
-        style: .quizStyle
+        style: .bold
     )
 
     Button {
-        value += 0.1
+        withAnimation {
+            value = min(1, value + 0.1)
+        }
     } label: {
-        Text("Go next")
+        Text(verbatim: "Go next")
     }
 }
+#endif

@@ -1,11 +1,13 @@
 //
 //  PreviewHelpers.swift
-//  DesignSystem
+//  UILibrary
 //
 //  Preview utilities for testing components in different contexts.
 //
 
 import SwiftUI
+
+#if DEBUG
 
 // MARK: - Preview Container
 
@@ -29,11 +31,11 @@ import SwiftUI
 /// ```
 public struct PreviewContainer<Content: View>: View {
     @ViewBuilder private let content: () -> Content
-    
+
     public init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content
     }
-    
+
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
@@ -50,22 +52,35 @@ public struct PreviewContainer<Content: View>: View {
 public struct PreviewSection<Content: View>: View {
     private let title: String?
     @ViewBuilder private let content: () -> Content
-    
+
     public init(_ title: String? = nil, @ViewBuilder content: @escaping () -> Content) {
         self.title = title
         self.content = content
     }
-    
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if let title {
-                Text(title)
+                Text(verbatim: title)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
             }
             content()
         }
+    }
+}
+
+// MARK: - Verbatim Strings for Previews
+
+public extension LocalizedStringResource {
+    /// Wraps a raw string so previews can pass sample copy to APIs that take
+    /// `LocalizedStringResource` without registering a key in the string catalog.
+    ///
+    /// Preview-only convention: real library strings must use proper
+    /// localization; preview copy must never be extracted for translation.
+    static func verbatim(_ string: String) -> LocalizedStringResource {
+        LocalizedStringResource("\(string)")
     }
 }
 
@@ -78,7 +93,7 @@ public extension View {
     func previewDynamicType(_ size: DynamicTypeSize) -> some View {
         environment(\.dynamicTypeSize, size)
     }
-    
+
     /// Enables right-to-left layout for preview testing.
     ///
     /// Simulates Arabic, Hebrew, or other RTL languages.
@@ -106,22 +121,27 @@ public extension View {
 /// ```
 public struct PreviewVariants<Content: View>: View {
     @ViewBuilder private let content: () -> Content
-    
+
     public init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content
     }
-    
+
     public var body: some View {
         PreviewContainer {
             PreviewSection("Default (Light)") {
                 content()
             }
 
+            PreviewSection("Dark Mode") {
+                content()
+                    .environment(\.colorScheme, .dark)
+            }
+
             PreviewSection("Right-to-Left (RTL)") {
                 content()
                     .previewRTL()
             }
-            
+
             PreviewSection("Large Text (XXXL)") {
                 content()
                     .previewDynamicType(.accessibility3)
@@ -129,3 +149,5 @@ public struct PreviewVariants<Content: View>: View {
         }
     }
 }
+
+#endif

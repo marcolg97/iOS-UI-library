@@ -66,7 +66,7 @@ public extension ProgressBarStyle {
                 activeWidth: CGFloat,
                 inactiveWidth: CGFloat,
                 spacing: CGFloat,
-                textColor: Color
+                textColor: Color? = nil
             ) {
                 self.activeWidth = activeWidth
                 self.inactiveWidth = inactiveWidth

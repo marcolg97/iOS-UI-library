@@ -42,6 +42,7 @@ public struct PreviewContainer<Content: View>: View {
                 content()
             }
             .padding()
+            .frame(maxWidth: .infinity, alignment: .center)
         }
     }
 }

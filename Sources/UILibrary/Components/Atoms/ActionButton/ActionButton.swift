@@ -208,92 +208,89 @@ extension ActionButton {
 
 #if DEBUG
 #Preview("Styles · Sizes") {
-    ScrollView {
-        VStack(spacing: 20) {
-            Group {
-                Text(verbatim: "Primary").font(.caption).foregroundStyle(.gray)
-                VStack(spacing: 8) {
-                    ActionButton(.verbatim("Compact"), size: .compact, style: .primary) {}
-                    ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .primary) {}
-                    ActionButton(.verbatim("Regular"), size: .regular, style: .primary) {}
-                    ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .primary) {}
-                    ActionButton(.verbatim("Large"), size: .large, style: .primary) {}
-                    ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .primary) {}
-                }
-                .frame(maxWidth: 320)
-
-                Text(verbatim: "Tonal").font(.caption).foregroundStyle(.gray)
-                VStack(spacing: 8) {
-                    ActionButton(.verbatim("Continue"), style: .tonal) {}
-                    ActionButton(.verbatim("Complete your data"), isEnabled: false, style: .tonal) {}
-                }
-                .frame(maxWidth: 320)
+    PreviewContainer {
+        Group {
+            Text(verbatim: "Primary").font(.caption).foregroundStyle(.gray)
+            VStack(spacing: 8) {
+                ActionButton(.verbatim("Compact"), size: .compact, style: .primary) {}
+                ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .primary) {}
+                ActionButton(.verbatim("Regular"), size: .regular, style: .primary) {}
+                ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .primary) {}
+                ActionButton(.verbatim("Large"), size: .large, style: .primary) {}
+                ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .primary) {}
             }
-
-            Group {
-                Text(verbatim: "Secondary").font(.caption).foregroundStyle(.gray)
-                VStack(spacing: 8) {
-                    ActionButton(.verbatim("Compact"), size: .compact, style: .secondary) {}
-                    ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .secondary) {}
-                    ActionButton(.verbatim("Regular"), size: .regular, style: .secondary) {}
-                    ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .secondary) {}
-                    ActionButton(.verbatim("Large"), size: .large, style: .secondary) {}
-                    ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .secondary) {}
-                }
-                .frame(maxWidth: 320)
+            .frame(maxWidth: 320)
+            
+            Text(verbatim: "Tonal").font(.caption).foregroundStyle(.gray)
+            VStack(spacing: 8) {
+                ActionButton(.verbatim("Continue"), style: .tonal) {}
+                ActionButton(.verbatim("Complete your data"), isEnabled: false, style: .tonal) {}
             }
-
-            Group {
-                Text(verbatim: "Destructive").font(.caption).foregroundStyle(.gray)
-                VStack(spacing: 8) {
-                    ActionButton(.verbatim("Compact"), size: .compact, style: .destructive) {}
-                    ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .destructive) {}
-                    ActionButton(.verbatim("Regular"), size: .regular, style: .destructive) {}
-                    ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .destructive) {}
-                    ActionButton(.verbatim("Large"), size: .large, style: .destructive) {}
-                    ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .destructive) {}
-                }
-                .frame(maxWidth: 320)
+            .frame(maxWidth: 320)
+        }
+        
+        Group {
+            Text(verbatim: "Secondary").font(.caption).foregroundStyle(.gray)
+            VStack(spacing: 8) {
+                ActionButton(.verbatim("Compact"), size: .compact, style: .secondary) {}
+                ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .secondary) {}
+                ActionButton(.verbatim("Regular"), size: .regular, style: .secondary) {}
+                ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .secondary) {}
+                ActionButton(.verbatim("Large"), size: .large, style: .secondary) {}
+                ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .secondary) {}
             }
-
-            Group {
-                Text(verbatim: "Ghost (intrinsic width)").font(.caption).foregroundStyle(.gray)
-                VStack(spacing: 12) {
-                    ActionButton(.verbatim("Compact"), size: .compact, style: .ghost) {}
-                    ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .ghost) {}
-                    ActionButton(.verbatim("Regular"), size: .regular, style: .ghost) {}
-                    ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .ghost) {}
-                    ActionButton(.verbatim("Large"), size: .large, style: .ghost) {}
-                    ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .ghost) {}
-                }
+            .frame(maxWidth: 320)
+        }
+        
+        Group {
+            Text(verbatim: "Destructive").font(.caption).foregroundStyle(.gray)
+            VStack(spacing: 8) {
+                ActionButton(.verbatim("Compact"), size: .compact, style: .destructive) {}
+                ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .destructive) {}
+                ActionButton(.verbatim("Regular"), size: .regular, style: .destructive) {}
+                ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .destructive) {}
+                ActionButton(.verbatim("Large"), size: .large, style: .destructive) {}
+                ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .destructive) {}
             }
-
-            Group {
-                Text(verbatim: "Mixed row").font(.caption).foregroundStyle(.gray)
-                HStack(spacing: 12) {
-                    ActionButton(.verbatim("Primary"), size: .regular, style: .primary) {}
-                    ActionButton(.verbatim("Secondary"), size: .regular, style: .secondary) {}
-                }
-                .frame(maxWidth: 320)
-            }
-
-            Group {
-                Text(verbatim: "Custom / icon-only examples").font(.caption).foregroundStyle(.gray)
-                VStack(spacing: 12) {
-                    ActionButton(systemName: "heart.fill", accessibilityLabel: .verbatim("Favorite"), style: .ghost) {}
-                    ActionButton(systemName: "trash", accessibilityLabel: .verbatim("Delete"), style: .destructive) {}
-                    ActionButton(systemName: "star", accessibilityLabel: .verbatim("Star"), style: .iconCircle) {}
-                    ActionButton(isEnabled: true, style: .primary, action: { }) {
-                        HStack {
-                            Image(systemName: "plus")
-                            Text(verbatim: "Add item")
-                        }
-                    }
-                }
-                .frame(maxWidth: 320)
+            .frame(maxWidth: 320)
+        }
+        
+        Group {
+            Text(verbatim: "Ghost (intrinsic width)").font(.caption).foregroundStyle(.gray)
+            VStack(spacing: 12) {
+                ActionButton(.verbatim("Compact"), size: .compact, style: .ghost) {}
+                ActionButton(.verbatim("Compact (disabled)"), isEnabled: false, size: .compact, style: .ghost) {}
+                ActionButton(.verbatim("Regular"), size: .regular, style: .ghost) {}
+                ActionButton(.verbatim("Regular (disabled)"), isEnabled: false, size: .regular, style: .ghost) {}
+                ActionButton(.verbatim("Large"), size: .large, style: .ghost) {}
+                ActionButton(.verbatim("Large (disabled)"), isEnabled: false, size: .large, style: .ghost) {}
             }
         }
-        .frame(maxWidth: .infinity)
+        
+        Group {
+            Text(verbatim: "Mixed row").font(.caption).foregroundStyle(.gray)
+            HStack(spacing: 12) {
+                ActionButton(.verbatim("Primary"), size: .regular, style: .primary) {}
+                ActionButton(.verbatim("Secondary"), size: .regular, style: .secondary) {}
+            }
+            .frame(maxWidth: 320)
+        }
+        
+        Group {
+            Text(verbatim: "Custom / icon-only examples").font(.caption).foregroundStyle(.gray)
+            VStack(spacing: 12) {
+                ActionButton(systemName: "heart.fill", accessibilityLabel: .verbatim("Favorite"), style: .ghost) {}
+                ActionButton(systemName: "trash", accessibilityLabel: .verbatim("Delete"), style: .destructive) {}
+                ActionButton(systemName: "star", accessibilityLabel: .verbatim("Star"), style: .iconCircle) {}
+                ActionButton(isEnabled: true, style: .primary, action: { }) {
+                    HStack {
+                        Image(systemName: "plus")
+                        Text(verbatim: "Add item")
+                    }
+                }
+            }
+            .frame(maxWidth: 320)
+        }
     }
 }
 

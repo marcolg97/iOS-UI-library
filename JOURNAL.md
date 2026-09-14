@@ -1,5 +1,21 @@
 # Journal
 
+## 2026-09-14 — Scroll-driven title fix, QuantityStepper, Badge.dot, adaptive form layout
+
+Driven by a UI audit of a consuming app (Chi Porta Cosa) that found the scroll-driven nav title bug affecting ~7 screens, plus four small library additions the app needed.
+
+- **Fixed `scrollDrivenNavigationBarTitle` on non-scrolling screens**: the modifier compared scroll offset against `revealAfter` unconditionally, so screens whose content never scrolls that far (most of them short/one-page forms) shipped with a permanently invisible nav title. The modifier now measures content height vs. viewport height (iOS 18+ via `ScrollGeometry.contentSize`/`containerSize`; iOS 17 via a second preference key alongside the existing offset one) and shows the title at full opacity immediately when there's nothing to scroll. When there is something to scroll, opacity now ramps continuously with offset instead of snapping at the threshold — a smoother, more predictable fade. The opacity math is a pure `nonisolated static func titleOpacity(scrollOffset:contentHeight:viewportHeight:threshold:)`, unit-tested directly (7 tests: not-scrollable, at-top, past-threshold, intermediate ramp, negative-offset clamping, zero-threshold edge case).
+- **`QuantityStepper` atom**: compact `−`/`+` stepper for small integer quantities (portions, party size, cart quantity). Built on `ActionButton.iconCircle` so it inherits the 44pt tap target for free. Exposed to VoiceOver as one adjustable element (`accessibilityAdjustableAction`) rather than two separately-focusable buttons — mirrors how SwiftUI's own `Stepper` behaves. Stepping arithmetic is a pure `clampedValue(_:step:range:direction:)` for deterministic testing.
+- **`Badge.dot(accessibilityLabel:style:)`**: extended `Badge`/`BadgeStyle` (rather than adding a parallel type) with an optional `dotDiameter` token; when set, `Badge` renders a plain filled circle instead of its text pill, using the passed text purely as the VoiceOver label. Replaces call sites that were bypassing `Badge` entirely to draw a raw `Circle()` for a status dot.
+- **`FormItemLayout.adaptive`**: a third case alongside `.vertical`/`.horizontal` that resolves to `.vertical` once `dynamicTypeSize.isAccessibilitySize` is true and `.horizontal` otherwise — solves the "label/value row gets squeezed at accessibility XL" problem once in `FormItem` instead of every call site re-deriving it with `AnyLayout`.
+- **`CardStyle` docc**: documented (no API change) that `backgroundColor` and `material` are mutually exclusive in practice — `Card` draws `backgroundColor` on top of `material`, so an opaque color fully hides the material underneath.
+
+**Deviations from the source proposal:**
+- The proposal sketched `QuantityStepper.init(value:range:style:)` with no accessibility parameter; added a required `accessibilityLabel: LocalizedStringResource` instead, mirroring `ActionButton`'s icon-only initializer — a bare number has no meaning to VoiceOver without one.
+- The proposal put the dot preset only on `BadgeStyle` (`static func dot(_:) -> BadgeStyle`); also added `Badge.dot(accessibilityLabel:style:)` as the actual construction entry point, since `Badge`'s existing contract treats its `text` parameter as the accessibility label — a dot has no visible text to supply that role on its own.
+
+Rationale: all four changes are exactly the kind of generic, cross-app UI concern this library exists to centralize (any list+claim/booking/cart flow needs a quantity stepper; any status list needs a lightweight dot indicator; any form needs to survive accessibility Dynamic Type; any scroll screen can be short). Nothing here encodes app-specific domain concepts.
+
 ## 2026-02-23 — State View Components (ErrorStateView, EmptyStateView, LoadingStateView)
 
 - Created three new reusable state view molecules using iOS 17+ `ContentUnavailableView`:

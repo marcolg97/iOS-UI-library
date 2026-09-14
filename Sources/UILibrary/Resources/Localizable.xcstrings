@@ -29,12 +29,20 @@
       "comment" : "Display name for the Dark theme.",
       "extractionState" : "manual"
     },
+    "Decrease" : {
+      "comment" : "Accessibility label for the QuantityStepper's decrement button.",
+      "extractionState" : "manual"
+    },
     "Highlighted" : {
       "comment" : "Default accessibility value for a highlighted day in the weekday strip.",
       "extractionState" : "manual"
     },
     "In progress" : {
       "comment" : "Accessibility value for an indeterminate progress bar.",
+      "extractionState" : "manual"
+    },
+    "Increase" : {
+      "comment" : "Accessibility label for the QuantityStepper's increment button.",
       "extractionState" : "manual"
     },
     "Light" : {

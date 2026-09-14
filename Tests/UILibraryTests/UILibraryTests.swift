@@ -14,6 +14,8 @@ struct PublicAPISmokeTests {
         _ = AvatarImage(name: "Alice")
         _ = AvatarImage(name: "Bob", image: Image(systemName: "person"))
         _ = Badge(.verbatimForTest("New"))
+        _ = Badge.dot(accessibilityLabel: .verbatimForTest("Status"))
+        _ = QuantityStepper(value: .constant(1), accessibilityLabel: .verbatimForTest("Portions"))
         _ = Card(style: .neutral) { Text(verbatim: "content") }
         _ = CheckboxAtom(isOn: .constant(true))
         _ = RadioButtonAtom(isSelected: .constant(false))
@@ -47,6 +49,7 @@ struct PublicAPISmokeTests {
         _ = FormContainer { Text(verbatim: "form") }
         _ = FormSection(header: .verbatimForTest("Header")) { Text(verbatim: "section") }
         _ = FormItem { Text(verbatim: "item") }
+        _ = FormItem(layout: .adaptive) { Text(verbatim: "item") }
 
         _ = Text(verbatim: "x")
             .backgroundStatusBar(isVisible: true, style: .warning)
@@ -220,6 +223,210 @@ struct WeekdayStatusStripTests {
         )
         #expect(strip.days[0].caption != nil)
         #expect(strip.days[1].caption == nil)
+    }
+}
+
+// MARK: - Badge.dot
+
+@Suite("Badge.dot")
+struct BadgeDotTests {
+
+    @Test func dotStyle_defaultDiameterAndCornerRadius() {
+        let style = BadgeStyle.dot()
+        #expect(style.dotDiameter == 10)
+        #expect(style.cornerRadius == 5)
+        #expect(style.backgroundColor == .primary)
+    }
+
+    @Test func dotStyle_customColorAndDiameter() {
+        let style = BadgeStyle.dot(.orange, diameter: 16)
+        #expect(style.dotDiameter == 16)
+        #expect(style.cornerRadius == 8)
+        #expect(style.backgroundColor == .orange)
+    }
+
+    @Test func textStyles_haveNoDotDiameter() {
+        #expect(BadgeStyle.default.dotDiameter == nil)
+        #expect(BadgeStyle.accent.dotDiameter == nil)
+    }
+
+    @MainActor
+    @Test func badge_dot_usesAccessibilityLabelAsText() {
+        let badge = Badge.dot(accessibilityLabel: .verbatimForTest("Table incomplete"))
+        #expect(badge.text == .verbatimForTest("Table incomplete"))
+        #expect(badge.style.dotDiameter != nil)
+    }
+}
+
+// MARK: - FormItemLayout.adaptive
+
+@Suite("FormItemLayout.adaptive")
+struct FormItemLayoutAdaptiveTests {
+
+    @Test func standardSizes_resolveToHorizontal() {
+        for size: DynamicTypeSize in [.xSmall, .medium, .large, .xxxLarge] {
+            #expect(FormItemLayout.adaptive.resolved(for: size) == .horizontal)
+        }
+    }
+
+    @Test func accessibilitySizes_resolveToVertical() {
+        for size: DynamicTypeSize in [.accessibility1, .accessibility2, .accessibility3, .accessibility4, .accessibility5] {
+            #expect(FormItemLayout.adaptive.resolved(for: size) == .vertical)
+        }
+    }
+
+    @Test func explicitLayouts_areUnaffectedByDynamicTypeSize() {
+        #expect(FormItemLayout.vertical.resolved(for: .accessibility5) == .vertical)
+        #expect(FormItemLayout.horizontal.resolved(for: .accessibility5) == .horizontal)
+        #expect(FormItemLayout.vertical.resolved(for: .medium) == .vertical)
+        #expect(FormItemLayout.horizontal.resolved(for: .medium) == .horizontal)
+    }
+}
+
+// MARK: - QuantityStepper
+
+@Suite("QuantityStepper")
+struct QuantityStepperTests {
+
+    @Test func increment_advancesByStep() {
+        #expect(QuantityStepper.clampedValue(3, step: 1, range: 0...10, direction: .increment) == 4)
+        #expect(QuantityStepper.clampedValue(3, step: 2, range: 0...10, direction: .increment) == 5)
+    }
+
+    @Test func decrement_retreatsByStep() {
+        #expect(QuantityStepper.clampedValue(3, step: 1, range: 0...10, direction: .decrement) == 2)
+        #expect(QuantityStepper.clampedValue(3, step: 2, range: 0...10, direction: .decrement) == 1)
+    }
+
+    @Test func increment_clampsAtUpperBound() {
+        #expect(QuantityStepper.clampedValue(10, step: 1, range: 0...10, direction: .increment) == 10)
+        #expect(QuantityStepper.clampedValue(9, step: 5, range: 0...10, direction: .increment) == 10)
+    }
+
+    @Test func decrement_clampsAtLowerBound() {
+        #expect(QuantityStepper.clampedValue(0, step: 1, range: 0...10, direction: .decrement) == 0)
+        #expect(QuantityStepper.clampedValue(1, step: 5, range: 0...10, direction: .decrement) == 0)
+    }
+}
+
+// MARK: - CardStyle
+
+@Suite("CardStyle")
+struct CardStyleTests {
+
+    @Test func materialAndBackgroundColor_canBothBeSet_backgroundColorWinsVisually() {
+        // Documents the precedence clarified in CardStyle's docc: both tokens can be set, but
+        // Card draws backgroundColor on top of material (see Card.body).
+        let style = CardStyle(backgroundColor: .red, material: .ultraThin)
+        #expect(style.backgroundColor == .red)
+        #expect(style.material == .ultraThin)
+    }
+}
+
+// MARK: - ScrollDrivenNavigationBarTitleModifier
+
+@Suite("ScrollDrivenNavigationBarTitleModifier — titleOpacity")
+struct ScrollDrivenNavigationBarTitleOpacityTests {
+
+    @Test func notScrollable_isAlwaysFullyOpaque() {
+        // Content shorter than (or equal to) the viewport can never be scrolled past
+        // `revealAfter`, so the title must show immediately — this is the bug fix.
+        #expect(
+            ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+                scrollOffset: 0,
+                contentHeight: 400,
+                viewportHeight: 800,
+                threshold: 50
+            ) == 1
+        )
+        #expect(
+            ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+                scrollOffset: 0,
+                contentHeight: 800,
+                viewportHeight: 800,
+                threshold: 50
+            ) == 1
+        )
+    }
+
+    @Test func scrollable_atTop_isFullyHidden() {
+        #expect(
+            ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+                scrollOffset: 0,
+                contentHeight: 1200,
+                viewportHeight: 800,
+                threshold: 50
+            ) == 0
+        )
+    }
+
+    @Test func scrollable_pastThreshold_isFullyOpaque() {
+        #expect(
+            ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+                scrollOffset: 50,
+                contentHeight: 1200,
+                viewportHeight: 800,
+                threshold: 50
+            ) == 1
+        )
+        #expect(
+            ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+                scrollOffset: 500,
+                contentHeight: 1200,
+                viewportHeight: 800,
+                threshold: 50
+            ) == 1
+        )
+    }
+
+    @Test func scrollable_betweenTopAndThreshold_ramps() {
+        let quarter = ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+            scrollOffset: 12.5,
+            contentHeight: 1200,
+            viewportHeight: 800,
+            threshold: 50
+        )
+        let half = ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+            scrollOffset: 25,
+            contentHeight: 1200,
+            viewportHeight: 800,
+            threshold: 50
+        )
+        #expect(quarter == 0.25)
+        #expect(half == 0.5)
+        #expect(quarter < half)
+        #expect(half < 1)
+    }
+
+    @Test func negativeScrollOffset_isClampedToZero() {
+        // Overscroll/bounce above the top shouldn't push opacity below 0.
+        #expect(
+            ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+                scrollOffset: -30,
+                contentHeight: 1200,
+                viewportHeight: 800,
+                threshold: 50
+            ) == 0
+        )
+    }
+
+    @Test func zeroOrNegativeThreshold_revealsAssoonAsScrolled() {
+        #expect(
+            ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+                scrollOffset: 0,
+                contentHeight: 1200,
+                viewportHeight: 800,
+                threshold: 0
+            ) == 0
+        )
+        #expect(
+            ScrollDrivenNavigationBarTitleModifier.titleOpacity(
+                scrollOffset: 1,
+                contentHeight: 1200,
+                viewportHeight: 800,
+                threshold: 0
+            ) == 1
+        )
     }
 }
 

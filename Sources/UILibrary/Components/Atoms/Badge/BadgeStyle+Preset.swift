@@ -50,6 +50,24 @@ public extension BadgeStyle {
         )
     }
     
+    /// Minimal circular dot variant — no visible text, just a filled circle. Use for lightweight
+    /// status indicators (e.g. "has updates", "table incomplete") where a full text/count badge
+    /// would be visually heavy. Pair with `Badge.dot(accessibilityLabel:style:)`, which supplies
+    /// the VoiceOver label that a dot has no visible text to provide on its own.
+    /// - Parameters:
+    ///   - color: Fill color of the dot (default: `.primary`).
+    ///   - diameter: Diameter of the dot in points (default: 10).
+    /// - Returns: A `BadgeStyle` that renders `Badge` as a plain filled circle.
+    static func dot(_ color: Color = .primary, diameter: CGFloat = 10) -> BadgeStyle {
+        BadgeStyle(
+            backgroundColor: color,
+            verticalPadding: 0,
+            horizontalPadding: 0,
+            cornerRadius: diameter / 2,
+            dotDiameter: diameter
+        )
+    }
+
     /// 3D variant with elevated appearance and shadow.
     /// - Parameter color: The base color for the badge (default: .blue).
     /// - Returns: A `BadgeStyle` with 3D shadow effect.

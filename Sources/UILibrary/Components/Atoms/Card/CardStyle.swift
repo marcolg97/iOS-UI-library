@@ -4,6 +4,18 @@ import SwiftUI
 ///
 /// - Responsibility: Visual tokens for `Card` (background, corner radius, padding, shadow).
 /// - Note: Immutable and brand-agnostic; apps should provide concrete colors via style factories.
+///
+/// ## `backgroundColor` and `material` are mutually exclusive in practice
+/// Both tokens *can* be set at once — `Card` draws `material` first and `backgroundColor` on top of
+/// it (see `Card.body`) — but doing so rarely produces a useful result: unless `backgroundColor` is
+/// partially transparent, its opaque fill completely obscures the material underneath, so the
+/// material is wasted. Pick one per style, matching the "flat vs. glass" look you want:
+/// - **Flat surface**: set `backgroundColor`, leave `material` `nil` (see `.surface`).
+/// - **Glass/translucent surface**: set `material`, leave `backgroundColor` `nil` (see `.neutral`).
+///
+/// If you do need both (e.g. a translucent color tint over a material), give `backgroundColor` an
+/// explicit opacity — a fully opaque `backgroundColor` alongside a non-nil `material` is very
+/// likely a mistake.
 public struct CardStyle: Equatable, Sendable {
     /// Material backing for the card surface.
     ///
@@ -26,7 +38,11 @@ public struct CardStyle: Equatable, Sendable {
         }
     }
 
+    /// Optional flat surface color. See the mutual-exclusivity note on `CardStyle` above — pair
+    /// this with `material == nil` unless you deliberately want a translucent color over glass.
     public let backgroundColor: Color?
+    /// Optional glass/translucent surface. See the mutual-exclusivity note on `CardStyle` above —
+    /// pair this with `backgroundColor == nil` for a pure glass surface.
     public let material: Material?
     public let expandsHorizontally: Bool
     public let cornerRadius: CGFloat

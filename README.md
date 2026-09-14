@@ -100,8 +100,8 @@ ComponentName/
 
 - `ActionButton` — centralized, style-driven button with size variants, icon-only (requires an accessibility label) and custom-content initializers. Presets: `.primary`, `.secondary`, `.destructive`, `.ghost`, `.tonal`, `.iconCircle`.
 - `AvatarImage` — circular avatar showing either a supplied image or the first letter of a name. Presets: `.default`, `.small`, `.large`, `.bordered(_:)`.
-- `Badge` — small status label for status/count/tag information (`LocalizedStringResource`). Presets: `.default`, `.neutral`, `.accent`, `.success`, `.warning`, `.error`, `.outlined(_:)`, `.threeDimensional(_:)`.
-- `Card` — style-driven container with optional color and/or material background, corner radius, padding, shadow, and `expandsHorizontally` control. Presets: `.neutral`, `.surface`.
+- `Badge` — small status label for status/count/tag information (`LocalizedStringResource`), plus a minimal circular dot variant via `Badge.dot(accessibilityLabel:style:)`. Presets: `.default`, `.neutral`, `.accent`, `.success`, `.warning`, `.error`, `.outlined(_:)`, `.threeDimensional(_:)`, `.dot(_:diameter:)`.
+- `Card` — style-driven container with optional color and/or material background, corner radius, padding, shadow, and `expandsHorizontally` control (`backgroundColor` and `material` are mutually exclusive in practice — see `CardStyle` docc). Presets: `.neutral`, `.surface`.
 - `CheckboxAtom` — pure binary toggle (44pt tap target, Dynamic Type scaling). Presets: `.default`, `.compact`, `.modern`.
 - `Chip` — tag/filter chip with optional icon, selection state, tap action, and removal affordance. Presets: `.default`, `.outlined`.
 - `CircularProgressBar` — determinate ring indicator with optional percentage label; geometry lives in `CircularProgressBarStyle`. Preset: `.default`.
@@ -111,6 +111,7 @@ ComponentName/
 - `FormLabel` — text label with optional icon for form fields. Preset: `.default`, `.modern`.
 - `LabelImage` — label with a leading or trailing icon. Presets: `.neutral`, `.compact`.
 - `ProgressBar` — determinate, indeterminate, and segmented (step) progress presentations. Presets: `.neutral`, `.accent`, `.threeD`, `.bold`, `.segmented`.
+- `QuantityStepper` — compact `−`/`+` stepper for small integer quantities (value binding, range, step, disabled state), exposed to VoiceOver as a single adjustable element. Presets: `.default`, `.compact`.
 - `RadioButtonAtom` — pure single-choice selector with radio (select-only) semantics. Presets: `.default`, `.compact`, `.modern`.
 - `SegmentedControlAtom` — segmented picker with a sliding selection indicator over any `Hashable` options. Presets: `.default`, `.accent`.
 - `SkeletonView` / `.skeleton(isLoading:)` — shimmering loading placeholder (static under Reduce Motion). Presets: `.default`, `.rounded`.
@@ -124,7 +125,7 @@ ComponentName/
 - `CarouselView` — horizontally scrolling list with snap/paging and optional paging dots, driven by `CarouselViewStyle`.
 - `EmptyStateView` — empty state built on `ContentUnavailableView` with optional action. Presets: `.empty()`, `.search()`, `.inbox()`, `.favorites()`, `.list()`, `.custom(...)`.
 - `ErrorStateView` — error state with retry action. Presets: `.error()`, `.networkError()`, `.serverError()`, `.custom(...)`.
-- `FormItem` — layout container for a single form field (label, input, hint/error); vertical and horizontal layouts.
+- `FormItem` — layout container for a single form field (label, input, hint/error); vertical, horizontal, and `.adaptive` (horizontal that switches to vertical at accessibility Dynamic Type sizes) layouts.
 - `FormSection` — groups related form items with optional localized header and footer.
 - `ListItemCard` — generic row card with leading/content/trailing slots (leading/trailing optional) and press feedback. Presets: `.default`, `.prominent`.
 - `LoadingStateView` — loading state with spinner or linear indicator and optional message; `expands` token for inline use. Presets: `.default()`, `.minimal()`, `.large()`, `.linear()`, `.custom(...)`.
@@ -158,7 +159,7 @@ ComponentName/
 ## Modifiers
 
 - `.bannerAndPopup(hasToShow:backgroundStatusBarStyle:popupBottomPadding:popupContent:)` — top status bar + dismissable bottom toast for app-wide states.
-- `.scrollDrivenNavigationBarTitle(_:revealAfter:)` — reveals the navigation title after a scroll threshold (iOS 18+ automatic; on iOS 17 also attach `.scrollDrivenNavigationBarTitleTracking()` to the scroll content).
+- `.scrollDrivenNavigationBarTitle(_:revealAfter:)` — reveals the navigation title after a scroll threshold (iOS 18+ automatic; on iOS 17 also attach `.scrollDrivenNavigationBarTitleTracking()` to the scroll content). Content shorter than the viewport (nothing to scroll) shows the title at full opacity immediately instead of staying invisible.
 - `.toast(isPresented:autoDismissAfter:bottomPadding:content:)` — transient toast presentation.
 - `.skeleton(isLoading:style:)` — skeleton placeholder over any view.
 - `.readHeight(_:)` — reports a view's height changes.

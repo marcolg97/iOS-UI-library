@@ -11,6 +11,8 @@ public struct FormItem<Content: View>: View {
     private let style: FormItemStyle
     @ViewBuilder private let content: () -> Content
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     // MARK: - Init
     public init(
         layout: FormItemLayout = .vertical,
@@ -22,9 +24,14 @@ public struct FormItem<Content: View>: View {
         self.content = content
     }
 
+    /// The concrete layout to render, resolving `.adaptive` against the current Dynamic Type size.
+    private var resolvedLayout: FormItemLayout.Resolved {
+        layout.resolved(for: dynamicTypeSize)
+    }
+
     // MARK: - Body
     public var body: some View {
-        switch layout {
+        switch resolvedLayout {
         case .vertical:
             VStack(alignment: .leading, spacing: style.spacing) {
                 content()
@@ -37,10 +44,37 @@ public struct FormItem<Content: View>: View {
     }
 }
 
-/// Layout options for FormItem
+/// Layout options for FormItem.
 public enum FormItemLayout: Equatable, Sendable {
+    /// Always stacks content vertically.
     case vertical
+    /// Always lays out content horizontally in a single row.
     case horizontal
+    /// Behaves like `.horizontal` at standard Dynamic Type sizes, and switches to `.vertical`
+    /// once `dynamicTypeSize.isAccessibilitySize` is true — so a label/value row (e.g. a
+    /// `FormLabel` + trailing control) reflows into a stack instead of truncating or being
+    /// squeezed at accessibility text sizes.
+    case adaptive
+
+    /// The two concrete layouts `.adaptive` resolves to.
+    enum Resolved {
+        case vertical
+        case horizontal
+    }
+
+    /// Resolves this layout against a Dynamic Type size — `.adaptive` becomes `.vertical` at
+    /// accessibility sizes and `.horizontal` otherwise; `.vertical`/`.horizontal` pass through
+    /// unchanged regardless of Dynamic Type size.
+    func resolved(for dynamicTypeSize: DynamicTypeSize) -> Resolved {
+        switch self {
+        case .vertical:
+            return .vertical
+        case .horizontal:
+            return .horizontal
+        case .adaptive:
+            return dynamicTypeSize.isAccessibilitySize ? .vertical : .horizontal
+        }
+    }
 }
 
 #if DEBUG
@@ -78,5 +112,16 @@ public enum FormItemLayout: Equatable, Sendable {
         }
     }
     .padding()
+}
+
+#Preview("FormItem — Adaptive layout") {
+    PreviewVariants {
+        FormItem(layout: .adaptive, style: .default) {
+            FormLabel(.verbatim("Guests"), style: .default)
+            Spacer()
+            Text(verbatim: "8 confirmed")
+                .foregroundStyle(.secondary)
+        }
+    }
 }
 #endif

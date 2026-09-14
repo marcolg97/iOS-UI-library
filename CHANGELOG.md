@@ -1,5 +1,21 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `QuantityStepper` atom — compact `−`/`+` stepper for small integer quantities (`value: Binding<Int>`, `accessibilityLabel:`, `range:`, `step:`, `isDisabled:`), built on `ActionButton.iconCircle`. Exposed to VoiceOver as a single adjustable element (label + current value, swipe up/down), the same pattern as SwiftUI's own `Stepper`. `QuantityStepperStyle` with `.default`/`.compact` presets.
+- `BadgeStyle.dot(_:diameter:)` preset and `Badge.dot(accessibilityLabel:style:)` — a minimal circular dot variant of `Badge` (no visible text) for lightweight status indicators, replacing hand-rolled `Circle()` views. `BadgeStyle` gained a `dotDiameter: CGFloat?` token (default `nil`, fully backward compatible).
+- `FormItemLayout.adaptive` — behaves like `.horizontal` at standard Dynamic Type sizes and switches to `.vertical` once `dynamicTypeSize.isAccessibilitySize` is true, so a label/value row reflows instead of truncating or being squeezed at accessibility text sizes.
+
+### Fixed
+
+- **`scrollDrivenNavigationBarTitle` title stays invisible on non-scrolling screens.** The modifier's opacity was purely threshold-driven (`scrollOffset > revealAfter`), so content shorter than the scroll view's viewport could never cross `revealAfter` and the title stayed at `opacity(0)` forever. The modifier now also measures content/viewport height (via `ScrollGeometry` on iOS 18+, via an additional preference key on iOS 17) and shows the title at full opacity immediately when the content isn't scrollable; when it is scrollable, opacity now ramps continuously with scroll offset instead of snapping between 0 and 1 at the threshold. The opacity calculation is extracted into a pure, unit-tested function (`titleOpacity(scrollOffset:contentHeight:viewportHeight:threshold:)`). Public API is unchanged and source-compatible.
+
+### Documentation
+
+- `CardStyle` docc now explicitly documents that `backgroundColor` and `material` are mutually exclusive in practice: both can be set, but `Card` draws `backgroundColor` opaquely on top of `material`, so an opaque `backgroundColor` alongside a non-nil `material` wastes the material. No API change.
+
 ## [0.2.0] - 2026-08-07
 
 Full library review and hardening pass: the library is now fully app-agnostic, localized, dependency-free, and accessible.

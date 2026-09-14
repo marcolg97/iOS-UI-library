@@ -43,6 +43,11 @@ public struct BadgeStyle: Equatable, Sendable {
     /// Shadow offset for 3D effects.
     public let shadowOffset: CGSize
 
+    /// When non-nil, `Badge` renders as a minimal filled circle of this diameter instead of its
+    /// usual text pill — see `BadgeStyle.dot(_:diameter:)` and `Badge.dot(accessibilityLabel:style:)`.
+    /// `nil` (the default) preserves the standard text-badge rendering.
+    public let dotDiameter: CGFloat?
+
     /// Creates a new `BadgeStyle`.
     ///
     /// - Parameters:
@@ -57,6 +62,8 @@ public struct BadgeStyle: Equatable, Sendable {
     ///   - shadowColor: Optional shadow color for 3D effects (nil = no shadow).
     ///   - shadowRadius: Shadow blur radius (default: 0).
     ///   - shadowOffset: Shadow offset (default: .zero).
+    ///   - dotDiameter: When non-nil, renders `Badge` as a filled circle of this diameter instead
+    ///     of a text pill (default: nil).
     public init(
         backgroundColor: Color = Color.primary.opacity(0.12),
         foregroundColor: Color = Color.primary,
@@ -68,7 +75,8 @@ public struct BadgeStyle: Equatable, Sendable {
         borderWidth: CGFloat = 0,
         shadowColor: Color? = nil,
         shadowRadius: CGFloat = 0,
-        shadowOffset: CGSize = .zero
+        shadowOffset: CGSize = .zero,
+        dotDiameter: CGFloat? = nil
     ) {
         self.backgroundColor = backgroundColor
         self.foregroundColor = foregroundColor
@@ -81,6 +89,7 @@ public struct BadgeStyle: Equatable, Sendable {
         self.shadowColor = shadowColor
         self.shadowRadius = shadowRadius
         self.shadowOffset = shadowOffset
+        self.dotDiameter = dotDiameter
     }
 }
 

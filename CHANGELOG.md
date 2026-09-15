@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.3] - 2026-09-15
+
+### Added
+
+- **`SegmentedControlAtom` per-segment accessibility identifiers.** New optional `accessibilityIdentifier: ((Option) -> String?)?` parameter (default `nil`) lets callers attach a UI-testing identifier to each individual segment button (e.g. `accessibilityIdentifier: { "editor.range.\($0)" }`), the same way a native `Picker(.segmented)`'s buttons or a hand-rolled row of options can be addressed by XCUITest. The identifier is applied to the segment's own tappable element, never to the shared container, so segments stay independently addressable and the container never overrides its children. Fully source compatible — the parameter is additive with a default, and every existing call site keeps compiling unchanged.
+
+### Documentation
+
+- Confirmed `RadioButtonAtom`, `CheckboxAtom`, and `Chip` need no API change for the same UI-testing need: unlike `SegmentedControlAtom`, these are already instantiated per item by the caller (e.g. inside the caller's own `ForEach`), so `.accessibilityIdentifier(_:)` can already be applied directly to each instance today. Also confirmed `SegmentedControlAtom` already exposes each segment to VoiceOver as a selectable element with the correct `.isSelected` trait — no change was needed there.
+
 ## [0.2.2] - 2026-09-14
 
 ### Added

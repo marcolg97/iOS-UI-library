@@ -1,5 +1,38 @@
 # Journal
 
+## 2026-09-15 — Per-item accessibility identifiers on `SegmentedControlAtom`
+
+Driven by a consuming app (PartyPlanner) rebuild that hit the same blocker in two places: the
+library's selection controls gave callers no way to attach a per-item accessibility identifier, so
+XCUITest couldn't address individual segments/options and the app had to fall back to native
+`Picker(.segmented)` plus a hand-rolled chip row instead of library components.
+
+- **Surveyed the gap.** `SegmentedControlAtom` takes `options: [Option]` + a `title: (Option) ->
+  LocalizedStringResource` closure and renders each segment internally via `ForEach` — the caller
+  never gets a handle to the individual segment view, so it had no way to attach an identifier per
+  option. `RadioButtonAtom`, `CheckboxAtom`, and `Chip` don't have this problem: apps instantiate
+  one of these per item themselves (typically inside their own `ForEach`), so `.accessibilityIdentifier(_:)`
+  already works today by applying it directly to each instance — no library change needed there.
+- **`SegmentedControlAtom(accessibilityIdentifier:)`**: new optional `(Option) -> String?` closure,
+  mirroring the existing `title` closure's shape and the placement convention used elsewhere in the
+  library (`QuantityStepper.accessibilityLabel` sits right after the parameter it describes).
+  Defaults to `nil` — every existing call site keeps compiling unchanged. The identifier is applied
+  to the segment's own `Button` (the leaf, via the existing `.if(_:transform:)` modifier), never to
+  the surrounding `HStack` container, since an identifier on a container overrides its children and
+  makes them unaddressable to XCUITest.
+- **Selected state was already correct**: each segment already carried `.accessibilityAddTraits(isSelected
+  ? [.isButton, .isSelected] : [.isButton])`, so VoiceOver/XCUITest already see the right selected
+  state. Nothing changed there.
+- Added a preview variant showing a segmented control with per-segment identifiers
+  (`"editor.range.week"` etc.) and a construction smoke test exercising the new parameter, matching
+  how other additive, non-computational changes in this library are tested (no new pure function to
+  extract here — the change is a straight closure pass-through, unlike e.g. `titleOpacity` or
+  `clampedValue`).
+
+Rationale: this is exactly the kind of cross-app UI-testing concern the library exists to
+centralize — any screen with a segmented picker needs its segments addressable by UI tests, and the
+fix generalizes past the one app that surfaced it.
+
 ## 2026-09-14 — Scroll-driven title fix, QuantityStepper, Badge.dot, adaptive form layout
 
 Driven by a UI audit of a consuming app (Chi Porta Cosa) that found the scroll-driven nav title bug affecting ~7 screens, plus four small library additions the app needed.

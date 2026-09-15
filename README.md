@@ -113,7 +113,7 @@ ComponentName/
 - `ProgressBar` — determinate, indeterminate, and segmented (step) progress presentations. Presets: `.neutral`, `.accent`, `.threeD`, `.bold`, `.segmented`.
 - `QuantityStepper` — compact `−`/`+` stepper for small integer quantities (value binding, range, step, disabled state), exposed to VoiceOver as a single adjustable element. Presets: `.default`, `.compact`.
 - `RadioButtonAtom` — pure single-choice selector with radio (select-only) semantics. Presets: `.default`, `.compact`, `.modern`.
-- `SegmentedControlAtom` — segmented picker with a sliding selection indicator over any `Hashable` options. Presets: `.default`, `.accent`.
+- `SegmentedControlAtom` — segmented picker with a sliding selection indicator over any `Hashable` options; optional per-option `accessibilityIdentifier` closure for UI testing (applied to each segment's own button, never to a container). Presets: `.default`, `.accent`.
 - `SkeletonView` / `.skeleton(isLoading:)` — shimmering loading placeholder (static under Reduce Motion). Presets: `.default`, `.rounded`.
 - `SwitchAtom` — pure on/off toggle. Presets: `.default`, `.compact`, `.modern`.
 - `TextFieldAtom` — pure single-line input with error/focused/disabled states; compose with `FormLabel`/`FormHint`/`FormError`. Presets: `.default`, `.compact`, `.modern`.

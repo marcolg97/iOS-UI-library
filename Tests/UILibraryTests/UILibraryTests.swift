@@ -31,6 +31,10 @@ struct PublicAPISmokeTests {
         _ = LabelImage(.verbatimForTest("Label"), systemImage: "star")
         _ = Chip(.verbatimForTest("Tag"), icon: "tag", isSelected: true, onTap: {}, onRemove: {})
         _ = SegmentedControlAtom(selection: .constant(0), options: [0, 1, 2], title: { _ in .verbatimForTest("Segment") })
+        _ = SegmentedControlAtom(
+            selection: .constant(0), options: [0, 1, 2], title: { _ in .verbatimForTest("Segment") },
+            accessibilityIdentifier: { "editor.range.\($0)" }
+        )
         _ = SkeletonView()
         _ = DividerAtom()
         _ = DividerAtom(axis: .vertical, style: .inset)

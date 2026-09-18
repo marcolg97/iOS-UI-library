@@ -5,9 +5,42 @@
 //  Preview utilities for testing components in different contexts.
 //
 
+import CustomDump
 import SwiftUI
 
 #if DEBUG
+
+// MARK: - Preview Action Logging
+
+/// Logs a `#Preview` action under the member name you spell: `onEditNameTapped:
+/// previewLog.onEditNameTapped`. Calling the closure prints that name and `customDump`s any
+/// arguments it receives, so previews don't need hand-written `{ print(...) }` closures.
+///
+/// `@dynamicMemberLookup` hands the member name to the subscript as a compile-time string,
+/// which is what makes this work: Swift keeps no runtime record of the argument label a value
+/// is passed to, so the name has to be spelled once at the call site — this is the shortest
+/// way to do it. The flip side is that it isn't compiler-checked: a typo or a rename of the
+/// real parameter leaves the log quietly out of date.
+///
+/// One generic subscript covers every arity and mixed argument types (`() -> Void`,
+/// `(Item) -> Void`, `(String, Int) -> Void`, …) via parameter packs.
+@dynamicMemberLookup
+public struct PreviewLogger: Sendable {
+    public subscript<each Parameter>(dynamicMember name: String) -> (repeat each Parameter) -> Void {
+        { (parameter: repeat each Parameter) in
+            print("👁️ [Preview] \(name)")
+            repeat _ = customDump(each parameter)
+        }
+    }
+}
+
+/// See `PreviewLogger`.
+/// ```swift
+/// #Preview {
+///     AccountCard(account: .success(.preview), onEditNameTapped: previewLog.onEditNameTapped)
+/// }
+/// ```
+public let previewLog = PreviewLogger()
 
 // MARK: - Preview Container
 

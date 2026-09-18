@@ -30,7 +30,7 @@ public struct Card<BodyContent: View>: View {
     public var body: some View {
         bodyContent()
             .padding(style.padding)
-            .frame(maxWidth: style.expandsHorizontally ? .infinity : nil)
+            .frame(maxWidth: style.expandsHorizontally ? .infinity : nil, alignment: .leading)
             .background {
                 ZStack {
                     if let material = style.material {

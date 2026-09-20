@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.0] - 2026-09-20
+
+### Changed
+
+- **One implementation of the sheet-dismiss "X".** `DismissToolbarItem` and `SheetCloseButton` implemented the same dismiss affordance twice, differently: `SheetCloseButton` uses Liquid Glass (`.buttonStyle(.glass)`) on iOS 26 and a tinted circular fallback below it, while `DismissToolbarItem` drew a bare `Image(systemName: "xmark")` with no background, sizing, or styling at all. `DismissToolbarItem` now renders `SheetCloseButton` inside its `ToolbarItem(placement: .cancellationAction)`, so there is exactly one "X" in the library. It also gained `style: SheetCloseButtonStyle = SheetCloseButtonStyle()` and `accessibilityIdentifier: String? = nil` parameters (kept in `SheetCloseButton`'s parameter order: `style`, `accessibilityIdentifier`, then the closure), since `DismissToolbarItem` previously offered no way to set an identifier at all, which blocked any consumer whose UI tests match on identifiers from using it. **This is source compatible** — both parameters are additive with defaults, so `DismissToolbarItem { dismiss() }` keeps compiling unchanged — **but it is not visually compatible**: every existing call site now renders the styled Liquid Glass/circular-fallback button instead of the old bare glyph. Any snapshot test that captures a screen using `DismissToolbarItem` will need re-recording.
+
+### Fixed
+
+- **`SheetCloseButton`'s accessibility identifier could land on a container instead of the button.** The identifier and accessibility label were applied to the `Group` that picks between the iOS-26 Liquid Glass style and the older fallback, rather than to the `Button` itself. They now sit directly on the `Button`, inside the `button` computed property, before the per-OS-version style modifier is layered on — so the identifier is always attached to the actual tappable, VoiceOver-focusable element, never to the wrapping container. This matters because the consuming app's UI-testing convention is that an accessibility identifier must never sit on a container that would swallow its children's identifiers.
+
+### Localization
+
+- **Added Italian localizations for the entire string catalog.** `Localizable.xcstrings` shipped with 34 keys and zero `localizations` entries — every string had a `comment` and `extractionState` but no translated value at all, so the library rendered English text (via its raw key) inside any app, English or not, and gave an Italian-shipping consumer no `it` string to fall back to. Every key now carries both an explicit `en` entry (the key text itself, `state: "translated"`) and an `it` translation, so the library's own accessibility labels/values (`Checkbox`, `Loading`, `Retry`, `Step %lld of %lld`, etc.) read correctly in an Italian UI instead of leaking English. `comment` and `extractionState` are unchanged for every key.
+
 ## [0.2.3] - 2026-09-15
 
 ### Added

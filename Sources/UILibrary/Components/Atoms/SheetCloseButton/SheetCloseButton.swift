@@ -15,6 +15,9 @@ import SwiftUI
 /// ```swift
 /// .toolbar { ToolbarItem(placement: .topBarTrailing) { SheetCloseButton { dismiss() } } }
 /// ```
+///
+/// For the common `.cancellationAction` placement, use `DismissToolbarItem` instead, which wraps
+/// this view in the `ToolbarItem` for you.
 public struct SheetCloseButton: View {
     private let style: SheetCloseButtonStyle
     private let accessibilityIdentifier: String?
@@ -38,10 +41,10 @@ public struct SheetCloseButton: View {
                 button.background(style.fallbackBackgroundColor, in: Circle())
             }
         }
-        .accessibilityLabel(Text("Close", bundle: .module))
-        .optionalAccessibilityIdentifier(accessibilityIdentifier)
     }
 
+    // The label and identifier are applied directly on the `Button`, not on the `Group` above
+    // (which only picks a style): a container must never be the element carrying an identifier.
     private var button: some View {
         Button(action: action) {
             Image(systemName: style.systemName)
@@ -49,6 +52,8 @@ public struct SheetCloseButton: View {
                 .foregroundStyle(style.glyphColor)
                 .frame(width: style.diameter, height: style.diameter)
         }
+        .accessibilityLabel(Text("Close", bundle: .module))
+        .optionalAccessibilityIdentifier(accessibilityIdentifier)
     }
 }
 

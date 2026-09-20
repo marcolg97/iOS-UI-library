@@ -7,9 +7,6 @@ import SwiftUI
 
 /// The top-trailing "X" affordance for a sheet.
 ///
-/// On iOS 26 and later it uses Liquid Glass (`.buttonStyle(.glass)`); below that it falls back to
-/// a tinted circular background, so the component stays usable at this package's iOS 17 minimum
-/// rather than forcing every consumer to raise theirs.
 ///
 /// Place it in the sheet root's toolbar:
 /// ```swift
@@ -42,7 +39,7 @@ public struct SheetCloseButton: View {
     public var body: some View {
         Group {
             if #available(iOS 26, macOS 26, *) {
-                button.buttonStyle(.glass)
+                button
             } else {
                 button.background(style.fallbackBackgroundColor, in: Circle())
             }

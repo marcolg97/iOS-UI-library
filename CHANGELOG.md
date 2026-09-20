@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2] - 2026-09-20
+
+### Fixed
+
+- **The dismiss "X" drew two nested circles.** `SheetCloseButton` applied `.buttonStyle(.glass)` from iOS 26, but a bar already draws that material behind its buttons, so the two stacked into a rounded glass capsule with a second circle inside it around the glyph. The `.glass` style is gone: from iOS 26 the button is the bare glyph and the bar supplies the chrome. Below iOS 26 nothing supplies it, so the tinted circular fallback stays. `DismissToolbarItem` keeps rendering `SheetCloseButton`, so there is still exactly one X in the library. No API change.
+- Note for consumers: a snapshot taken through `.image(layout: .sizeThatFits)` cannot catch this class of bug. That host lays the toolbar out but never composites the bar's real material, so the doubled chrome is invisible there and shows only on a device or simulator.
+
 ## [0.3.1] - 2026-09-20
 
 ### Added

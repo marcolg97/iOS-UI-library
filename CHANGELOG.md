@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.1] - 2026-09-20
+
+### Added
+
+- **`isDisabled` on `SheetCloseButton` and `DismissToolbarItem`.** A sheet often needs its dismiss "X" unavailable while a save is in flight, and there was no way to express that. `SheetCloseButton` is a `View`, so `.disabled(_:)` worked on it, but `DismissToolbarItem` is `ToolbarContent` — not a `View` — so no view modifier can be applied to it from the outside at all. The only workaround left to a consumer was to pass a no-op closure while busy, which is the wrong fix twice over: the X still renders at full opacity so it looks tappable, and VoiceOver still announces an available button that then silently does nothing. Both types now take `isDisabled: Bool = false`, applied to the underlying `Button`, so the control dims and reports itself as disabled the way every other disabled control does. Additive with a default, so fully source compatible.
+
 ## [0.3.0] - 2026-09-20
 
 ### Changed

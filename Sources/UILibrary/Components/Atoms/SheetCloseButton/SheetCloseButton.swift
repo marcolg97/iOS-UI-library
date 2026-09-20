@@ -18,18 +18,24 @@ import SwiftUI
 ///
 /// For the common `.cancellationAction` placement, use `DismissToolbarItem` instead, which wraps
 /// this view in the `ToolbarItem` for you.
+///
+/// Pass `isDisabled` while a screen is mid-save rather than swapping in a no-op action: the button
+/// must *look* unavailable, and VoiceOver must announce it as such, not silently do nothing.
 public struct SheetCloseButton: View {
     private let style: SheetCloseButtonStyle
     private let accessibilityIdentifier: String?
+    private let isDisabled: Bool
     private let action: () -> Void
 
     public init(
         style: SheetCloseButtonStyle = SheetCloseButtonStyle(),
         accessibilityIdentifier: String? = nil,
+        isDisabled: Bool = false,
         action: @escaping () -> Void
     ) {
         self.style = style
         self.accessibilityIdentifier = accessibilityIdentifier
+        self.isDisabled = isDisabled
         self.action = action
     }
 
@@ -52,6 +58,7 @@ public struct SheetCloseButton: View {
                 .foregroundStyle(style.glyphColor)
                 .frame(width: style.diameter, height: style.diameter)
         }
+        .disabled(isDisabled)
         .accessibilityLabel(Text("Close", bundle: .module))
         .optionalAccessibilityIdentifier(accessibilityIdentifier)
     }

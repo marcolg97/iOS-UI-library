@@ -41,7 +41,22 @@ struct PublicAPISmokeTests {
         _ = DismissToolbarItem(dismiss: {})
     }
 
+    @Test func settingsGroup_lines_dividers_up_with_the_rows_text() {
+        let rowStyle = SettingsRowStyle(symbolWidth: 20, contentSpacing: 12, padding: EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
+        #expect(rowStyle.textInset == 42)
+        // A group whose rows have no chevron still lines its dividers up the same way.
+        #expect(SettingsRowStyle.plain.disclosureSystemName == nil)
+        #expect(SettingsRowStyle.default.disclosureSystemName == "chevron.right")
+    }
+
     @Test func molecules_and_organisms_construct() {
+        _ = SettingsRow(id: "row", systemImage: "leaf", title: .verbatimForTest("Allergies")) {}
+        _ = SettingsRow(
+            id: "row", systemImage: "bell", title: .verbatimForTest("Reminders"),
+            subtitle: .verbatimForTest("Before your events"), accessory: { Text(verbatim: "On") }, action: {}
+        )
+        _ = SettingsGroup(header: .verbatimForTest("Preferences"), rows: [])
+        _ = SettingsGroup(rows: [SettingsRow(id: "row", systemImage: "leaf", title: .verbatimForTest("Allergies")) {}])
         _ = Banner(title: .verbatimForTest("Title"), subtitle: .verbatimForTest("Subtitle"), style: .info())
         _ = Toast(icon: "info.circle", message: .verbatimForTest("Test"), style: .neutral)
         _ = EmptyStateView(title: .verbatimForTest("Empty"), description: .verbatimForTest("Nothing here"))

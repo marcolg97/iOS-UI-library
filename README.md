@@ -130,11 +130,23 @@ ComponentName/
 - `ListItemCard` — generic row card with leading/content/trailing slots (leading/trailing optional) and press feedback. Presets: `.default`, `.prominent`.
 - `LoadingStateView` — loading state with spinner or linear indicator and optional message; `expands` token for inline use. Presets: `.default()`, `.minimal()`, `.large()`, `.linear()`, `.custom(...)`.
 - `SelectableItemCard` — selectable row with customizable content and a configurable selection indicator.
+- `SettingsRow` — one line of a settings list: leading symbol, title, optional subtitle, optional accessory, chevron. Draws no surface of its own — it belongs inside `SettingsGroup`. Presets: `.default`, `.plain` (no chevron).
 - `Toast` / `.toast(isPresented:)` — transient message with icon; the modifier adds slide+fade presentation, drag-to-dismiss, and optional auto-dismiss. Presets: `.neutral`, `.success`, `.warning`, `.error`.
 - `WeekdayStatusStrip` — locale-aware seven-day status strip (weekday symbols and first weekday from `Calendar`); statuses and captions are caller-defined.
 
 ## Organisms
 
+- `SettingsGroup` — a titled group of `SettingsRow`s sharing one surface, with dividers between them (and none after the last). Takes `[SettingsRow]` rather than a view builder so it knows where the row boundaries are; an empty array renders nothing. Presets: `.default`, `.fullWidthDividers`. Example:
+  ```swift
+  SettingsGroup(header: "Preferences", rows: [
+      SettingsRow(id: "dietary", systemImage: "leaf", title: "Allergies") { open() },
+      SettingsRow(id: "alerts", systemImage: "bell", title: "Reminders") {
+          Text(verbatim: "On")
+      } action: {
+          ask()
+      },
+  ])
+  ```
 - `FormContainer` — top-level container for form sections (named to avoid colliding with `SwiftUI.Form`). Example:
   ```swift
   ScrollView {

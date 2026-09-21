@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0] - 2026-09-21
+
+### Added
+
+- **`SettingsRow` (Molecule) and `SettingsGroup` (Organism)** — the settings-list idiom, which the library had no answer for. `ListItemCard` gives every row its own card, which is right for a list of events and wrong for a screen of settings: a column of separate cards reads as an unsorted pile rather than as groups. `SettingsGroup` puts one surface behind several `SettingsRow`s and draws a divider *between* them, never under the last one.
+- `SettingsGroup` takes `[SettingsRow]` instead of a `@ViewBuilder`. SwiftUI offers no public way to take a view builder apart, so a builder-based group cannot tell where one row ends and the next begins — it would have to make every row draw its own trailing divider, and `Card` does not clip, so the last one would be drawn across the card's rounded bottom edge. Passing rows as values makes the boundaries explicit and lets the group keep the divider inset in step with `SettingsRowStyle.textInset`.
+- An empty `rows` array renders nothing, header included, so a caller can filter rows behind feature flags without also deciding whether the group still has anything left to show.
+
+### Changed
+
+- `PressScaleButtonStyle` moved out of `ListItemCard.swift` into `Utilities/`, so `SettingsRow` and `ListItemCard` share one press feedback instead of two copies drifting apart. Still internal — no public API change.
+
 ## [0.3.2] - 2026-09-20
 
 ### Fixed

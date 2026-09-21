@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.2] - 2026-09-21
+
+### Fixed
+
+- **`SettingsRow` broke apart at accessibility Dynamic Type sizes.** Title and accessory share one line, and at those sizes neither fits: both collapse into narrow hyphenated columns ("Pro-me-mo-ria" beside "Non attivi"). The accessory now drops below the title once `dynamicTypeSize.isAccessibilitySize` is true — the same adaptation `FormItem`'s `.adaptive` layout already makes. No API change.
+
 ## [0.4.1] - 2026-09-21
 
 ### Added

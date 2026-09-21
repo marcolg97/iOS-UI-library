@@ -31,6 +31,10 @@ import SwiftUI
 /// The row is a single button. `id` is applied as its accessibility identifier, and the accessory
 /// keeps whatever identifier the caller puts on it, so a UI test can read a count or a status
 /// without the row's own identifier getting in the way.
+///
+/// At accessibility Dynamic Type sizes the accessory drops below the title instead of sitting
+/// beside it, the same adaptation `FormItem`'s `.adaptive` layout makes: side by side, a title and
+/// an accessory of that size squeeze each other into two hyphenated columns.
 public struct SettingsRow: View, Identifiable {
     // MARK: - Private stored properties
     private let systemImage: String
@@ -39,6 +43,8 @@ public struct SettingsRow: View, Identifiable {
     private let accessory: AnyView
     private let style: SettingsRowStyle
     private let action: () -> Void
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// Identifies the row inside its group, and doubles as its accessibility identifier.
     public let id: String
@@ -90,25 +96,17 @@ public struct SettingsRow: View, Identifiable {
     // MARK: - Body
     public var body: some View {
         Button(action: action) {
-            HStack(spacing: style.contentSpacing) {
+            HStack(alignment: stacksAccessory ? .top : .center, spacing: style.contentSpacing) {
                 Image(systemName: systemImage)
                     .font(style.symbolFont)
                     .foregroundStyle(style.symbolColor)
                     .frame(width: style.symbolWidth)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(style.titleFont)
-                        .multilineTextAlignment(.leading)
-                        .foregroundStyle(style.titleColor)
-                    if let subtitle {
-                        Text(subtitle)
-                            .font(style.subtitleFont)
-                            .multilineTextAlignment(.leading)
-                            .foregroundStyle(style.subtitleColor)
-                    }
+                    text
+                    if stacksAccessory { accessory }
                 }
                 Spacer(minLength: 8)
-                accessory
+                if !stacksAccessory { accessory }
                 if let disclosureSystemName = style.disclosureSystemName {
                     Image(systemName: disclosureSystemName)
                         .font(style.disclosureFont)
@@ -120,6 +118,22 @@ public struct SettingsRow: View, Identifiable {
         }
         .buttonStyle(PressScaleButtonStyle(pressedScale: style.pressedScale))
         .accessibilityIdentifier(id)
+    }
+
+    private var stacksAccessory: Bool { dynamicTypeSize.isAccessibilitySize }
+
+    @ViewBuilder
+    private var text: some View {
+        Text(title)
+            .font(style.titleFont)
+            .multilineTextAlignment(.leading)
+            .foregroundStyle(style.titleColor)
+        if let subtitle {
+            Text(subtitle)
+                .font(style.subtitleFont)
+                .multilineTextAlignment(.leading)
+                .foregroundStyle(style.subtitleColor)
+        }
     }
 }
 

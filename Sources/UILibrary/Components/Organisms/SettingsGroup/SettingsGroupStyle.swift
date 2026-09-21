@@ -13,6 +13,8 @@ public struct SettingsGroupStyle: Equatable, Sendable {
     public let headerFont: Font
     public let headerColor: Color
     public let headerTextCase: Text.Case?
+    /// Letter spacing on the header, for a design whose small-caps headers are tracked out.
+    public let headerTracking: CGFloat
     /// Leading padding on the header, to sit it just off the card's edge rather than flush with it.
     public let headerInset: CGFloat
     /// Gap between the header and the card.
@@ -28,6 +30,7 @@ public struct SettingsGroupStyle: Equatable, Sendable {
         headerFont: Font = .caption,
         headerColor: Color = .secondary,
         headerTextCase: Text.Case? = .uppercase,
+        headerTracking: CGFloat = 0,
         headerInset: CGFloat = 4,
         headerSpacing: CGFloat = 8,
         dividerStyle: DividerStyle = .default,
@@ -37,6 +40,7 @@ public struct SettingsGroupStyle: Equatable, Sendable {
         self.headerFont = headerFont
         self.headerColor = headerColor
         self.headerTextCase = headerTextCase
+        self.headerTracking = headerTracking
         self.headerInset = headerInset
         self.headerSpacing = headerSpacing
         self.dividerStyle = dividerStyle

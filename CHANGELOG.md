@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.1] - 2026-09-21
+
+### Added
+
+- **`headerTracking` on `SettingsGroupStyle`.** A design system whose small-caps section headers are tracked out could not reproduce them through `SettingsGroup`: tracking is a view modifier, not part of `Font`, so `headerFont` alone cannot carry it, and the group's header would sit visibly tighter than every other section header on the same screen. Defaults to `0`, so nothing changes for anyone not setting it.
+
 ## [0.4.0] - 2026-09-21
 
 ### Added

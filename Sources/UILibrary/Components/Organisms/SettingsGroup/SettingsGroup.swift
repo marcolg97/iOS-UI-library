@@ -62,6 +62,7 @@ public struct SettingsGroup: View {
                 if let header {
                     Text(header)
                         .font(style.headerFont)
+                        .tracking(style.headerTracking)
                         .textCase(style.headerTextCase)
                         .foregroundStyle(style.headerColor)
                         .padding(.horizontal, style.headerInset)

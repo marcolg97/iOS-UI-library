@@ -13,7 +13,7 @@ import SwiftUI
 /// .toolbar { ToolbarItem(placement: .topBarTrailing) { SheetCloseButton { dismiss() } } }
 /// ```
 ///
-/// For the common `.cancellationAction` placement, use `DismissToolbarItem` instead, which wraps
+/// In a toolbar, use `DismissToolbarItem` instead (the system Close button, trailing), which wraps
 /// this view in the `ToolbarItem` for you.
 ///
 /// Pass `isDisabled` while a screen is mid-save rather than swapping in a no-op action: the button

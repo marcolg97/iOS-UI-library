@@ -7,11 +7,16 @@
 
 import SwiftUI
 
-/// A `.cancellationAction` toolbar item that dismisses the current screen with `SheetCloseButton`.
+/// The toolbar item that closes the current modal screen: the system Close button — the standard
+/// "xmark", with its Liquid Glass treatment and VoiceOver label — on the **trailing** edge of the
+/// navigation bar on iOS.
 ///
-/// This is the "X" that belongs in a `.toolbar { }` builder, where a bare `SheetCloseButton` (a
-/// `View`) doesn't fit — `DismissToolbarItem` supplies the `ToolbarItem` and placement around it.
-/// See `SheetCloseButton` for the styling and fallback behavior.
+/// Apple's HIG (Toolbars › Navigation): "Use the standard Back and Close buttons… prefer the
+/// standard symbols for each, and don't use a text label that says Back or Close." On iOS 26 and
+/// later that is `Button(role: .close)`; earlier systems fall back to `SheetCloseButton` (styled by
+/// `style`). The item sits in `.topBarTrailing`, where the system's own sheets put it, so a screen
+/// whose primary action lives at the bottom never shows a leading "Cancel" — pair it with a
+/// bottom action, not with a bar Done button. On macOS it stays a `.cancellationAction`.
 ///
 /// ```swift
 /// .toolbar {
@@ -41,14 +46,28 @@ public struct DismissToolbarItem: ToolbarContent {
     }
 
     public var body: some ToolbarContent {
-        ToolbarItem(placement: .cancellationAction) {
-            SheetCloseButton(
-                style: style,
-                accessibilityIdentifier: accessibilityIdentifier,
-                isDisabled: isDisabled
-            ) {
-                dismiss()
+        ToolbarItem(placement: Self.placement) {
+            if #available(iOS 26, macOS 26, *) {
+                Button(role: .close, action: dismiss)
+                    .disabled(isDisabled)
+                    .if(accessibilityIdentifier != nil) { $0.accessibilityIdentifier(accessibilityIdentifier ?? "") }
+            } else {
+                SheetCloseButton(
+                    style: style,
+                    accessibilityIdentifier: accessibilityIdentifier,
+                    isDisabled: isDisabled
+                ) {
+                    dismiss()
+                }
             }
         }
+    }
+
+    private static var placement: ToolbarItemPlacement {
+        #if os(iOS)
+        .topBarTrailing
+        #else
+        .cancellationAction
+        #endif
     }
 }

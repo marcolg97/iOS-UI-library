@@ -1,5 +1,22 @@
 # Journal
 
+## 2026-09-25 — `DismissToolbarItem` moves to the trailing system Close button
+
+Driven by PartyPlanner's owner: "no Cancel-type buttons, every modal closes with the X on the
+right in the bar." Every one of the app's 15 modal screens used `DismissToolbarItem`, so the fix
+belongs here, not in an app-side lookalike (an app-only `CloseToolbarItem` was written first and
+thrown away once it was clear the library is ours to change).
+
+- **Placement.** `.cancellationAction` resolves to the leading edge on iOS — the slot HIG reserves
+  for a text Cancel paired with a trailing Done. The consuming apps put their primary action in a
+  bottom bar, so there is no Done to pair with; the lone X goes trailing (`.topBarTrailing`), as in
+  the system's own sheets (Maps, Weather, Find My). macOS keeps `.cancellationAction`.
+- **Glyph.** iOS 26 has a standard Close button: `Button(role: .close)`. It gets the platform's
+  glass treatment, size and localized VoiceOver label for free, which the custom disc imitated.
+  `SheetCloseButton` stays as the pre-26 fallback and for non-toolbar placements.
+- API unchanged; accessibility identifiers are applied to the system button, so XCUITest page
+  objects keep working. Minor version bump because every consumer's screens change visually.
+
 ## 2026-09-15 — Per-item accessibility identifiers on `SegmentedControlAtom`
 
 Driven by a consuming app (PartyPlanner) rebuild that hit the same blocker in two places: the

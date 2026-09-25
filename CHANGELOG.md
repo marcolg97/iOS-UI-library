@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.0] - 2026-09-25
+
+### Changed
+
+- **`DismissToolbarItem` is the system Close button, on the trailing edge.** On iOS 26+ it renders `Button(role: .close)` — the standard Liquid Glass xmark with its own VoiceOver label — in `.topBarTrailing`; before iOS 26 it falls back to `SheetCloseButton` (so `style` only matters there). It used to be a custom disc in `.cancellationAction`, which puts it on the leading edge where a text "Cancel" normally sits. HIG, Toolbars: use the standard Close button and symbol, never a "Close"/"Cancel" label. Same initializer, same `accessibilityIdentifier`/`isDisabled`; the only visible change is the glyph's look and side. macOS keeps `.cancellationAction`.
+
 ## [0.4.2] - 2026-09-21
 
 ### Fixed
